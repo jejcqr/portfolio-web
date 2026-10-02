@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jean-Emmanuel Jacquier · Portfolio</title>
+  <meta name="description" content="Projets de Jean-Emmanuel Jacquier, étudiant en informatique à Epitech Lyon, à la recherche d'une alternance.">
+  <link rel="stylesheet" href="css/style.css">
+  <script>
+    // Appliqué avant l'affichage pour éviter un flash de thème clair.
+    try {
+      var t = localStorage.getItem("theme");
+      if (t) document.documentElement.dataset.theme = t;
+    } catch (e) {}
+  </script>
+</head>
+<body>
+  <header class="entete">
+    <nav class="nav conteneur">
+      <a class="logo" href="#accueil">JEJ</a>
+      <div class="nav-liens">
+        <a href="#projets">Projets</a>
+        <a href="#competences">Compétences</a>
+        <a href="#contact">Contact</a>
+        <button class="bouton-theme" type="button" aria-label="Changer de thème">☾</button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section id="accueil" class="accueil conteneur">
+      <p class="surtitre">Étudiant en informatique · Epitech Lyon</p>
+      <h1>Jean-Emmanuel Jacquier</h1>
+      <p class="intro">
+        Je recherche une <strong>alternance de 12 mois</strong> en développement
+        (3 semaines en entreprise, 1 semaine à l'école).
+        Voici des projets qui montrent concrètement ce que je sais faire,
+        du back-end à l'infrastructure en passant par l'IA.
+      </p>
+      <div class="chiffres">
+        <div><span class="compteur" data-cible="0" id="nb-projets">0</span> projets</div>
+        <div><span class="compteur" data-cible="0" id="nb-competences">0</span> technologies</div>
+      </div>
+    </section>
+
+    <section id="projets" class="conteneur">
+      <h2>Projets</h2>
+      <div class="outils">
+        <input id="recherche" type="search" placeholder="Rechercher un projet ou une technologie…" aria-label="Rechercher">
+        <div class="categories" role="group" aria-label="Filtrer par catégorie"></div>
+      </div>
+      <p class="filtre-actif" hidden>Filtré par <strong></strong> · <a href="#" class="effacer">tout afficher</a></p>
+      <div class="grille" id="grille"></div>
+      <p class="vide" hidden>Aucun projet ne correspond à cette recherche.</p>
+    </section>
+
+    <section id="competences" class="conteneur">
+      <h2>Compétences</h2>
+      <p class="aide">Cliquez sur une compétence pour voir les projets qui l'utilisent.</p>
+      <div class="nuage" id="nuage"></div>
+    </section>
+
+    <section id="contact" class="conteneur contact">
+      <h2>Contact</h2>
+      <p>Disponible pour une alternance à Lyon et ses environs.</p>
+      <div class="contact-liens">
+        <a class="bouton" href="mailto:je.jcqr@gmail.com">je.jcqr@gmail.com</a>
+        <a class="bouton secondaire" href="https://github.com/jejcqr">GitHub</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pied conteneur">
+    Site statique en HTML, CSS et jQuery · <a href="https://github.com/jejcqr/portfolio-web">code source</a>
+  </footer>
+
+  <div class="modale" id="modale" role="dialog" aria-modal="true" aria-labelledby="modale-titre" hidden>
+    <div class="modale-fond"></div>
+    <div class="modale-contenu">
+      <button class="modale-fermer" type="button" aria-label="Fermer">×</button>
+      <h3 id="modale-titre"></h3>
+      <p class="modale-details"></p>
+      <ul class="etiquettes modale-competences"></ul>
+      <a class="bouton modale-lien" target="_blank" rel="noopener">Voir le code sur GitHub</a>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+          integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  <script src="js/filtres.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

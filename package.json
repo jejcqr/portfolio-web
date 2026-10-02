@@ -1,0 +1,13 @@
+{
+  "name": "portfolio-web",
+  "private": true,
+  "scripts": {
+    "start": "npx --yes http-server -p 8080 -c-1 .",
+    "test": "node --test tests/filtres.test.js",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "jquery": "3.7.1"
+  }
+}

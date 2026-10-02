@@ -1,0 +1,110 @@
+[
+  {
+    "id": "api-django-mariadb",
+    "titre": "API Bibliothèque",
+    "resume": "API REST de gestion d'auteurs, de livres et d'emprunts, avec verrouillage contre les emprunts simultanés.",
+    "details": "Django REST Framework avec recherche, filtres, pagination et permissions. Chaque utilisateur ne voit que ses emprunts. Conteneurisée avec Docker et testée en CI contre un vrai serveur MariaDB.",
+    "competences": ["Python", "Django", "MariaDB", "SQL", "Docker"],
+    "categorie": "back-end",
+    "depot": "https://github.com/jejcqr/api-django-mariadb"
+  },
+  {
+    "id": "go-uptime",
+    "titre": "go-uptime",
+    "resume": "Surveillance de sites web avec tableau de bord, historique de latence et disponibilité sur 24 h.",
+    "details": "Une goroutine par site surveillé, arrêt propre sur signal, stockage MongoDB avec index TTL et pipeline d'agrégation. Image Docker distroless d'environ 10 Mo.",
+    "competences": ["Go", "MongoDB", "Docker", "HTML", "JavaScript"],
+    "categorie": "back-end",
+    "depot": "https://github.com/jejcqr/go-uptime"
+  },
+  {
+    "id": "mini-shell-c",
+    "titre": "mysh, mini-shell Unix",
+    "resume": "Interpréteur de commandes en C : pipes, redirections, opérateurs && et ||, variables et builtins.",
+    "details": "Lexer et parser écrits à la main, fork/execvp/pipe/dup2, gestion des signaux. 46 cas de test comparés automatiquement à /bin/sh, zéro fuite mémoire sous valgrind.",
+    "competences": ["C", "Linux"],
+    "categorie": "système",
+    "depot": "https://github.com/jejcqr/mini-shell-c"
+  },
+  {
+    "id": "analyse-donnees-r",
+    "titre": "Émissions de CO₂ en R",
+    "resume": "Analyse reproductible des émissions de CO₂ de la France et du monde depuis 1950.",
+    "details": "Nettoyage avec dplyr, contrôles de qualité, six graphiques ggplot2 et un rapport R Markdown où chaque chiffre est calculé. Généré automatiquement par GitHub Actions.",
+    "competences": ["R", "Data"],
+    "categorie": "data",
+    "depot": "https://github.com/jejcqr/analyse-donnees-r"
+  },
+  {
+    "id": "homelab-infra",
+    "titre": "Infra homelab",
+    "resume": "Stack auto-hébergée derrière Caddy (HTTPS automatique) et Nginx, avec durcissement du serveur Debian.",
+    "details": "Docker Compose avec réseau interne isolé, limitation de débit et micro-cache Nginx, scripts Bash idempotents (SSH, UFW, fail2ban) et sauvegardes planifiées par systemd. Testée de bout en bout en CI.",
+    "competences": ["Docker", "Nginx", "Caddy", "Linux"],
+    "categorie": "infra",
+    "depot": "https://github.com/jejcqr/homelab-infra"
+  },
+  {
+    "id": "mcp-textes-sacres",
+    "titre": "Serveur MCP textes sacrés",
+    "resume": "Permet à un assistant IA de lire et rechercher dans la Bible et le Coran en citant des références exactes.",
+    "details": "Outils, ressource et prompt MCP avec le SDK officiel. Requêtes SQL paramétrées, analyse souple des références (« Jn 3:16 »), 48 tests dont un client MCP réel, CI sur SQLite et MariaDB.",
+    "competences": ["Python", "MCP", "SQL", "MariaDB"],
+    "categorie": "ia",
+    "depot": "https://github.com/jejcqr/mcp-textes-sacres"
+  },
+  {
+    "id": "lumen",
+    "titre": "Lumen",
+    "resume": "Chatbot de jeu d'épreuves : un personnage piloté par un LLM réagit aux réussites et aux échecs du joueur.",
+    "details": "Serveur Node.js/Express qui construit les prompts et appelle l'API Groq, avec limitation de débit. Client web en HTML, CSS et JavaScript.",
+    "competences": ["JavaScript", "Node.js", "Express", "API Groq", "HTML", "CSS"],
+    "categorie": "ia",
+    "depot": "https://github.com/jejcqr/lumen-improved"
+  },
+  {
+    "id": "rag",
+    "titre": "RAG examens",
+    "resume": "Assistant qui répond aux questions sur les examens à partir du règlement, en citant ses sources.",
+    "details": "Découpage des documents, embeddings et index FAISS, génération avec un modèle local Ollama. Comparaison des modes RAG et sans contexte, seuil de pertinence.",
+    "competences": ["Python", "LLM"],
+    "categorie": "ia",
+    "depot": "https://github.com/jejcqr/RAG-improved"
+  },
+  {
+    "id": "cocovoit",
+    "titre": "Cocovoit",
+    "resume": "Site de covoiturage pour les membres de l'université : trajets, réservations, messagerie.",
+    "details": "Application PHP en MVC sur MySQL, avec une API JSON consommée par l'application mobile.",
+    "competences": ["PHP", "MySQL", "SQL", "JavaScript", "HTML", "CSS"],
+    "categorie": "web",
+    "depot": "https://github.com/jejcqr/Cocovoit"
+  },
+  {
+    "id": "cocovoit-mobile",
+    "titre": "Cocovoit mobile",
+    "resume": "Application Flutter du covoiturage : recherche, réservation, proposition de trajets et messagerie.",
+    "details": "Client Flutter connecté à l'API JSON du backend PHP de Cocovoit.",
+    "competences": ["Flutter"],
+    "categorie": "mobile",
+    "depot": "https://github.com/jejcqr/Cocovoit-mobile"
+  },
+  {
+    "id": "yeshuabot",
+    "titre": "YeshuaBot",
+    "resume": "Bot Discord en français : lecture de la Bible, recherche, verset du jour et calendrier liturgique.",
+    "details": "Python avec py-cord, base MySQL de la Bible Louis Segond 1910, tâches planifiées et pagination interactive.",
+    "competences": ["Python", "MySQL"],
+    "categorie": "bots",
+    "depot": "https://github.com/jejcqr/YeshuaBot"
+  },
+  {
+    "id": "alhudabot",
+    "titre": "AlHudaBot",
+    "resume": "Bot Discord en français : Coran en arabe et en français, hadiths et verset du jour.",
+    "details": "Python avec py-cord, base MySQL, appel d'une API de hadiths et tâches planifiées par serveur Discord.",
+    "competences": ["Python", "MySQL"],
+    "categorie": "bots",
+    "depot": "https://github.com/jejcqr/AlHudaBot"
+  }
+]

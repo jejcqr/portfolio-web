@@ -45,6 +45,10 @@ python3 -m http.server 8080      # ou : npm start
 # puis ouvrir http://localhost:8080
 ```
 
+## Documentation
+
+[`docs/EXPLICATIONS.md`](docs/EXPLICATIONS.md) ([PDF](docs/EXPLICATIONS.pdf)) explique l'architecture du projet, le code pas à pas et ce qu'on apprend en le réalisant soi-même. Le PDF est régénéré automatiquement par la CI à chaque modification du Markdown.
+
 ## Tests
 
 ```bash

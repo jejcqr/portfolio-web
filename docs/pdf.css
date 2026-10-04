@@ -1,0 +1,83 @@
+/* Mise en page du PDF généré par generer-pdf.sh (WeasyPrint). */
+@page {
+    size: A4;
+    margin: 22mm 20mm 22mm 20mm;
+    @bottom-right {
+        content: counter(page) " / " counter(pages);
+        font: 9pt "DejaVu Sans", sans-serif;
+        color: #777;
+    }
+}
+
+body {
+    font: 10.5pt/1.5 "DejaVu Sans", sans-serif;
+    color: #222;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+}
+
+header#title-block-header {
+    border-bottom: 3px solid #2b5797;
+    margin-bottom: 1.5em;
+    padding-bottom: 0.6em;
+}
+header .title { font-size: 22pt; margin: 0; color: #2b5797; }
+header .subtitle { font-size: 12pt; margin: 0.3em 0 0; color: #555; font-weight: normal; }
+header .author, header .date { margin: 0.2em 0 0; color: #777; font-size: 9.5pt; }
+
+nav#TOC {
+    background: #f4f6fa;
+    border-left: 4px solid #2b5797;
+    padding: 0.6em 1.2em;
+    margin-bottom: 2em;
+    page-break-after: always;
+}
+nav#TOC::before { content: "Sommaire"; font-weight: bold; color: #2b5797; }
+nav#TOC ul { list-style: none; padding-left: 1em; margin: 0.3em 0; }
+nav#TOC > ul { padding-left: 0; }
+nav#TOC a { color: #222; text-decoration: none; }
+
+h1, h2, h3 { color: #2b5797; line-height: 1.25; page-break-after: avoid; }
+h1 { font-size: 17pt; border-bottom: 1px solid #c8d3e6; padding-bottom: 0.2em; margin-top: 1.6em; }
+h2 { font-size: 13.5pt; margin-top: 1.4em; }
+h3 { font-size: 11.5pt; margin-top: 1.2em; }
+
+a { color: #2b5797; }
+
+code {
+    font-family: "DejaVu Sans Mono", monospace;
+    font-size: 9pt;
+    background: #f2f2f2;
+    padding: 0.05em 0.25em;
+    border-radius: 3px;
+}
+pre {
+    background: #f7f7f7;
+    border: 1px solid #e1e1e1;
+    border-radius: 4px;
+    padding: 0.7em 0.9em;
+    font-size: 8.5pt;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    page-break-inside: avoid;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+
+table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 9.5pt; page-break-inside: avoid; }
+th, td { border: 1px solid #d5d9e0; padding: 0.35em 0.6em; text-align: left; vertical-align: top; }
+th { background: #eef2f8; }
+
+blockquote {
+    margin: 1em 0;
+    padding: 0.5em 1em;
+    background: #fff8e6;
+    border-left: 4px solid #e0a800;
+    color: #444;
+}
+blockquote p { margin: 0.3em 0; }
+
+img { max-width: 100%; }
+/* Annule le retrait négatif que pandoc applique aux lignes de code. */
+pre > code.sourceCode > span { display: inline; text-indent: 0; padding-left: 0; }
+pre > code.sourceCode { white-space: pre-wrap; }

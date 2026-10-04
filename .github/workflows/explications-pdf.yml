@@ -1,0 +1,42 @@
+name: PDF des explications
+
+# Régénère docs/EXPLICATIONS.pdf dès que le Markdown (ou sa mise en page) change,
+# puis le commite sur la branche.
+on:
+  push:
+    branches: [main]
+    paths:
+      - docs/EXPLICATIONS.md
+      - docs/pdf.css
+      - docs/generer-pdf.sh
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  pdf:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Installer pandoc et WeasyPrint
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc fonts-dejavu
+          pip install weasyprint
+
+      - name: Générer le PDF
+        run: bash docs/generer-pdf.sh
+
+      - name: Commiter le PDF s'il a changé
+        run: |
+          if git diff --quiet -- docs/EXPLICATIONS.pdf && git ls-files --error-unmatch docs/EXPLICATIONS.pdf >/dev/null 2>&1; then
+            echo "PDF inchangé"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add docs/EXPLICATIONS.pdf
+          git commit -m "Régénère le PDF des explications"
+          git push

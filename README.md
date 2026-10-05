@@ -13,11 +13,11 @@ déployé automatiquement sur GitHub Pages.
 
 | Compétence | Où la voir |
 |---|---|
-| HTML sémantique et accessible | `header`/`main`/`section`, modale `role="dialog"`, cartes utilisables au clavier, `aria-pressed` — `index.html` |
-| CSS moderne | variables, thème clair/sombre (préférence système + choix mémorisé), grille responsive, `color-mix`, `prefers-reduced-motion` — `css/style.css` |
-| jQuery | chargement AJAX (`$.getJSON`), délégation d'événements, animations, compteurs animés, défilement doux — `js/app.js` |
+| HTML sémantique et accessible | `header`/`main`/`section`, modale `role="dialog"` avec piège à focus et arrière-plan `inert`, cartes utilisables au clavier, `aria-pressed` — `index.html`, `js/app.js` |
+| CSS moderne | variables, thème clair/sombre (préférence système + choix mémorisé), grille responsive, `color-mix`, défilement doux (`scroll-behavior`), `prefers-reduced-motion` — `css/style.css` |
+| jQuery | chargement AJAX (`$.getJSON`), délégation d'événements, animations et compteurs animés, coupés par `prefers-reduced-motion` — `js/app.js` |
 | JavaScript | logique de filtrage séparée du DOM, recherche insensible aux accents — `js/filtres.js` |
-| Tests | tests unitaires `node --test` + 14 tests Playwright sur ordinateur et mobile |
+| Tests | 9 tests unitaires `node --test` + 34 tests Playwright sur ordinateur et mobile |
 | CI/CD | GitHub Actions : tests puis déploiement sur GitHub Pages |
 
 ## Fonctionnement
@@ -41,9 +41,12 @@ les compteurs sont calculés à partir de ce fichier.
 ## Lancer en local
 
 ```bash
-python3 -m http.server 8080      # ou : npm start
-# puis ouvrir http://localhost:8080
+npm start      # lance python3 -m http.server 8080 --bind 127.0.0.1
+# puis ouvrir http://127.0.0.1:8080
 ```
+
+`npm start` ne télécharge rien : il lance le serveur intégré à Python 3, le même
+que celui que démarrent les tests Playwright.
 
 ## Documentation
 
@@ -55,7 +58,7 @@ python3 -m http.server 8080      # ou : npm start
 npm install
 npm test                          # filtres et validité de projets.json
 npx playwright install chromium
-npm run test:e2e                  # recherche, filtres, modale, thème, mobile
+npm run test:e2e                  # recherche, filtres, modale, clavier, thème, mobile
 ```
 
 ## Mise en ligne

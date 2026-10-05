@@ -2,7 +2,7 @@
   "name": "portfolio-web",
   "private": true,
   "scripts": {
-    "start": "npx --yes http-server -p 8080 -c-1 .",
+    "start": "python3 -m http.server 8080 --bind 127.0.0.1",
     "test": "node --test tests/filtres.test.js",
     "test:e2e": "playwright test"
   },

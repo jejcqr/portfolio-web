@@ -52,3 +52,9 @@ test("compterCompetences trie par fréquence", () => {
 test("categories garde l'ordre d'apparition sans doublon", () => {
   assert.deepEqual(categories([{ categorie: "x" }, { categorie: "y" }, { categorie: "x" }]), ["x", "y"]);
 });
+
+test("une liste de projets vide donne des résultats vides", () => {
+  assert.deepEqual(filtrerProjets([], { recherche: "go" }), []);
+  assert.deepEqual(compterCompetences([]), []);
+  assert.deepEqual(categories([]), []);
+});

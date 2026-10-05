@@ -22,7 +22,7 @@
         <a href="#projets">Projets</a>
         <a href="#competences">Compétences</a>
         <a href="#contact">Contact</a>
-        <button class="bouton-theme" type="button" aria-label="Changer de thème">☾</button>
+        <button class="bouton-theme" type="button" aria-label="Thème sombre"></button>
       </div>
     </nav>
   </header>
@@ -38,8 +38,8 @@
         du back-end à l'infrastructure en passant par l'IA.
       </p>
       <div class="chiffres">
-        <div><span class="compteur" data-cible="0" id="nb-projets">0</span> projets</div>
-        <div><span class="compteur" data-cible="0" id="nb-competences">0</span> technologies</div>
+        <div><span class="compteur" id="nb-projets">0</span> projets</div>
+        <div><span class="compteur" id="nb-competences">0</span> technologies</div>
       </div>
     </section>
 
@@ -49,9 +49,9 @@
         <input id="recherche" type="search" placeholder="Rechercher un projet ou une technologie…" aria-label="Rechercher">
         <div class="categories" role="group" aria-label="Filtrer par catégorie"></div>
       </div>
-      <p class="filtre-actif" hidden>Filtré par <strong></strong> · <a href="#" class="effacer">tout afficher</a></p>
+      <p class="filtre-actif" tabindex="-1" hidden>Filtré par <strong></strong> · <a href="#" class="effacer">tout afficher</a></p>
       <div class="grille" id="grille"></div>
-      <p class="vide" hidden>Aucun projet ne correspond à cette recherche.</p>
+      <p class="vide" hidden></p>
     </section>
 
     <section id="competences" class="conteneur">

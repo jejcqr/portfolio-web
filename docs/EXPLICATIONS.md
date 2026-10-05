@@ -26,11 +26,11 @@ modification du code.
 
 ## Les compétences qu'il montre
 
-- **HTML** sémantique et accessible : modale `role="dialog"`, `aria-*` (`index.html`) ;
+- **HTML** sémantique et accessible : modale `role="dialog"` avec piège à focus, `inert`, `aria-*` (`index.html`) ;
 - **CSS** moderne : variables, thème clair/sombre, grille responsive (`css/style.css`) ;
-- **jQuery** : AJAX, délégation d'événements, animations (`js/app.js`) ;
+- **jQuery** : AJAX, délégation d'événements, animations coupées par `prefers-reduced-motion` (`js/app.js`) ;
 - **JavaScript** : fonctions pures, normalisation Unicode (`js/filtres.js`) ;
-- **tests** : 8 tests `node --test` et 14 tests Playwright (`tests/`) ;
+- **tests** : 9 tests `node --test` et 34 tests Playwright (`tests/`) ;
 - **CI/CD** : GitHub Actions et déploiement GitHub Pages (`.github/workflows/ci.yml`).
 
 ## Un exemple concret
@@ -62,15 +62,16 @@ Le détail se trouve dans le `README.md`. Le site doit être servi par HTTP (la
 section 5.4 explique pourquoi un double-clic sur `index.html` ne suffit pas) :
 
 ```bash
-python3 -m http.server 8080      # ou : npm start, puis ouvrir http://localhost:8080
+npm start                        # python3 -m http.server, puis ouvrir http://127.0.0.1:8080
 npm install
-npm test                         # 8 tests unitaires (node --test), ~0,1 s
+npm test                         # 9 tests unitaires (node --test), ~0,1 s
 npx playwright install chromium
-npm run test:e2e                 # 14 tests de bout en bout (Playwright)
+npm run test:e2e                 # 34 tests de bout en bout (Playwright)
 ```
 
-Les 7 scénarios de `tests/portfolio.spec.js` sont joués deux fois, sur un écran
-d'ordinateur et sur un téléphone simulé (Pixel 7), d'où 14 tests. Si un Chromium est
+`npm start` ne fait que lancer le serveur intégré à Python 3 : rien n'est téléchargé.
+Les 17 scénarios de `tests/portfolio.spec.js` sont joués deux fois, sur un écran
+d'ordinateur et sur un téléphone simulé (Pixel 7), d'où 34 tests. Si un Chromium est
 déjà installé, la variable `CHROMIUM_PATH` permet de l'utiliser (voir
 `playwright.config.js`). À chaque `push` sur `main`, `.github/workflows/ci.yml` relance
 tous les tests puis, s'ils passent, publie le site sur GitHub Pages.
@@ -115,7 +116,7 @@ est redessinée à partir de zéro.
 | `data/projets.json` | Les 12 projets (titre, résumé, détails, compétences, catégorie, dépôt) |
 | `tests/filtres.test.js` | Tests `node --test` des filtres et de la validité du JSON |
 | `tests/portfolio.spec.js` | Tests Playwright : recherche, filtres, modale, thème, mobile |
-| `playwright.config.js` | Serveur Python de test, profils « ordinateur » et « mobile » |
+| `playwright.config.js` | Serveur de test (`npm start`), profils « ordinateur » et « mobile » |
 | `.github/workflows/ci.yml` | Tests puis déploiement GitHub Pages |
 | `docs/`, `explications-pdf.yml` | Ce document, son script PDF et le workflow qui le régénère |
 
@@ -256,9 +257,13 @@ function afficherProjets() {
       .append($("<h3>").text(p.titre))
       .append($("<p>").text(p.resume))
       .append($("<ul class='etiquettes'>").append(etiquettes(p.competences)));
-    $carte.hide().appendTo($grille).delay(i * 40).fadeIn(200);
+    $carte.appendTo($grille);
+    // Fondu en cascade, sauf animations coupées : delay() ne tient pas compte de $.fx.off.
+    if (!$.fx.off) $carte.hide().delay(i * 40).fadeIn(200);
   });
-  $(".vide").prop("hidden", visibles.length > 0);
+  $(".vide").prop("hidden", visibles.length > 0).text(projets.length
+    ? "Aucun projet ne correspond à cette recherche."
+    : "Aucun projet à afficher pour le moment.");
   $(".filtre-actif").prop("hidden", !criteres.competence)
     .find("strong").text(criteres.competence || "");
 }
@@ -270,17 +275,19 @@ function afficherProjets() {
 - Tous les textes passent par `.text(...)`, jamais par `.html(...)` (voir 5.7).
 - `LIBELLES[p.categorie] || p.categorie` affiche « Bots Discord » pour `bots`, ou la
   valeur brute si aucun libellé n'est prévu.
-- `.hide().appendTo($grille).delay(i * 40).fadeIn(200)` insère chaque carte invisible,
-  puis la fait apparaître en fondu avec 40 ms de décalage par rang : effet de cascade.
-- Les deux dernières instructions affichent « Aucun projet ne correspond… » seulement si
-  la liste est vide, et le bandeau « Filtré par … » seulement si une compétence est
-  choisie.
+- `.hide().delay(i * 40).fadeIn(200)` cache chaque carte insérée, puis la fait
+  apparaître en fondu avec 40 ms de décalage par rang : effet de cascade. Quand les
+  animations sont coupées (`$.fx.off`, voir 5.11), la carte reste simplement visible.
+- Les deux dernières instructions affichent un message seulement si la liste est vide
+  (« Aucun projet ne correspond… », ou « Aucun projet à afficher… » si
+  `data/projets.json` lui-même est vide), et le bandeau « Filtré par … » seulement si
+  une compétence est choisie.
 
 ## 4.6 Les filtres par catégorie et par compétence
 
 Les boutons de catégorie sont créés par `afficherCategories` à partir de
 `Filtres.categories(projets)` (catégories dans l'ordre d'apparition, sans doublon). Un
-clic met à jour `criteres.categorie`, passe `aria-pressed` à `true` sur le bouton choisi
+clic met à jour `criteres.categorie` (lu avec `.attr("data-categorie")`, voir 5.1), passe `aria-pressed` à `true` sur le bouton choisi
 (ce qui sert aux lecteurs d'écran et au CSS `.filtre[aria-pressed="true"]`), puis appelle
 `afficherProjets()`.
 
@@ -292,19 +299,29 @@ function filtrerParCompetence(nom) {
   criteres.competence = nom;
   fermerModale();
   afficherProjets();
-  $("html, body").animate({ scrollTop: $("#projets").offset().top - 70 }, 400);
+  document.getElementById("projets").scrollIntoView();
+  $(".filtre-actif")[0].focus({ preventScroll: true });
 }
 
 $(document).on("click", ".etiquette, .mot", function (e) {
   e.stopPropagation();
-  filtrerParCompetence($(this).data("competence"));
+  filtrerParCompetence($(this).attr("data-competence"));
 });
 ```
 
 `e.stopPropagation()` empêche le clic de remonter jusqu'à la carte qui contient
 l'étiquette ; sans lui, cliquer sur « Docker » dans une carte ouvrirait aussi la fiche du
-projet. `fermerModale()` ne fait rien si la modale est déjà fermée. Le défilement animé
-ramène la section « Projets » en haut de l'écran, le `- 70` compensant l'en-tête collant.
+projet. `fermerModale()` ne fait rien si la modale est déjà fermée. `scrollIntoView()`
+ramène la section « Projets » en haut de l'écran : le défilement est doux grâce à
+`scroll-behavior: smooth` sur `<html>`, et `scroll-padding-top: 70px` le fait s'arrêter
+sous l'en-tête collant (voir 5.11).
+
+Le focus suit le défilement : il va sur le bandeau « Filtré par … », qui porte
+`tabindex="-1"` dans `index.html` (focalisable par le code, mais pas avec Tab). Un
+lecteur d'écran peut alors lire le filtre appliqué, et le Tab suivant atteint « tout
+afficher », puis les cartes. `preventScroll: true` évite que `focus()` ne lance son
+propre défilement vers le bandeau. Ce n'est pas un détail : voir 5.6. Symétriquement, « tout afficher » cache
+le bandeau qui le contient, donc son gestionnaire renvoie le focus au champ de recherche.
 
 ## 4.7 Le nuage de compétences et les compteurs
 
@@ -312,6 +329,12 @@ ramène la section « Projets » en haut de l'écran, le `- 70` compensant l'en-
 renvoie de la plus fréquente à la moins fréquente (départage alphabétique avec
 `localeCompare(..., "fr")`), donc `stats[0].nombre` est le maximum, et la taille de police
 varie de 0,9 rem à 1,8 rem avec `0.9 + 0.9 * s.nombre / max`.
+
+Si `data/projets.json` est un tableau vide, `stats[0]` n'existe pas, et lire
+`stats[0].nombre` lèverait une `TypeError` qui arrêterait tout le rendu (compteurs
+compris). La fonction teste donc `stats.length` et remplace la phrase d'aide par
+« Aucune compétence à afficher pour le moment. » ; un test Playwright sert un JSON vide
+pour le vérifier.
 
 Les compteurs « 12 projets » et « N technologies » utilisent une astuce jQuery dans
 `animerCompteur` : `$({ valeur: 0 }).animate({ valeur: cible }, { duration: 900, ... })`.
@@ -330,7 +353,8 @@ function ouvrirModale(id) {
   $modale.find(".modale-details").text(p.details);
   $modale.find(".modale-competences").empty().append(etiquettes(p.competences));
   $modale.find(".modale-lien").attr("href", p.depot);
-  $modale.prop("hidden", false).hide().fadeIn(150);
+  $modale.stop(true, true).prop("hidden", false).hide().fadeIn(150);
+  $arrierePlan.prop("inert", true);
   $modale.find(".modale-fermer").trigger("focus");
   $("body").addClass("sans-defilement");
 }
@@ -339,17 +363,30 @@ function ouvrirModale(id) {
 `dernierFocus` mémorise l'élément qui avait le focus (la carte) pour le lui rendre à la
 fermeture. La modale existe déjà dans `index.html` : on remplit seulement ses zones.
 `.prop("hidden", false).hide().fadeIn(150)` retire l'attribut `hidden`, cache aussitôt
-avec jQuery, puis fait apparaître en fondu. Le focus va sur le bouton « Fermer », et la
-classe `sans-defilement` (`overflow: hidden`) bloque le défilement de l'arrière-plan. La
+avec jQuery, puis fait apparaître en fondu ; le `.stop(true, true)` qui précède est
+expliqué en 5.6. `$arrierePlan` regroupe l'en-tête, `main` et le pied de page : l'attribut
+`inert` les rend inertes (ni clic, ni focus, ni lecture par un lecteur d'écran) tant que
+la modale est ouverte. Le focus va sur le bouton « Fermer », et la classe
+`sans-defilement` (`overflow: hidden`) bloque le défilement de l'arrière-plan. La
 fermeture et l'usage au clavier sont détaillés en 5.6.
 
 ## 4.9 Le bouton de thème
 
-Au clic sur `.bouton-theme`, `js/app.js` détermine le thème affiché : il est sombre si
+La fonction `themeSombre()` de `js/app.js` détermine le thème affiché : il est sombre si
 `data-theme` vaut `"sombre"`, **ou** si aucun choix n'est enregistré et que
-`window.matchMedia("(prefers-color-scheme: dark)").matches` est vrai. Il pose l'autre
-valeur sur `<html>` et l'enregistre avec `localStorage.setItem("theme", nouveau)` (dans
-un `try/catch`), pour que le script inline de 4.1 la réapplique à la prochaine visite.
+`window.matchMedia("(prefers-color-scheme: dark)").matches` est vrai. Au clic sur
+`.bouton-theme`, on pose l'autre valeur sur `<html>` et on l'enregistre avec
+`localStorage.setItem("theme", nouveau)` (dans un `try/catch`), pour que le script
+inline de 4.1 la réapplique à la prochaine visite.
+
+Le bouton est un interrupteur : son nom accessible est fixe (`aria-label="Thème
+sombre"`) et son état est porté par `aria-pressed`, que `majBoutonTheme()` recalcule au
+chargement, après chaque clic et quand la préférence du système change (événement
+`change` de `matchMedia`). Un lecteur d'écran annonce ainsi le nom, le rôle de bouton
+bascule et l'état (activé ou non). Le nom ne doit pas changer avec l'état : « Passer au
+thème clair », annoncé « activé », serait contradictoire. L'icône, purement visuelle, vient du CSS :
+`content: var(--icone-theme)` sur `.bouton-theme::before`, la variable valant « ☾ » dans
+le thème clair et « ☀ » dans le sombre, dans les mêmes blocs que les couleurs (5.5).
 
 # 5. Ce qu'on apprend en le codant soi-même
 
@@ -381,7 +418,7 @@ $(".x").trigger("click");                    // n vaut 10, pas 11
 on précise un sélecteur en deuxième argument :
 
 ```js
-$grille.on("click", ".carte", function () { ouvrirModale($(this).data("id")); });
+$grille.on("click", ".carte", function () { ouvrirModale($(this).attr("data-id")); });
 $(".categories").on("click", ".filtre", function () { /* ... */ });
 $(document).on("click", ".etiquette, .mot", function (e) { /* ... */ });
 ```
@@ -395,14 +432,32 @@ carte. Les étiquettes sont déléguées à `document` car elles apparaissent à
 Corollaire : comme l'événement remonte, un clic sur une étiquette **dans** une carte
 atteindrait aussi le gestionnaire de la carte. D'où le `e.stopPropagation()` de 4.6.
 
+Le clavier a produit un vrai bug du même genre. Le gestionnaire `keydown` de `.carte`
+ouvre la fiche sur Entrée ou Espace et appelle `e.preventDefault()`. Or l'appui sur
+Entrée dans une étiquette remonte, lui aussi, jusqu'à la carte : la fiche s'ouvrait, et
+le `preventDefault()` annulait le clic que le navigateur aurait déclenché sur le bouton,
+si bien que le filtre n'était jamais appliqué. `stopPropagation()` dans le gestionnaire
+de clic n'y pouvait rien, puisque ce clic n'avait jamais lieu. La correction consiste à
+ne traiter que les touches adressées à la carte elle-même :
+
+```js
+$grille.on("keydown", ".carte", function (e) {
+  if (e.target !== this) return;   // touche frappée dans une étiquette
+  // ...
+});
+```
+
 Piège voisin : `.data()` convertit les attributs `data-*`, et `data-id="42"` devient le
-**nombre** 42. Avec un identifiant `"42"`, la comparaison `x.id === id` d'`ouvrirModale`
-échouerait. Les identifiants actuels sont des mots (`go-uptime`, `rag`…), mais
-`.attr("data-id")`, qui renvoie toujours une chaîne, serait plus prévisible.
+**nombre** 42 ; la comparaison `x.id === id` d'`ouvrirModale` échouait alors. Le projet
+lit donc `data-id`, `data-categorie` et `data-competence` avec `.attr()`, qui renvoie
+toujours une chaîne. Un test Playwright sert un projet d'identifiant `"42"` pour le
+vérifier.
 
 > **À retenir :** pour des éléments créés dynamiquement, on attache l'écouteur à un
 > conteneur qui existe déjà, avec `.on("click", "selecteur", ...)`. Un sélecteur qui ne
-> trouve rien ne provoque aucune erreur, il ne fait simplement rien.
+> trouve rien ne provoque aucune erreur, il ne fait simplement rien. Un gestionnaire
+> délégué reçoit aussi les événements des descendants : comparer `e.target` et `this`
+> avant d'appeler `preventDefault()`.
 
 ## 5.2 Séparer la logique du DOM pour pouvoir la tester
 
@@ -431,7 +486,7 @@ test("filtre par compétence", () => {
 });
 ```
 
-Les 8 tests de `tests/filtres.test.js` s'exécutent en une fraction de seconde avec
+Les 9 tests de `tests/filtres.test.js` s'exécutent en une fraction de seconde avec
 `node --test`, sans dépendance à installer. Ils vérifient aussi les données : chaque
 projet a tous ses champs, un lien vers `github.com/jejcqr/`, et aucun identifiant n'est
 en double. Une faute de frappe dans `data/projets.json` est donc détectée par la CI avant
@@ -509,11 +564,10 @@ l'envoyer sur Internet.
 **La bonne façon, dans le projet.** On sert le dossier par HTTP, même en local :
 
 ```bash
-python3 -m http.server 8080
+npm start      # python3 -m http.server 8080 --bind 127.0.0.1
 ```
 
-C'est aussi ce que fait `playwright.config.js` (option `webServer`) avant de lancer les
-tests, et c'est la situation réelle sur GitHub Pages. Le code prévoit en outre le cas
+`playwright.config.js` lance la même commande (option `webServer`) avant les tests, et c'est la situation réelle sur GitHub Pages. Le code prévoit en outre le cas
 d'échec avec `.fail(...)` : l'utilisateur voit un message plutôt qu'une page vide.
 
 Deux détails utiles :
@@ -604,25 +658,59 @@ ajoute donc explicitement :
 
 ```js
 $grille.on("keydown", ".carte", function (e) {
+  if (e.target !== this) return;
   if (e.key === "Enter" || e.key === " ") {
     e.preventDefault();
-    ouvrirModale($(this).data("id"));
+    ouvrirModale($(this).attr("data-id"));
   }
 });
 ```
 
-  Le `preventDefault()` empêche Espace de faire défiler la page.
+  Le `preventDefault()` empêche Espace de faire défiler la page ; la première ligne est
+  expliquée en 5.1.
 - À l'ouverture, le focus va sur le bouton « Fermer ». La touche Échap, écoutée sur
   `document`, appelle `fermerModale`, qui rend le focus à `dernierFocus` (la carte
   d'origine) et ne remet l'attribut `hidden` qu'à la **fin** du fondu, dans la fonction
   de rappel de `fadeOut(150, ...)`.
+- `aria-modal="true"` promet que rien d'autre n'est utilisable : il faut le tenir. Tant
+  que la modale est ouverte, l'en-tête, `main` et le pied de page reçoivent l'attribut
+  `inert` (4.8), et un gestionnaire fait boucler Tab du dernier élément au premier, et
+  Maj+Tab du premier au dernier :
 
-Ce qui manque encore (voir la partie 6) : le focus n'est pas « piégé » dans la modale.
-Après quelques appuis sur Tab, il ressort vers les cartes en arrière-plan.
+```js
+$modale.on("keydown", function (e) {
+  if (e.key !== "Tab") return;
+  var $elements = $modale.find("a[href], button:not(:disabled)");
+  var premier = $elements.get(0), dernier = $elements.get(-1);
+  if (e.shiftKey && document.activeElement === premier) {
+    e.preventDefault();
+    dernier.focus();
+  } else if (!e.shiftKey && document.activeElement === dernier) {
+    e.preventDefault();
+    premier.focus();
+  }
+});
+```
+
+  `inert` seul ne suffit pas : après le dernier élément, Tab ferait sortir le focus de la
+  page, vers l'interface du navigateur. À la fermeture, `inert` est retiré **avant** de rendre le
+  focus à la carte, sinon `focus()` sur un élément inerte serait sans effet.
+
+Deux pièges réels sont apparus en testant au clavier. D'abord, un élément focalisé qui
+disparaît du DOM emporte le focus avec lui : après un filtre lancé depuis une étiquette de
+la modale, `fermerModale` rendait le focus à la carte d'origine, aussitôt détruite par
+`afficherProjets()`, et le focus retombait sur `<body>`, au tout début de la page. Le
+filtre place désormais le focus lui-même (4.6). Ensuite, appuyer sur Échap puis tout de
+suite sur Entrée rouvrait la fiche **pendant** le fondu de fermeture : le rappel de
+`fadeOut` remettait ensuite `hidden`, et la fiche restait affichée mais marquée cachée,
+impossible à refermer. `$modale.stop(true, true)` termine le fondu en cours (rappel
+compris) avant de rouvrir.
 
 > **À retenir :** un élément interactif doit être atteignable au clavier, avoir un nom
-> lisible et rendre le focus là où il l'a pris. Un `display` défini en CSS annule
-> l'attribut `hidden` : il faut ajouter `[hidden] { display: none; }`.
+> lisible et rendre le focus là où il l'a pris ; une modale doit garder le focus et
+> rendre l'arrière-plan inerte. Avant de détruire l'élément qui a le focus, décider où
+> le mettre. Un `display` défini en CSS annule l'attribut `hidden` : il faut ajouter
+> `[hidden] { display: none; }`.
 
 ## 5.7 `.text()` plutôt que `.html()` : éviter l'injection de code
 
@@ -689,7 +777,12 @@ Trois autres choix rendent la suite fiable :
   version npm est exactement la 3.7.1 : sinon l'empreinte `integrity` (4.1) ne
   correspondrait plus et le navigateur refuserait le script.
 - **Les attentes viennent des données.** Le test « affiche tous les projets » compare
-  à `projets.length` lu dans le JSON : ajouter un projet ne casse pas le test.
+  à `projets.length` lu dans le JSON : ajouter un projet ne casse pas le test. À
+  l'inverse, quand un cas limite l'exige, `page.route("**/data/projets.json", ...)` sert
+  des données fabriquées (une liste vide, un identifiant `"42"`).
+- **Les préférences de l'utilisateur sont simulées.** `page.emulateMedia({ colorScheme })`
+  et `test.use({ reducedMotion: "reduce" })` jouent les tests du thème et de
+  `prefers-reduced-motion` (5.11) sans toucher au système.
 - **Deux appareils.** `playwright.config.js` déclare les profils `ordinateur` (Desktop
   Chrome) et `mobile` (Pixel 7). Le test « pas de défilement horizontal » vérifie que
   `scrollWidth` ne dépasse pas la largeur de l'écran, un défaut fréquent sur mobile.
@@ -709,7 +802,7 @@ et les tests et la configuration sont publiés avec le site.
 **La bonne façon, dans le projet.** Dans `.github/workflows/ci.yml` :
 
 - le job `tests` exécute `npm ci` (installation exacte des versions de
-  `package-lock.json`), `npm test`, puis les 14 tests Playwright ;
+  `package-lock.json`), `npm test`, puis les 34 tests Playwright ;
 - le job `deploiement` déclare `needs: tests` : il ne démarre que si les tests ont
   réussi, et seulement sur `main` (`if: github.ref == 'refs/heads/main' && ...`) ;
 - seul le dossier `_site`, qui contient `index.html`, `css`, `js` et `data`, est
@@ -776,24 +869,78 @@ codes de caractères).
 > avec `normalize("NFD")` puis on retire la plage U+0300 à U+036F. Pour trier, on utilise
 > `localeCompare` avec la langue voulue.
 
+## 5.11 Moins d'animations quand on le demande
+
+**Contexte.** Certaines personnes (troubles vestibulaires, migraines, simple confort)
+demandent à leur système de réduire les animations. Le navigateur l'expose avec la
+requête média `prefers-reduced-motion: reduce`.
+
+**L'approche naïve.** Une règle CSS qui coupe les transitions :
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; scroll-behavior: auto !important; }
+}
+```
+
+Elle est utile (survol des cartes), mais les fondus en cascade et les compteurs sont des
+`.animate()` jQuery, qui modifient les styles à chaque image depuis JavaScript. Le CSS
+n'en sait rien et ils continuaient de s'exécuter. Le défilement doux était lui aussi un
+`.animate({ scrollTop })` jQuery, et le gestionnaire des liens du menu appelait
+`e.preventDefault()` pour le lancer. Effet de bord : le navigateur ne traitait plus
+l'ancre, donc ne déplaçait pas le point de départ de la navigation au clavier. Après
+« Projets », la page avait défilé mais le Tab suivant repartait du menu.
+
+**La bonne façon, dans le projet.** jQuery a un interrupteur global, `$.fx.off` : à
+`true`, chaque animation saute directement à son état final et appelle quand même sa
+fonction `complete`. `js/app.js` le règle d'après la même requête média, et le met à jour
+si la préférence change pendant la visite :
+
+```js
+var moinsDeMouvement = window.matchMedia("(prefers-reduced-motion: reduce)");
+$.fx.off = moinsDeMouvement.matches;
+moinsDeMouvement.addEventListener("change", function (e) { $.fx.off = e.matches; });
+```
+
+Le défilement doux est, lui, confié au CSS : `html { scroll-behavior: smooth; }`, que la
+règle ci-dessus ramène à `auto` sous `prefers-reduced-motion`. Les liens du menu n'ont
+plus aucun JavaScript : le navigateur suit l'ancre, met l'adresse à jour (`#projets`),
+s'arrête sous l'en-tête grâce à `scroll-padding-top` et place le point de départ de Tab
+dans la section visée. Un test Playwright le vérifie : après Entrée sur « Projets », Tab
+atteint le champ de recherche. Le filtre par compétence utilise `scrollIntoView()`
+(4.6), qui suit la même règle CSS.
+
+Le compteur affiche alors directement « 12 » et le défilement vers les projets est
+immédiat. Seul `.delay()` y échappe : c'est un simple minuteur, qui aurait encore fait
+apparaître les cartes une à une ; `afficherProjets` ne l'utilise donc que si les
+animations sont actives (4.5). Le test Playwright correspondant observe toutes les
+valeurs écrites dans le compteur (une seule attendue) et vérifie, dans le même tour de
+boucle que le clic, que toutes les cartes sont visibles et que la page a défilé.
+
+> **À retenir :** `prefers-reduced-motion` doit couper **toutes** les animations, y
+> compris celles pilotées en JavaScript ; avec jQuery, `$.fx.off = true` suffit pour
+> `.animate()` et les fondus, mais pas pour `.delay()`. Un défilement doux en CSS
+> respecte la préférence et laisse le navigateur gérer les ancres et le focus.
+
 # 6. Pour aller plus loin
 
 Du plus simple au plus ambitieux :
 
-1. **Respecter `prefers-reduced-motion` en JavaScript.** La règle CSS ne coupe pas les
-   animations jQuery (fondus, compteurs, défilement). Piste : si
-   `matchMedia("(prefers-reduced-motion: reduce)").matches`, poser `$.fx.off = true`,
-   et le tester avec `page.emulateMedia({ reducedMotion: "reduce" })`.
-2. **Activer une étiquette au clavier depuis une carte.** Entrée sur une étiquette
-   d'une carte ouvre la fiche au lieu de filtrer : le `keydown` remonte au gestionnaire
-   de `.carte`, dont le `preventDefault()` annule le clic du bouton. Piste : ignorer
-   l'événement quand `e.target !== this`, après avoir écrit le test qui échoue.
+1. **Annoncer le nombre de résultats.** Pendant la frappe, un lecteur d'écran ne sait
+   pas combien de cartes restent. Piste : un paragraphe `aria-live="polite"` que
+   `afficherProjets()` remplit avec « 3 projets », et un test Playwright qui lit son
+   texte.
+2. **Vérifier l'accessibilité automatiquement.** Les tests actuels couvrent les défauts
+   déjà rencontrés, pas les autres (contraste insuffisant, nom manquant…). Piste :
+   ajouter `@axe-core/playwright` et un test qui analyse la page, en thème clair et en
+   thème sombre, modale ouverte et fermée, et exige zéro violation.
 3. **Mémoriser les filtres dans l'adresse.** Piste : écrire `criteres` dans
    `location.hash` à chaque changement et le relire avant le premier
    `afficherProjets()`, pour pouvoir partager un lien déjà filtré.
-4. **Piéger le focus dans la modale.** Piste : sur Tab depuis le dernier élément, revenir
-   au premier (et l'inverse avec Maj+Tab), ou utiliser l'élément natif `<dialog>` et sa
-   méthode `showModal()`.
+4. **Remplacer la modale par l'élément natif `<dialog>`.** Sa méthode `showModal()`
+   rend déjà l'arrière-plan inerte et gère Échap. Piste : supprimer le code
+   correspondant de `js/app.js` et vérifier que les tests de la modale (focus piégé,
+   réouverture rapide) restent verts.
 5. **Compléter `data/projets.json` depuis l'API GitHub.** Piste : un script Node.js lancé
    en CI interroge `https://api.github.com/users/jejcqr/repos` et ajoute la date de mise
    à jour et les étoiles, ce qui permet un tri « plus récents d'abord ».

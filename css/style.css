@@ -7,23 +7,24 @@
   --accent: #2456c9;
   --accent-doux: #e8eefb;
   --ombre: 0 1px 2px rgba(0, 0, 0, .06), 0 4px 16px rgba(0, 0, 0, .05);
+  --icone-theme: "☾";
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="clair"]) {
     --fond: #111318; --surface: #1a1d24; --texte: #e8eaee; --doux: #9aa1ad;
     --bord: #2a2f39; --accent: #7aa2ff; --accent-doux: #1f2a44;
-    --ombre: 0 1px 2px rgba(0, 0, 0, .4); color-scheme: dark;
+    --ombre: 0 1px 2px rgba(0, 0, 0, .4); --icone-theme: "☀"; color-scheme: dark;
   }
 }
 :root[data-theme="sombre"] {
   --fond: #111318; --surface: #1a1d24; --texte: #e8eaee; --doux: #9aa1ad;
   --bord: #2a2f39; --accent: #7aa2ff; --accent-doux: #1f2a44;
-  --ombre: 0 1px 2px rgba(0, 0, 0, .4); color-scheme: dark;
+  --ombre: 0 1px 2px rgba(0, 0, 0, .4); --icone-theme: "☀"; color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
-html { scroll-padding-top: 70px; }
+html { scroll-behavior: smooth; scroll-padding-top: 70px; }   /* ancres sous l'en-tête collant */
 body {
   margin: 0;
   font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -54,6 +55,7 @@ section { padding: 48px 0; }
   background: none; border: 1px solid var(--bord); color: var(--texte);
   width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; line-height: 1;
 }
+.bouton-theme::before { content: var(--icone-theme); }   /* nom accessible : aria-label */
 
 /* Accueil */
 .accueil { padding-top: 72px; }

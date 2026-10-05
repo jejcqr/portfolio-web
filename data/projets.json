@@ -12,7 +12,7 @@
     "id": "go-uptime",
     "titre": "go-uptime",
     "resume": "Surveillance de sites web avec tableau de bord, historique de latence et disponibilité sur 24 h.",
-    "details": "Une goroutine par site surveillé, arrêt propre sur signal, stockage MongoDB avec index TTL et pipeline d'agrégation. Image Docker distroless d'environ 10 Mo.",
+    "details": "Une goroutine par site surveillé, arrêt propre sur signal, stockage MongoDB avec index TTL et pipeline d'agrégation. Image Docker distroless non root.",
     "competences": ["Go", "MongoDB", "Docker", "HTML", "JavaScript"],
     "categorie": "back-end",
     "depot": "https://github.com/jejcqr/go-uptime"
@@ -21,7 +21,7 @@
     "id": "mini-shell-c",
     "titre": "mysh, mini-shell Unix",
     "resume": "Interpréteur de commandes en C : pipes, redirections, opérateurs && et ||, variables et builtins.",
-    "details": "Lexer et parser écrits à la main, fork/execvp/pipe/dup2, gestion des signaux. 46 cas de test comparés automatiquement à /bin/sh, zéro fuite mémoire sous valgrind.",
+    "details": "Lexer et parser écrits à la main, fork/execvp/pipe/dup2, gestion des signaux. Cas de test comparés automatiquement à /bin/sh, zéro fuite mémoire sous valgrind.",
     "competences": ["C", "Linux"],
     "categorie": "système",
     "depot": "https://github.com/jejcqr/mini-shell-c"
@@ -48,7 +48,7 @@
     "id": "mcp-textes-sacres",
     "titre": "Serveur MCP textes sacrés",
     "resume": "Permet à un assistant IA de lire et rechercher dans la Bible et le Coran en citant des références exactes.",
-    "details": "Outils, ressource et prompt MCP avec le SDK officiel. Requêtes SQL paramétrées, analyse souple des références (« Jn 3:16 »), 48 tests dont un client MCP réel, CI sur SQLite et MariaDB.",
+    "details": "Outils, ressource et prompt MCP avec le SDK officiel. Requêtes SQL paramétrées, analyse souple des références (« Jn 3:16 »), tests avec un client MCP réel, CI sur SQLite et MariaDB.",
     "competences": ["Python", "MCP", "SQL", "MariaDB"],
     "categorie": "ia",
     "depot": "https://github.com/jejcqr/mcp-textes-sacres"

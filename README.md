@@ -17,7 +17,7 @@ déployé automatiquement sur GitHub Pages.
 | CSS moderne | variables, thème clair/sombre (préférence système + choix mémorisé), grille responsive, `color-mix`, défilement doux (`scroll-behavior`), `prefers-reduced-motion` — `css/style.css` |
 | jQuery | chargement AJAX (`$.getJSON`), délégation d'événements, animations et compteurs animés, coupés par `prefers-reduced-motion` — `js/app.js` |
 | JavaScript | logique de filtrage séparée du DOM, recherche insensible aux accents — `js/filtres.js` |
-| Tests | 9 tests unitaires `node --test` + 36 tests Playwright sur ordinateur et mobile |
+| Tests | tests unitaires `node --test` et tests Playwright sur ordinateur et mobile |
 | Qualité | ESLint (règles recommandées) et Prettier — `eslint.config.js`, `.prettierrc.json` |
 | CI/CD | GitHub Actions : lint et tests, puis déploiement sur GitHub Pages ; permissions minimales par job |
 

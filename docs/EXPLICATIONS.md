@@ -57,12 +57,12 @@ npm run lint               # ESLint (règles recommandées)
 npm run format:check       # Prettier, sans rien modifier
 npm test                   # 9 tests unitaires (node --test)
 npx playwright install chromium
-npm run test:e2e           # 36 tests de bout en bout (Playwright)
+npm run test:e2e           # tests de bout en bout (Playwright)
 ```
 
-`npm start` ne télécharge rien : il lance le serveur intégré à Python 3. Les 18
-scénarios de `tests/portfolio.spec.js` sont joués sur un écran d'ordinateur et sur un
-téléphone simulé (Pixel 7), d'où 36 tests. Le port 8080 doit être libre : Playwright
+`npm start` ne télécharge rien : il lance le serveur intégré à Python 3. Chaque
+scénario de `tests/portfolio.spec.js` est joué deux fois : sur un écran d'ordinateur et sur un
+téléphone simulé (Pixel 7). Le port 8080 doit être libre : Playwright
 lance son propre serveur et refuse d'en réutiliser un (5.12). Si un Chromium est déjà installé, la variable
 `CHROMIUM_PATH` permet de l'utiliser à la place de `npx playwright install` (voir
 `playwright.config.js`). À chaque `push`, `.github/workflows/ci.yml` relance ESLint,
@@ -426,8 +426,8 @@ donner trop de permissions à la CI (5.12). À sa première exécution, ESLint a
 
 Chaque sous-partie part du code qu'un débutant écrirait spontanément dans ce projet. La
 mention « Piège réel rencontré dans ce projet » signale un défaut d'une version
-précédente du dépôt : soit celle du commit `bdd73d5`, corrigée dans le commit `63c1652`,
-soit celle de `63c1652` lui-même, corrigée ensuite (journalisation des erreurs en 5.6,
+précédente du dépôt : soit la première version, corrigée lors de la relecture,
+soit la version de relecture elle-même, corrigée ensuite (journalisation des erreurs en 5.6,
 permissions de la CI et serveur de test en 5.12). Chaque correction est accompagnée d'un
 test quand le défaut est testable, et la conséquence décrite a été reproduite en lançant
 l'ancien code. Les autres conséquences ont été reproduites dans la page actuelle, sauf
@@ -438,7 +438,7 @@ mention « illustratif ».
 Piège réel rencontré dans ce projet (deuxième forme).
 
 **Ce qu'on écrit spontanément.** `$(".carte").on("click", ...)` ; ou, une fois la
-délégation découverte, un gestionnaire clavier trop large (version `bdd73d5`) :
+délégation découverte, un gestionnaire clavier trop large (première version) :
 
 ```js
 $grille.on("keydown", ".carte", function (e) {
@@ -456,7 +456,7 @@ avec jQuery 3.7.1 : après `$(".x").on("click", () => n++)` et
 `n` vaut 10, pas 11. Pour le second extrait, l'appui sur Entrée dans l'étiquette
 « Docker » d'une carte remonte jusqu'à la carte : la fiche s'ouvre et `preventDefault()`
 annule le clic que le navigateur aurait déclenché sur le bouton. Mesure réelle sur
-`bdd73d5` : modale ouverte, aucun filtre, 12 cartes au lieu de 3.
+la première version : modale ouverte, aucun filtre, 12 cartes au lieu de 3.
 
 **Pourquoi c'est une mauvaise pratique.** Un sélecteur est évalué une seule fois : il
 ignore les éléments créés ensuite, et ceux qu'il a trouvés disparaissent au premier
@@ -493,7 +493,7 @@ seulement à la souris ; un gestionnaire qui appelle `preventDefault()` vérifie
 
 Piège réel rencontré dans ce projet.
 
-**Ce qu'on écrit spontanément** (version `bdd73d5`) :
+**Ce qu'on écrit spontanément** (première version) :
 
 ```js
 $grille.on("click", ".carte", function () { ouvrirModale($(this).data("id")); });
@@ -505,8 +505,8 @@ if (!p) return;
 **Ce qui se passe.** `.data()` convertit une valeur qui ressemble à un nombre, un booléen
 ou du JSON. Essai réel : `$("<div data-id='42'>").data("id")` renvoie le nombre `42`,
 `.attr("data-id")` la chaîne `"42"`. Avec un projet d'identifiant `"42"`, `"42" === 42`
-est faux, `find` ne trouve rien et `return` fait échouer l'ouverture en silence. Sur
-`bdd73d5`, le test correspondant échoue avec `Expected: "Projet 42"`, `Received: ""`.
+est faux, `find` ne trouve rien et `return` fait échouer l'ouverture en silence. Sur la
+première version, le test correspondant échoue avec `Expected: "Projet 42"`, `Received: ""`.
 
 **Pourquoi c'est une mauvaise pratique.** Une conversion implicite rend le comportement
 dépendant du **contenu** des données : le code marche avec `"go-uptime"`, casse avec
@@ -600,7 +600,7 @@ principe de `npm ci` et de `package-lock.json` : exécuter exactement ce qu'on a
 Dans le même esprit, le lien GitHub de la modale (`target="_blank"`) porte
 `rel="noopener"` : la page ouverte ne peut pas manipuler l'onglet du portfolio.
 
-**Comment s'en protéger durablement.** Les 36 tests Playwright servent le jQuery de
+**Comment s'en protéger durablement.** Les tests Playwright servent le jQuery de
 `node_modules` (version 3.7.1 exacte) à la place du CDN : si l'empreinte ne correspond
 pas, la page ne fonctionne plus et tous les tests échouent. Mettre jQuery à jour oblige à
 changer `package.json` et `integrity` ensemble.
@@ -612,14 +612,14 @@ changer `package.json` et `integrity` ensemble.
 
 Piège réel rencontré dans ce projet.
 
-**Ce qu'on écrit spontanément** (version `bdd73d5`, dans `afficherNuage`) :
+**Ce qu'on écrit spontanément** (première version, dans `afficherNuage`) :
 
 ```js
 var stats = Filtres.compterCompetences(projets);
 var max = stats[0].nombre;
 ```
 
-**Ce qui se passe.** Avec un `data/projets.json` réduit à `[]`, la version `bdd73d5`
+**Ce qui se passe.** Avec un `data/projets.json` réduit à `[]`, la première version
 lève, en sortie réelle, `Cannot read properties of undefined (reading 'nombre')`.
 L'exception interrompt `afficherNuage` ; la page affiche « Aucun projet ne correspond à
 cette recherche. » alors qu'aucune recherche n'a été faite, et garde « Cliquez sur une
@@ -712,11 +712,11 @@ qui journalise ; chaque `catch` vide porte un commentaire qui justifie le silenc
 
 Deux pièges réels rencontrés dans ce projet.
 
-**Ce qu'on écrit spontanément** (version `bdd73d5`) : une modale qui met le focus sur
+**Ce qu'on écrit spontanément** (première version) : une modale qui met le focus sur
 « Fermer » à l'ouverture, sans plus ; un filtre par compétence qui ferme la modale,
 redessine la grille et fait défiler la page, sans s'occuper du focus.
 
-**Ce qui se passe.** Mesures réelles sur `bdd73d5`, fiche « mysh » ouverte au clavier :
+**Ce qui se passe.** Mesures réelles sur la première version, fiche « mysh » ouverte au clavier :
 
 - Tab parcourt « C », « Linux », le lien GitHub, puis sort de la modale vers `<body>`,
   puis vers le logo de l'en-tête, **derrière** le fond sombre ;
@@ -768,7 +768,7 @@ focus, et où celui-ci doit aller.
 
 Piège réel rencontré dans ce projet.
 
-**Ce qu'on écrit spontanément** (version `bdd73d5`) :
+**Ce qu'on écrit spontanément** (première version) :
 
 ```js
 $modale.prop("hidden", false).hide().fadeIn(150);                    // ouvrirModale
@@ -777,7 +777,7 @@ $modale.fadeOut(150, function () { $modale.prop("hidden", true); });  // fermerM
 
 **Ce qui se passe.** Échap puis, tout de suite, Entrée sur la carte : la fiche se rouvre
 **pendant** le fondu de fermeture, dont le rappel remet ensuite `hidden`. Mesure réelle
-sur `bdd73d5`, 600 ms plus tard : attribut `hidden` présent, mais `display: block` (style
+sur la première version, 600 ms plus tard : attribut `hidden` présent, mais `display: block` (style
 en ligne posé par jQuery) et opacité 1. La fiche est affichée mais marquée cachée, et
 Échap ne fait plus rien, puisque `fermerModale` commence par
 `if ($modale.prop("hidden")) return;`.
@@ -805,7 +805,7 @@ action animée, tester l'action inverse déclenchée pendant l'animation.
 
 Deux pièges réels rencontrés dans ce projet.
 
-**Ce qu'on écrit spontanément** (version `bdd73d5`) : une règle CSS qui coupe les
+**Ce qu'on écrit spontanément** (première version) : une règle CSS qui coupe les
 transitions sous `prefers-reduced-motion`, des fondus et compteurs jQuery, et un
 défilement doux programmé pour les liens du menu :
 
@@ -819,7 +819,7 @@ $(".nav a[href^='#']").on("click", function (e) {
 });
 ```
 
-**Ce qui se passe.** Mesures réelles sur `bdd73d5` avec `reducedMotion: "reduce"` : le
+**Ce qui se passe.** Mesures réelles sur la première version avec `reducedMotion: "reduce"` : le
 compteur « projets » reçoit 57 valeurs successives au lieu d'une, car la règle CSS ne
 voit pas les `.animate()` jQuery ; après Entrée sur « Projets », l'adresse reste sans
 `#projets` et le Tab suivant va sur le lien « Compétences » du menu au lieu du champ de
@@ -862,11 +862,11 @@ recherche.
 
 Piège réel rencontré dans ce projet.
 
-**Ce qu'on écrit spontanément** (version `bdd73d5`) : un bouton
+**Ce qu'on écrit spontanément** (première version) : un bouton
 `<button class="bouton-theme" type="button" aria-label="Changer de thème">☾</button>`, et
 la logique « le thème est-il sombre ? » écrite directement dans le gestionnaire de clic.
 
-**Ce qui se passe.** Mesure réelle sur `bdd73d5`, système en thème sombre : nom
+**Ce qui se passe.** Mesure réelle sur la première version, système en thème sombre : nom
 « Changer de thème », `aria-pressed` absent, icône « ☾ » alors que la page est déjà
 sombre. Un lecteur d'écran annonce « Changer de thème, bouton » sans dire quel thème est
 actif, et l'icône ne change jamais.
@@ -912,9 +912,9 @@ modifier `app.js`, vérifier à la main, commiter.
 machine de CI est chargée (illustratif). La correction sans test ne protège de rien : le
 bug peut revenir au prochain remaniement sans que personne ne le voie.
 
-Démarche réelle dans ce projet : les 17 scénarios de la suite du commit `63c1652` ont été
-rejoués contre la version précédente, extraite à part avec
-`git archive bdd73d5 | tar -x -C <dossier>` (port du serveur de test changé dans la copie
+Démarche réelle dans ce projet : les 17 scénarios de la suite écrite à la relecture ont été
+rejoués contre la première version, extraite à part avec
+`git archive <commit> | tar -x -C <dossier>` (port du serveur de test changé dans la copie
 pour ne pas réutiliser celui de la version actuelle, voir 5.12). Sortie réelle :
 `20 failed`, `14 passed (1.1m)`. Les dix scénarios ajoutés par ce commit échouent, chacun
 sur le défaut qu'il vise, sur les deux profils ; sur la version corrigée, les 34 tests
@@ -1039,7 +1039,7 @@ sont aussi celles de la CI) :
 npm run lint                               # ESLint : aucune sortie = OK
 npm run format:check                       # Prettier ; corriger avec npm run format
 npm test                                   # 9 tests unitaires, dont la validité du JSON
-npm run test:e2e                           # 36 tests Playwright (port 8080 libre)
+npm run test:e2e                           # tests Playwright (port 8080 libre)
 grep -nE '\.(html|append)\(' js/app.js     # relire : pas de HTML construit
 git diff --check                           # espaces en fin de ligne
 bash docs/generer-pdf.sh                   # si la documentation a changé

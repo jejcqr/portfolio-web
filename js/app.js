@@ -2,7 +2,7 @@
 $(function () {
   "use strict";
 
-  var LIBELLES = {
+  const LIBELLES = {
     tous: "Tous",
     "back-end": "Back-end",
     système: "Système",
@@ -13,28 +13,28 @@ $(function () {
     mobile: "Mobile",
     bots: "Bots Discord",
   };
-  var projets = [];
-  var criteres = { recherche: "", categorie: "tous", competence: null };
-  var $grille = $("#grille");
-  var $modale = $("#modale");
+  let projets = [];
+  const criteres = { recherche: "", categorie: "tous", competence: null };
+  const $grille = $("#grille");
+  const $modale = $("#modale");
   // Tout ce que la modale recouvre.
-  var $arrierePlan = $(".entete, main, .pied");
-  var dernierFocus = null;
+  const $arrierePlan = $(".entete, main, .pied");
+  let dernierFocus = null;
 
   // ---- Animations : coupées si le système demande moins de mouvement ----
   // La règle CSS prefers-reduced-motion ne touche pas aux animations jQuery.
-  var moinsDeMouvement = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const moinsDeMouvement = window.matchMedia("(prefers-reduced-motion: reduce)");
   $.fx.off = moinsDeMouvement.matches;
   moinsDeMouvement.addEventListener("change", function (e) {
     $.fx.off = e.matches;
   });
 
   // ---- Thème clair / sombre ----
-  var $boutonTheme = $(".bouton-theme");
-  var systemeSombre = window.matchMedia("(prefers-color-scheme: dark)");
+  const $boutonTheme = $(".bouton-theme");
+  const systemeSombre = window.matchMedia("(prefers-color-scheme: dark)");
 
   function themeSombre() {
-    var choix = $("html").attr("data-theme");
+    const choix = $("html").attr("data-theme");
     return choix ? choix === "sombre" : systemeSombre.matches;
   }
 
@@ -44,7 +44,7 @@ $(function () {
   }
 
   $boutonTheme.on("click", function () {
-    var nouveau = themeSombre() ? "clair" : "sombre";
+    const nouveau = themeSombre() ? "clair" : "sombre";
     $("html").attr("data-theme", nouveau);
     try {
       localStorage.setItem("theme", nouveau);
@@ -67,10 +67,10 @@ $(function () {
   }
 
   function afficherProjets() {
-    var visibles = Filtres.filtrerProjets(projets, criteres);
+    const visibles = Filtres.filtrerProjets(projets, criteres);
     $grille.empty();
     visibles.forEach(function (p, i) {
-      var $carte = $("<article class='carte' tabindex='0'>")
+      const $carte = $("<article class='carte' tabindex='0'>")
         .attr("data-id", p.id)
         .attr("aria-label", "Voir le détail de " + p.titre)
         .append($("<span class='categorie'>").text(LIBELLES[p.categorie] || p.categorie))
@@ -100,7 +100,7 @@ $(function () {
   }
 
   function afficherCategories() {
-    var $zone = $(".categories");
+    const $zone = $(".categories");
     ["tous"].concat(Filtres.categories(projets)).forEach(function (cat) {
       $("<button type='button' class='filtre'>")
         .text(LIBELLES[cat] || cat)
@@ -111,9 +111,9 @@ $(function () {
   }
 
   function afficherNuage() {
-    var stats = Filtres.compterCompetences(projets);
+    const stats = Filtres.compterCompetences(projets);
     // Liste triée : la première compétence est la plus utilisée.
-    var max = stats.length ? stats[0].nombre : 0;
+    const max = stats.length ? stats[0].nombre : 0;
     if (!stats.length) $(".aide").text("Aucune compétence à afficher pour le moment.");
     stats.forEach(function (s) {
       $("<button type='button' class='mot'>")
@@ -144,9 +144,9 @@ $(function () {
   }
 
   // ---- Filtres ----
-  var minuterie;
+  let minuterie;
   $("#recherche").on("input", function () {
-    var valeur = $(this).val();
+    const valeur = $(this).val();
     clearTimeout(minuterie);
     // Attendre une pause de 150 ms évite de tout redessiner à chaque touche.
     minuterie = setTimeout(function () {
@@ -188,7 +188,7 @@ $(function () {
 
   // ---- Modale de détail ----
   function ouvrirModale(id) {
-    var p = projets.find(function (x) {
+    const p = projets.find(function (x) {
       return x.id === id;
     });
     if (!p) return;
@@ -233,8 +233,8 @@ $(function () {
   // Piège à focus : Tab et Maj+Tab bouclent sur les éléments de la modale.
   $modale.on("keydown", function (e) {
     if (e.key !== "Tab") return;
-    var $elements = $modale.find("a[href], button:not(:disabled)");
-    var premier = $elements.get(0),
+    const $elements = $modale.find("a[href], button:not(:disabled)");
+    const premier = $elements.get(0),
       dernier = $elements.get(-1);
     if (e.shiftKey && document.activeElement === premier) {
       e.preventDefault();

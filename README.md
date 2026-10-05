@@ -18,8 +18,16 @@ déployé automatiquement sur GitHub Pages.
 | jQuery | chargement AJAX (`$.getJSON`), délégation d'événements, animations et compteurs animés, coupés par `prefers-reduced-motion` — `js/app.js` |
 | JavaScript | logique de filtrage séparée du DOM, recherche insensible aux accents — `js/filtres.js` |
 | Tests | tests unitaires `node --test` et tests Playwright sur ordinateur et mobile |
-| Qualité | ESLint (règles recommandées) et Prettier — `eslint.config.js`, `.prettierrc.json` |
+| Qualité | ESLint (règles recommandées, `const`/`let` imposés) et Prettier — `eslint.config.js`, `.prettierrc.json` |
 | CI/CD | GitHub Actions : lint et tests, puis déploiement sur GitHub Pages ; permissions minimales par job |
+
+## Pourquoi jQuery
+
+jQuery figure sur mon CV : ce projet montre que je sais m'en servir proprement
+(délégation d'événements, AJAX, animations qui respectent `prefers-reduced-motion`).
+Pour un nouveau site, je choisirais du JavaScript natif ou un framework. La logique
+qui compte, le filtrage, est d'ailleurs écrite sans jQuery ni DOM (`js/filtres.js`)
+et testée seule.
 
 ## Fonctionnement
 

@@ -8,7 +8,7 @@
 
   /** Garde les projets de la catégorie et de la compétence choisies qui contiennent la recherche. */
   function filtrerProjets(projets, criteres) {
-    var recherche = normaliser(criteres.recherche || "");
+    const recherche = normaliser(criteres.recherche || "");
     return projets.filter(function (p) {
       if (
         criteres.categorie &&
@@ -23,7 +23,7 @@
       if (!recherche) {
         return true;
       }
-      var texte = normaliser([p.titre, p.resume, p.details].concat(p.competences).join(" "));
+      const texte = normaliser([p.titre, p.resume, p.details].concat(p.competences).join(" "));
       return recherche.split(/\s+/).every(function (mot) {
         return texte.indexOf(mot) !== -1;
       });
@@ -32,7 +32,7 @@
 
   /** Nombre de projets par compétence, de la plus utilisée à la moins utilisée. */
   function compterCompetences(projets) {
-    var compte = {};
+    const compte = {};
     projets.forEach(function (p) {
       p.competences.forEach(function (c) {
         compte[c] = (compte[c] || 0) + 1;
@@ -48,7 +48,7 @@
   }
 
   function categories(projets) {
-    var vues = [];
+    const vues = [];
     projets.forEach(function (p) {
       if (vues.indexOf(p.categorie) === -1) vues.push(p.categorie);
     });

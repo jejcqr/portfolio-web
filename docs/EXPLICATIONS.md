@@ -259,9 +259,9 @@ que le JSON contient au moins un projet (5.5).
 recherche, on attend une pause dans la frappe (*debounce*) :
 
 ```js
-var minuterie;
+let minuterie;
 $("#recherche").on("input", function () {
-  var valeur = $(this).val();
+  const valeur = $(this).val();
   clearTimeout(minuterie);
   // Attendre une pause de 150 ms évite de tout redessiner à chaque touche.
   minuterie = setTimeout(function () {
@@ -290,7 +290,7 @@ au clavier et avec un lecteur d'écran.
 
 ```js
 function ouvrirModale(id) {
-  var p = projets.find(function (x) {
+  const p = projets.find(function (x) {
     return x.id === id;
   });
   if (!p) return;
@@ -330,7 +330,7 @@ Dans le `<head>` de `index.html`, avant tout affichage :
 <script>
   // Appliqué avant l'affichage pour éviter un flash de thème clair.
   try {
-    var t = localStorage.getItem("theme");
+    const t = localStorage.getItem("theme");
     if (t) document.documentElement.dataset.theme = t;
   } catch {
     /* stockage indisponible : thème par défaut */
@@ -356,7 +356,7 @@ bouton doit aussi exposer son état (5.10).
 personnes qui ont demandé moins d'animations à leur système.
 
 ```js
-var moinsDeMouvement = window.matchMedia("(prefers-reduced-motion: reduce)");
+const moinsDeMouvement = window.matchMedia("(prefers-reduced-motion: reduce)");
 $.fx.off = moinsDeMouvement.matches;
 moinsDeMouvement.addEventListener("change", function (e) {
   $.fx.off = e.matches;
@@ -634,7 +634,7 @@ développement.
 
 ```js
 // Liste triée : la première compétence est la plus utilisée.
-var max = stats.length ? stats[0].nombre : 0;
+const max = stats.length ? stats[0].nombre : 0;
 if (!stats.length) $(".aide").text("Aucune compétence à afficher pour le moment.");
 ```
 
@@ -734,8 +734,8 @@ modale :
 ```js
 $modale.on("keydown", function (e) {
   if (e.key !== "Tab") return;
-  var $elements = $modale.find("a[href], button:not(:disabled)");
-  var premier = $elements.get(0),
+  const $elements = $modale.find("a[href], button:not(:disabled)");
+  const premier = $elements.get(0),
     dernier = $elements.get(-1);
   if (e.shiftKey && document.activeElement === premier) {
     e.preventDefault();
@@ -881,7 +881,7 @@ système :
 
 ```js
 function themeSombre() {
-  var choix = $("html").attr("data-theme");
+  const choix = $("html").attr("data-theme");
   return choix ? choix === "sombre" : systemeSombre.matches;
 }
 function majBoutonTheme() {

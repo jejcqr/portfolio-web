@@ -12,7 +12,9 @@ module.exports = [
       sourceType: "script",
       globals: { ...globals.browser, ...globals.jquery, Filtres: "readonly" },
     },
-    rules: { eqeqeq: "error" },
+    // Portée de bloc partout : « var » remonte en haut de la fonction et se redéclare
+    // sans erreur ; const signale à la lecture ce qui ne change plus.
+    rules: { eqeqeq: "error", "no-var": "error", "prefer-const": "error" },
   },
   {
     // filtres.js est aussi chargé par Node.js (module.exports) pour les tests.

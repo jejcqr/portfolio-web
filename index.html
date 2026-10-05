@@ -12,7 +12,7 @@
     <script>
       // Appliqué avant l'affichage pour éviter un flash de thème clair.
       try {
-        var t = localStorage.getItem("theme");
+        const t = localStorage.getItem("theme");
         if (t) document.documentElement.dataset.theme = t;
       } catch {
         /* stockage indisponible : thème par défaut */

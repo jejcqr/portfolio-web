@@ -5,7 +5,10 @@ const projets = require("../data/projets.json");
 test.beforeEach(async ({ page }) => {
   // jQuery est servi depuis node_modules : les tests ne dépendent pas du réseau.
   await page.route("https://code.jquery.com/**", (route) =>
-    route.fulfill({ path: path.join(__dirname, "../node_modules/jquery/dist/jquery.min.js"), contentType: "application/javascript" })
+    route.fulfill({
+      path: path.join(__dirname, "../node_modules/jquery/dist/jquery.min.js"),
+      contentType: "application/javascript",
+    }),
   );
   await page.goto("/");
 });
@@ -43,7 +46,10 @@ test("la modale s'ouvre au clic et se ferme avec Échap", async ({ page }) => {
   await page.locator(".carte", { hasText: "mysh" }).click();
   const modale = page.locator("#modale");
   await expect(modale).toBeVisible();
-  await expect(modale.locator(".modale-lien")).toHaveAttribute("href", "https://github.com/jejcqr/mini-shell-c");
+  await expect(modale.locator(".modale-lien")).toHaveAttribute(
+    "href",
+    "https://github.com/jejcqr/mini-shell-c",
+  );
   await page.keyboard.press("Escape");
   await expect(modale).toBeHidden();
 });
@@ -58,13 +64,17 @@ test("le thème sombre est mémorisé", async ({ page }) => {
 
 test("pas de défilement horizontal", async ({ page }) => {
   await expect(page.locator(".carte")).toHaveCount(projets.length);
-  const deborde = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+  const deborde = await page.evaluate(
+    () => document.documentElement.scrollWidth > window.innerWidth,
+  );
   expect(deborde).toBe(false);
 });
 
 test("Entrée sur une étiquette d'une carte filtre sans ouvrir la fiche", async ({ page }) => {
-  const etiquette = page.locator(".carte", { hasText: "go-uptime" }).locator(".etiquette[data-competence='Docker']");
-  await expect(etiquette).toBeVisible();   // focus() n'attend pas la fin du fondu
+  const etiquette = page
+    .locator(".carte", { hasText: "go-uptime" })
+    .locator(".etiquette[data-competence='Docker']");
+  await expect(etiquette).toBeVisible(); // focus() n'attend pas la fin du fondu
   await etiquette.focus();
   await page.keyboard.press("Enter");
   await expect(page.locator(".filtre-actif strong")).toHaveText("Docker");
@@ -106,7 +116,9 @@ test("le focus reste piégé dans la modale et l'arrière-plan est inerte", asyn
   await expect(carte).toBeFocused();
 });
 
-test("après un filtre lancé depuis la modale, le focus va sur le bandeau du filtre", async ({ page }) => {
+test("après un filtre lancé depuis la modale, le focus va sur le bandeau du filtre", async ({
+  page,
+}) => {
   await page.locator(".carte", { hasText: "mysh" }).click();
   await page.locator("#modale .etiquette[data-competence='Linux']").click();
   await expect(page.locator("#modale")).toBeHidden();
@@ -154,6 +166,21 @@ test("une liste de projets vide affiche un message au lieu de planter", async ({
   expect(erreurs).toEqual([]);
 });
 
+test("un JSON invalide affiche un message clair et journalise la cause", async ({ page }) => {
+  const erreurs = [];
+  page.on("console", (m) => {
+    if (m.type() === "error") erreurs.push(m.text());
+  });
+  await page.route("**/data/projets.json", (route) =>
+    route.fulfill({ body: "[ { invalide", contentType: "application/json" }),
+  );
+  await page.reload();
+  await expect(page.locator("#grille")).toHaveText("Impossible de charger les projets.");
+  await expect(page.locator("#grille")).not.toContainText("SyntaxError");
+  await expect.poll(() => erreurs.join("\n")).toContain("parsererror");
+  expect(erreurs.join("\n")).toContain("data/projets.json");
+});
+
 test("un identifiant numérique ouvre quand même la bonne fiche", async ({ page }) => {
   const projet = { ...projets[0], id: "42", titre: "Projet 42", competences: ["2024"] };
   await page.route("**/data/projets.json", (route) => route.fulfill({ json: [projet] }));
@@ -181,8 +208,11 @@ test.describe("avec prefers-reduced-motion", () => {
       window.valeursCompteur = [];
       document.addEventListener("DOMContentLoaded", () => {
         const el = document.getElementById("nb-projets");
-        new MutationObserver(() => window.valeursCompteur.push(el.textContent))
-          .observe(el, { childList: true, characterData: true, subtree: true });
+        new MutationObserver(() => window.valeursCompteur.push(el.textContent)).observe(el, {
+          childList: true,
+          characterData: true,
+          subtree: true,
+        });
       });
     });
     await page.reload();
@@ -194,8 +224,9 @@ test.describe("avec prefers-reduced-motion", () => {
     const etat = await page.evaluate(() => {
       document.querySelector(".mot[data-competence='Python']").click();
       return {
-        cartesCachees: [...document.querySelectorAll(".carte")]
-          .filter((c) => getComputedStyle(c).display === "none" || getComputedStyle(c).opacity !== "1").length,
+        cartesCachees: [...document.querySelectorAll(".carte")].filter(
+          (c) => getComputedStyle(c).display === "none" || getComputedStyle(c).opacity !== "1",
+        ).length,
         defile: window.scrollY > 0,
       };
     });

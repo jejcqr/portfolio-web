@@ -1,43 +1,31 @@
 ---
 title: "portfolio-web — explications"
-subtitle: "Un site portfolio statique en HTML, CSS et jQuery qui présente des projets décrits dans un fichier JSON, avec recherche, filtres, fiche détaillée et thème sombre."
+subtitle: "Un site portfolio statique en HTML, CSS et jQuery : comment le refaire soi-même, étape par étape, et les mauvaises pratiques qu'on apprend à éviter en le codant."
 author: "Jean-Emmanuel Jacquier"
 ---
 
 # 1. Le projet en bref
 
-## Ce que fait le projet
-
 `portfolio-web` est le site personnel de Jean-Emmanuel Jacquier, étudiant en informatique
-à Epitech Lyon. C'est une seule page web qui présente ses projets GitHub sous forme de
+à Epitech Lyon. C'est une seule page qui présente ses projets GitHub sous forme de
 cartes. Le visiteur peut rechercher un projet par mot-clé (sans se soucier des accents ni
 des majuscules), filtrer par catégorie, cliquer sur une compétence comme « Docker » pour
 ne voir que les projets qui l'utilisent, ouvrir la fiche détaillée d'un projet à la
 souris ou au clavier, et basculer entre thème clair et thème sombre.
 
-Le site est **statique** : il n'y a ni serveur applicatif ni base de données. Le
-navigateur télécharge `index.html`, une feuille de style, deux scripts et le fichier de
-données `data/projets.json`, puis construit la page en JavaScript.
+Le site est **statique** : ni serveur applicatif ni base de données. Le navigateur
+télécharge `index.html`, une feuille de style, jQuery, deux scripts et le fichier
+`data/projets.json`, puis construit la page en JavaScript. Ajouter un projet consiste à
+ajouter une entrée au JSON, sans toucher au code.
 
-Il sert de vitrine pour une recherche d'alternance : un recruteur doit pouvoir trouver
-en quelques secondes « les projets en Python » ou « ce qui touche à l'infrastructure ».
-Comme les projets sont décrits dans un fichier JSON, en ajouter un ne demande aucune
-modification du code.
+**Ce que le projet apprend à faire :** séparer la logique (fonctions pures testables
+avec Node.js) de l'affichage (jQuery) ; manipuler le DOM sans ouvrir de faille
+d'injection ; gérer le clavier, le focus et les préférences du système (thème,
+animations réduites) ; écrire des tests de bout en bout fiables avec Playwright ; contrôler le code avec ESLint
+et Prettier ; et publier automatiquement le site seulement si tout passe.
 
-## Les compétences qu'il montre
-
-- **HTML** sémantique et accessible : modale `role="dialog"` avec piège à focus, `inert`, `aria-*` (`index.html`) ;
-- **CSS** moderne : variables, thème clair/sombre, grille responsive (`css/style.css`) ;
-- **jQuery** : AJAX, délégation d'événements, animations coupées par `prefers-reduced-motion` (`js/app.js`) ;
-- **JavaScript** : fonctions pures, normalisation Unicode (`js/filtres.js`) ;
-- **tests** : 9 tests `node --test` et 34 tests Playwright (`tests/`) ;
-- **CI/CD** : GitHub Actions et déploiement GitHub Pages (`.github/workflows/ci.yml`).
-
-## Un exemple concret
-
-La logique de filtrage ne dépend pas du navigateur : on peut l'appeler depuis Node.js
-pour voir ce que la page affichera. Ici, une recherche sans accent retrouve un projet
-dont le titre en contient un, puis on affiche les deux compétences les plus fréquentes :
+**Un exemple réel.** La logique de filtrage ne dépend pas du navigateur : on peut
+l'appeler depuis Node.js pour savoir ce que la page affichera.
 
 ```bash
 node -e '
@@ -53,39 +41,43 @@ console.log(F.compterCompetences(p).slice(0, 2));'
 [ { nom: 'Python', nombre: 5 }, { nom: 'Docker', nombre: 3 } ]
 ```
 
-Dans la page, taper « emissions » dans la zone de recherche laisse exactement cette
-carte visible, et « Python » est le mot le plus gros du nuage de compétences.
+Dans la page, taper « emissions » laisse exactement cette carte visible, et « Python »
+est le mot le plus gros du nuage de compétences.
 
 # 2. Lancer et tester
 
-Le détail se trouve dans le `README.md`. Le site doit être servi par HTTP (la
-section 5.4 explique pourquoi un double-clic sur `index.html` ne suffit pas) :
+Le site doit être servi par HTTP (un double-clic sur `index.html` ne suffit pas, voir
+l'étape 4.1) :
 
 ```bash
-npm start                        # python3 -m http.server, puis ouvrir http://127.0.0.1:8080
+npm start                  # python3 -m http.server 8080 --bind 127.0.0.1
+                           # puis ouvrir http://127.0.0.1:8080
 npm install
-npm test                         # 9 tests unitaires (node --test), ~0,1 s
+npm run lint               # ESLint (règles recommandées)
+npm run format:check       # Prettier, sans rien modifier
+npm test                   # 9 tests unitaires (node --test)
 npx playwright install chromium
-npm run test:e2e                 # 34 tests de bout en bout (Playwright)
+npm run test:e2e           # 36 tests de bout en bout (Playwright)
 ```
 
-`npm start` ne fait que lancer le serveur intégré à Python 3 : rien n'est téléchargé.
-Les 17 scénarios de `tests/portfolio.spec.js` sont joués deux fois, sur un écran
-d'ordinateur et sur un téléphone simulé (Pixel 7), d'où 34 tests. Si un Chromium est
-déjà installé, la variable `CHROMIUM_PATH` permet de l'utiliser (voir
-`playwright.config.js`). À chaque `push` sur `main`, `.github/workflows/ci.yml` relance
-tous les tests puis, s'ils passent, publie le site sur GitHub Pages.
+`npm start` ne télécharge rien : il lance le serveur intégré à Python 3. Les 18
+scénarios de `tests/portfolio.spec.js` sont joués sur un écran d'ordinateur et sur un
+téléphone simulé (Pixel 7), d'où 36 tests. Le port 8080 doit être libre : Playwright
+lance son propre serveur et refuse d'en réutiliser un (5.12). Si un Chromium est déjà installé, la variable
+`CHROMIUM_PATH` permet de l'utiliser à la place de `npx playwright install` (voir
+`playwright.config.js`). À chaque `push`, `.github/workflows/ci.yml` relance ESLint,
+Prettier et tous les tests ; sur `main`, s'ils passent, il publie le site sur GitHub Pages.
 
 # 3. Architecture
 
 ```text
   push sur main --> GitHub Actions (ci.yml)
-                      tests : npm test, npm run test:e2e
-                      déploiement : index.html css js data --> GitHub Pages
+                      job tests : lint, format:check, npm test, npm run test:e2e
+                      job deploiement (needs: tests) : index.html css js data --> Pages
 
   Navigateur
     index.html     script inline du <head> : applique le thème mémorisé
-    css/style.css  variables de couleur, thème sombre
+    css/style.css  variables de couleur, thème sombre, prefers-reduced-motion
     jQuery (CDN)   vérifié par l'attribut integrity
     js/filtres.js  crée window.Filtres (fonctions pures, sans DOM)
     js/app.js      $(function () { ... }) quand le DOM est prêt
@@ -115,72 +107,123 @@ est redessinée à partir de zéro.
 | `js/app.js` | Code jQuery : chargement, rendu, événements, modale, thème, compteurs |
 | `data/projets.json` | Les 12 projets (titre, résumé, détails, compétences, catégorie, dépôt) |
 | `tests/filtres.test.js` | Tests `node --test` des filtres et de la validité du JSON |
-| `tests/portfolio.spec.js` | Tests Playwright : recherche, filtres, modale, thème, mobile |
+| `tests/portfolio.spec.js` | Tests Playwright : recherche, filtres, modale, clavier, thème, mobile |
 | `playwright.config.js` | Serveur de test (`npm start`), profils « ordinateur » et « mobile » |
-| `.github/workflows/ci.yml` | Tests puis déploiement GitHub Pages |
+| `eslint.config.js`, `.prettierrc.json` | Analyse statique (ESLint) et mise en forme (Prettier) |
+| `.github/workflows/ci.yml` | Lint et tests, puis déploiement GitHub Pages |
 | `docs/`, `explications-pdf.yml` | Ce document, son script PDF et le workflow qui le régénère |
 
-# 4. Le code pas à pas
+# 4. Refaire le projet soi-même, étape par étape
 
-On suit le parcours complet, de l'ouverture de la page au clic sur une compétence.
+Les étapes suivent l'ordre dans lequel on construirait réellement le site : d'abord la
+plus petite version qui fonctionne, puis une fonctionnalité à la fois, chacune vérifiée
+avant de passer à la suivante. Les extraits sont ceux du code final.
 
-## 4.1 Avant l'affichage : le thème mémorisé
+## 4.1 Étape 1 : une page statique servie par HTTP
 
-Tout en haut de `index.html`, un petit script s'exécute **avant** que le navigateur ne
-dessine la page :
+**Objectif.** Écrire le squelette HTML (en-tête, sections vides, modale cachée) et
+l'ouvrir dans un navigateur comme il le sera en production. Les zones à remplir par
+JavaScript sont vides :
 
 ```html
-<script>
-  // Appliqué avant l'affichage pour éviter un flash de thème clair.
-  try {
-    var t = localStorage.getItem("theme");
-    if (t) document.documentElement.dataset.theme = t;
-  } catch (e) {}
-</script>
+<div class="grille" id="grille"></div>
+<p class="vide" hidden></p>
 ```
 
-`localStorage.getItem("theme")` lit le choix fait lors d'une visite précédente
-(`"clair"` ou `"sombre"`), ou `null`. La ligne suivante pose l'attribut
-`data-theme="sombre"` sur `<html>`, auquel réagit le CSS (voir 5.5). Le `try/catch`
-protège contre les navigateurs où le stockage est interdit : la page fonctionne quand
-même, sans mémoire du thème.
+**Vérifier.** Lancer `npm start`, puis dans un autre terminal :
 
-En bas de la page, trois scripts sont ensuite chargés dans l'ordre : jQuery depuis le
-CDN `code.jquery.com` (avec un attribut `integrity` qui contient l'empreinte SHA-256
-attendue, pour que le navigateur refuse un fichier modifié), puis `js/filtres.js`, puis
-`js/app.js`, qui a besoin des deux premiers.
+```bash
+curl -s -o /dev/null -w '%{http_code} %{content_type}\n' \
+  http://127.0.0.1:8080/data/projets.json
+```
 
-## 4.2 Le module de filtrage, utilisable partout
+```text
+# sortie réelle (une fois data/projets.json créé à l'étape 2)
+200 application/json
+```
 
-`js/filtres.js` fonctionne à la fois dans le navigateur et dans Node.js :
+**Le piège à cette étape.** Ouvrir `index.html` par un double-clic (adresse `file://`).
+Dès l'étape 4, la page affiche « Impossible de charger les projets. » et la console de
+Chromium indique, en sortie réelle : `Access to XMLHttpRequest at
+'file:///home/claude/portfolio-web/data/projets.json' from origin 'null' has been
+blocked by CORS policy`. Une page ouverte depuis le disque n'a pas d'origine et ne peut
+pas lire d'autres fichiers locaux. Autre piège : oublier `--bind` (5.12).
+
+## 4.2 Étape 2 : décrire les projets dans un JSON, et le valider
+
+**Objectif.** Séparer les données du code. Chaque projet de `data/projets.json` a un
+`id`, un `titre`, un `resume`, des `details`, une liste de `competences`, une
+`categorie` et un lien `depot` (exemple dans le `README.md`). Le premier test à écrire
+vérifie les données elles-mêmes (`tests/filtres.test.js`) :
+
+```js
+test("chaque projet a les champs attendus", () => {
+  const ids = new Set();
+  for (const p of projets) {
+    for (const champ of ["id", "titre", "resume", "details", "categorie", "depot"]) {
+      assert.ok(p[champ], `${p.id} : champ ${champ} manquant`);
+    }
+    assert.ok(p.competences.length > 0, `${p.id} : aucune compétence`);
+    assert.match(p.depot, /^https:\/\/github\.com\/jejcqr\//);
+    assert.ok(!ids.has(p.id), `id en double : ${p.id}`);
+    ids.add(p.id);
+  }
+});
+```
+
+**Vérifier.** `npm test` ; avec le projet complet, la sortie réelle se termine par
+`# tests 9`, `# pass 9`, `# fail 0`.
+
+**Le piège à cette étape.** Une virgule après le dernier élément, tolérée en JavaScript,
+est interdite en JSON. Essai réel sur une copie du projet : `npm test` échoue dès le
+chargement, avec `SyntaxError: .../data/projets.json: Unexpected token ']', ... is not
+valid JSON`. C'est voulu : l'erreur est arrêtée avant la mise en ligne (5.12).
+
+## 4.3 Étape 3 : la logique de filtrage en fonctions pures
+
+**Objectif.** Écrire « quels projets afficher ? » sans jQuery ni `document`, dans un
+fichier que le navigateur **et** Node.js peuvent charger. Extrait de `js/filtres.js` :
 
 ```js
 (function (exports) {
   "use strict";
-  function normaliser(texte) { /* ... */ }
-  function filtrerProjets(projets, criteres) { /* ... */ }
-  // ...
+
+  function normaliser(texte) {
+    return String(texte)
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim();
+  }
+  // ... filtrerProjets, compterCompetences, categories ...
   exports.normaliser = normaliser;
   exports.filtrerProjets = filtrerProjets;
-  exports.compterCompetences = compterCompetences;
-  exports.categories = categories;
+  // ...
 })(typeof module !== "undefined" ? module.exports : (window.Filtres = {}));
 ```
 
-Tout le fichier est une fonction appelée immédiatement, qui range ses fonctions dans
-l'objet `exports` qu'on lui passe. La dernière ligne choisit cet objet : dans Node.js,
-la variable `module` existe et les fonctions vont dans `module.exports`, ce qui permet
-`require("../js/filtres.js")` dans les tests ; dans le navigateur, on crée
-`window.Filtres = {}`. Le test `typeof module !== "undefined"` est la seule façon sûre de
-tester une variable qui peut ne pas exister : `module !== undefined` lèverait une
-`ReferenceError` dans le navigateur.
+Le fichier réel écrit cette chaîne d'appels sur une seule ligne, et contient directement
+les deux accents combinants au lieu de `\u0300` et
+`\u036f` ; la forme échappée est plus lisible. `normalize("NFD")` sépare « é » en « e »
+suivi d'un accent combinant, que l'expression régulière supprime. `filtrerProjets`
+applique la catégorie, puis la compétence, puis exige que **chaque** mot de la recherche
+apparaisse dans le titre, le résumé, les détails ou les compétences. La dernière ligne
+range les fonctions dans `module.exports` sous Node.js, dans `window.Filtres` dans le
+navigateur ; `typeof` est la seule façon sûre de tester une variable qui peut ne pas
+exister (`module !== undefined` lèverait une `ReferenceError` dans le navigateur).
 
-## 4.3 Le démarrage de app.js et le chargement des données
+**Vérifier.** Écrire les tests en même temps que les fonctions, par exemple « la
+recherche ignore les accents et combine les mots », qui attend `["alhudabot"]` pour
+`{ recherche: "python discord coran" }`. L'appel `node -e` de la partie 1 donne aussi
+un retour immédiat.
 
-`js/app.js` est entièrement enveloppé dans `$(function () { ... })`, le raccourci jQuery
-pour « exécuter quand le DOM est prêt ». Il déclare l'état (`projets`, `criteres`,
-`dernierFocus`), puis les gestionnaires d'événements, et seulement à la fin charge les
-données :
+**Le piège à cette étape.** Se contenter de `toLowerCase()` : en sortie réelle,
+`"Émissions".toLowerCase().includes("emissions")` vaut `false`. Et écrire le filtre
+dans un gestionnaire jQuery le rendrait intestable sans navigateur.
+
+## 4.4 Étape 4 : charger les données et afficher les cartes
+
+**Objectif.** Relier données et fonctions pures à la page. Fin de `js/app.js` :
 
 ```js
 $.getJSON("data/projets.json")
@@ -190,474 +233,242 @@ $.getJSON("data/projets.json")
     afficherProjets();
     afficherNuage();
   })
-  .fail(function () {
+  .fail(function (xhr, statut, erreur) {
+    // Le détail technique va dans la console, pour le développeur ; le visiteur ne
+    // voit qu'un message fixe, sans information interne.
+    console.error("Chargement de data/projets.json impossible :", statut, String(erreur));
     $grille.html("<p class='vide'>Impossible de charger les projets.</p>");
   });
 ```
 
-`$.getJSON` envoie une requête HTTP en arrière-plan (AJAX) et transforme la réponse en
-tableau JavaScript. La requête est **asynchrone** : les fonctions passées à `.done`
-(succès) ou `.fail` (échec) sont appelées plus tard, à l'arrivée de la réponse. Les
-gestionnaires sont donc posés avant que la moindre carte n'existe ; cela fonctionne grâce
-à la délégation d'événements (5.1). Le `$` devant `$grille` est une convention qui
-signale une variable contenant un objet jQuery.
+`$.getJSON` est **asynchrone** : `.done` est appelé plus tard, à l'arrivée de la
+réponse ; tout code qui a besoin des projets part de là. `afficherProjets` appelle
+`Filtres.filtrerProjets(projets, criteres)`, vide la grille avec `$grille.empty()`, puis
+crée chaque carte avec des balises fixes remplies par `.text()` et `.attr()` (5.3).
 
-## 4.4 Le filtrage : une fonction pure
+**Vérifier.** Premier test Playwright, « affiche tous les projets et les compteurs » :
+`await expect(page.locator(".carte")).toHaveCount(projets.length)`. L'attente vient des
+données : ajouter un projet ne casse pas le test.
 
-Le cœur du site est `filtrerProjets` dans `js/filtres.js` :
+**Le piège à cette étape.** Concaténer du HTML (5.3), oublier le `.fail` (5.6), supposer
+que le JSON contient au moins un projet (5.5).
 
-```js
-function filtrerProjets(projets, criteres) {
-  var recherche = normaliser(criteres.recherche || "");
-  return projets.filter(function (p) {
-    if (criteres.categorie && criteres.categorie !== "tous"
-        && p.categorie !== criteres.categorie) {
-      return false;
-    }
-    if (criteres.competence && p.competences.indexOf(criteres.competence) === -1) {
-      return false;
-    }
-    if (!recherche) {
-      return true;
-    }
-    var texte = normaliser([p.titre, p.resume, p.details]
-      .concat(p.competences).join(" "));
-    return recherche.split(/\s+/).every(function (mot) {
-      return texte.indexOf(mot) !== -1;
-    });
-  });
-}
-```
+## 4.5 Étape 5 : la recherche et les filtres
 
-(Deux lignes sont coupées pour la mise en page.)
-
-- `criteres.recherche || ""` remplace une recherche absente par une chaîne vide, ce qui
-  autorise l'appel `filtrerProjets(projets, {})` dans les tests.
-- Les trois critères se cumulent : catégorie, **puis** compétence, **puis** recherche.
-- Pour la recherche, titre, résumé, détails et compétences sont réunis en un seul texte
-  normalisé (sans accents, en minuscules, voir 5.10).
-- `recherche.split(/\s+/)` découpe la saisie en mots ; `every` exige que **chaque** mot
-  soit présent. « python discord coran » ne garde ainsi que AlHudaBot, ce que vérifie
-  `tests/filtres.test.js`.
-- La fonction ne modifie rien et ne touche pas au DOM : c'est une fonction **pure**.
-
-## 4.5 Le rendu des cartes
-
-`afficherProjets` dans `js/app.js` transforme le résultat du filtrage en HTML :
-
-```js
-function afficherProjets() {
-  var visibles = Filtres.filtrerProjets(projets, criteres);
-  $grille.empty();
-  visibles.forEach(function (p, i) {
-    var $carte = $("<article class='carte' tabindex='0'>")
-      .attr("data-id", p.id)
-      .attr("aria-label", "Voir le détail de " + p.titre)
-      .append($("<span class='categorie'>").text(LIBELLES[p.categorie] || p.categorie))
-      .append($("<h3>").text(p.titre))
-      .append($("<p>").text(p.resume))
-      .append($("<ul class='etiquettes'>").append(etiquettes(p.competences)));
-    $carte.appendTo($grille);
-    // Fondu en cascade, sauf animations coupées : delay() ne tient pas compte de $.fx.off.
-    if (!$.fx.off) $carte.hide().delay(i * 40).fadeIn(200);
-  });
-  $(".vide").prop("hidden", visibles.length > 0).text(projets.length
-    ? "Aucun projet ne correspond à cette recherche."
-    : "Aucun projet à afficher pour le moment.");
-  $(".filtre-actif").prop("hidden", !criteres.competence)
-    .find("strong").text(criteres.competence || "");
-}
-```
-
-- `$grille.empty()` : on redessine tout plutôt que de calculer quelles cartes ajouter ou
-  retirer. Avec douze projets, c'est instantané et beaucoup plus simple.
-- `tabindex='0'` rend l'`<article>` atteignable avec Tab (voir 5.6).
-- Tous les textes passent par `.text(...)`, jamais par `.html(...)` (voir 5.7).
-- `LIBELLES[p.categorie] || p.categorie` affiche « Bots Discord » pour `bots`, ou la
-  valeur brute si aucun libellé n'est prévu.
-- `.hide().delay(i * 40).fadeIn(200)` cache chaque carte insérée, puis la fait
-  apparaître en fondu avec 40 ms de décalage par rang : effet de cascade. Quand les
-  animations sont coupées (`$.fx.off`, voir 5.11), la carte reste simplement visible.
-- Les deux dernières instructions affichent un message seulement si la liste est vide
-  (« Aucun projet ne correspond… », ou « Aucun projet à afficher… » si
-  `data/projets.json` lui-même est vide), et le bandeau « Filtré par … » seulement si
-  une compétence est choisie.
-
-## 4.6 Les filtres par catégorie et par compétence
-
-Les boutons de catégorie sont créés par `afficherCategories` à partir de
-`Filtres.categories(projets)` (catégories dans l'ordre d'apparition, sans doublon). Un
-clic met à jour `criteres.categorie` (lu avec `.attr("data-categorie")`, voir 5.1), passe `aria-pressed` à `true` sur le bouton choisi
-(ce qui sert aux lecteurs d'écran et au CSS `.filtre[aria-pressed="true"]`), puis appelle
-`afficherProjets()`.
-
-Les étiquettes des cartes, celles de la modale et les mots du nuage portent tous un
-attribut `data-competence`. Un seul gestionnaire les couvre :
-
-```js
-function filtrerParCompetence(nom) {
-  criteres.competence = nom;
-  fermerModale();
-  afficherProjets();
-  document.getElementById("projets").scrollIntoView();
-  $(".filtre-actif")[0].focus({ preventScroll: true });
-}
-
-$(document).on("click", ".etiquette, .mot", function (e) {
-  e.stopPropagation();
-  filtrerParCompetence($(this).attr("data-competence"));
-});
-```
-
-`e.stopPropagation()` empêche le clic de remonter jusqu'à la carte qui contient
-l'étiquette ; sans lui, cliquer sur « Docker » dans une carte ouvrirait aussi la fiche du
-projet. `fermerModale()` ne fait rien si la modale est déjà fermée. `scrollIntoView()`
-ramène la section « Projets » en haut de l'écran : le défilement est doux grâce à
-`scroll-behavior: smooth` sur `<html>`, et `scroll-padding-top: 70px` le fait s'arrêter
-sous l'en-tête collant (voir 5.11).
-
-Le focus suit le défilement : il va sur le bandeau « Filtré par … », qui porte
-`tabindex="-1"` dans `index.html` (focalisable par le code, mais pas avec Tab). Un
-lecteur d'écran peut alors lire le filtre appliqué, et le Tab suivant atteint « tout
-afficher », puis les cartes. `preventScroll: true` évite que `focus()` ne lance son
-propre défilement vers le bandeau. Ce n'est pas un détail : voir 5.6. Symétriquement, « tout afficher » cache
-le bandeau qui le contient, donc son gestionnaire renvoie le focus au champ de recherche.
-
-## 4.7 Le nuage de compétences et les compteurs
-
-`afficherNuage` crée un bouton `.mot` par compétence. `Filtres.compterCompetences` les
-renvoie de la plus fréquente à la moins fréquente (départage alphabétique avec
-`localeCompare(..., "fr")`), donc `stats[0].nombre` est le maximum, et la taille de police
-varie de 0,9 rem à 1,8 rem avec `0.9 + 0.9 * s.nombre / max`.
-
-Si `data/projets.json` est un tableau vide, `stats[0]` n'existe pas, et lire
-`stats[0].nombre` lèverait une `TypeError` qui arrêterait tout le rendu (compteurs
-compris). La fonction teste donc `stats.length` et remplace la phrase d'aide par
-« Aucune compétence à afficher pour le moment. » ; un test Playwright sert un JSON vide
-pour le vérifier.
-
-Les compteurs « 12 projets » et « N technologies » utilisent une astuce jQuery dans
-`animerCompteur` : `$({ valeur: 0 }).animate({ valeur: cible }, { duration: 900, ... })`.
-Ici `$()` enveloppe un simple objet JavaScript, pas un élément HTML ; `.animate` fait
-varier sa propriété `valeur` de 0 à `cible`, la fonction `step` écrit à chaque étape
-`Math.round(this.valeur)` dans la page, et `complete` garantit un nombre final exact.
-
-## 4.8 La fiche détaillée (modale)
-
-```js
-function ouvrirModale(id) {
-  var p = projets.find(function (x) { return x.id === id; });
-  if (!p) return;
-  dernierFocus = document.activeElement;
-  $modale.find("#modale-titre").text(p.titre);
-  $modale.find(".modale-details").text(p.details);
-  $modale.find(".modale-competences").empty().append(etiquettes(p.competences));
-  $modale.find(".modale-lien").attr("href", p.depot);
-  $modale.stop(true, true).prop("hidden", false).hide().fadeIn(150);
-  $arrierePlan.prop("inert", true);
-  $modale.find(".modale-fermer").trigger("focus");
-  $("body").addClass("sans-defilement");
-}
-```
-
-`dernierFocus` mémorise l'élément qui avait le focus (la carte) pour le lui rendre à la
-fermeture. La modale existe déjà dans `index.html` : on remplit seulement ses zones.
-`.prop("hidden", false).hide().fadeIn(150)` retire l'attribut `hidden`, cache aussitôt
-avec jQuery, puis fait apparaître en fondu ; le `.stop(true, true)` qui précède est
-expliqué en 5.6. `$arrierePlan` regroupe l'en-tête, `main` et le pied de page : l'attribut
-`inert` les rend inertes (ni clic, ni focus, ni lecture par un lecteur d'écran) tant que
-la modale est ouverte. Le focus va sur le bouton « Fermer », et la classe
-`sans-defilement` (`overflow: hidden`) bloque le défilement de l'arrière-plan. La
-fermeture et l'usage au clavier sont détaillés en 5.6.
-
-## 4.9 Le bouton de thème
-
-La fonction `themeSombre()` de `js/app.js` détermine le thème affiché : il est sombre si
-`data-theme` vaut `"sombre"`, **ou** si aucun choix n'est enregistré et que
-`window.matchMedia("(prefers-color-scheme: dark)").matches` est vrai. Au clic sur
-`.bouton-theme`, on pose l'autre valeur sur `<html>` et on l'enregistre avec
-`localStorage.setItem("theme", nouveau)` (dans un `try/catch`), pour que le script
-inline de 4.1 la réapplique à la prochaine visite.
-
-Le bouton est un interrupteur : son nom accessible est fixe (`aria-label="Thème
-sombre"`) et son état est porté par `aria-pressed`, que `majBoutonTheme()` recalcule au
-chargement, après chaque clic et quand la préférence du système change (événement
-`change` de `matchMedia`). Un lecteur d'écran annonce ainsi le nom, le rôle de bouton
-bascule et l'état (activé ou non). Le nom ne doit pas changer avec l'état : « Passer au
-thème clair », annoncé « activé », serait contradictoire. L'icône, purement visuelle, vient du CSS :
-`content: var(--icone-theme)` sur `.bouton-theme::before`, la variable valant « ☾ » dans
-le thème clair et « ☀ » dans le sombre, dans les mêmes blocs que les couleurs (5.5).
-
-# 5. Ce qu'on apprend en le codant soi-même
-
-Cette partie rassemble les notions pratiques qu'on découvre en écrivant ce projet, en
-général après s'être heurté au problème. Pour chacune : le contexte, l'erreur naïve, la
-solution retenue dans le code.
-
-## 5.1 La délégation d'événements
-
-**Contexte.** Les cartes, les étiquettes et les boutons de catégorie n'existent pas dans
-`index.html` : ils sont créés par JavaScript après le chargement du JSON, et recréés à
-chaque filtrage par `$grille.empty()`.
-
-**L'approche naïve.** On écrit naturellement `$(".carte").on("click", ...)`. Au moment
-où cette ligne s'exécute, `$.getJSON` n'a pas encore répondu : `$(".carte")` ne trouve
-**aucun** élément, et le gestionnaire n'est attaché à rien. Aucune erreur n'apparaît ; le
-clic ne fait simplement rien. Et même placée dans `.done`, cette ligne ne suffirait pas :
-le premier filtrage détruirait les cartes et leurs gestionnaires. Un essai dans Chromium
-avec jQuery 3.7.1 le confirme, seul le gestionnaire délégué réagit :
-
-```js
-$(".x").on("click", () => n++);              // attaché à rien
-$("#g").on("click", ".x", () => n += 10);    // délégué au conteneur
-$("#g").append("<button class=x>");
-$(".x").trigger("click");                    // n vaut 10, pas 11
-```
-
-**La bonne façon, dans le projet.** On attache le gestionnaire à un parent **stable** et
-on précise un sélecteur en deuxième argument :
-
-```js
-$grille.on("click", ".carte", function () { ouvrirModale($(this).attr("data-id")); });
-$(".categories").on("click", ".filtre", function () { /* ... */ });
-$(document).on("click", ".etiquette, .mot", function (e) { /* ... */ });
-```
-
-Le clic sur une carte « remonte » (on dit qu'il se propage, *bubbling*) jusqu'à
-`#grille`, qui existe depuis le début. jQuery vérifie alors si l'élément cliqué, ou l'un
-de ses ancêtres, correspond à `.carte`, et appelle la fonction avec `this` égal à cette
-carte. Les étiquettes sont déléguées à `document` car elles apparaissent à trois endroits
-(cartes, modale, nuage).
-
-Corollaire : comme l'événement remonte, un clic sur une étiquette **dans** une carte
-atteindrait aussi le gestionnaire de la carte. D'où le `e.stopPropagation()` de 4.6.
-
-Le clavier a produit un vrai bug du même genre. Le gestionnaire `keydown` de `.carte`
-ouvre la fiche sur Entrée ou Espace et appelle `e.preventDefault()`. Or l'appui sur
-Entrée dans une étiquette remonte, lui aussi, jusqu'à la carte : la fiche s'ouvrait, et
-le `preventDefault()` annulait le clic que le navigateur aurait déclenché sur le bouton,
-si bien que le filtre n'était jamais appliqué. `stopPropagation()` dans le gestionnaire
-de clic n'y pouvait rien, puisque ce clic n'avait jamais lieu. La correction consiste à
-ne traiter que les touches adressées à la carte elle-même :
-
-```js
-$grille.on("keydown", ".carte", function (e) {
-  if (e.target !== this) return;   // touche frappée dans une étiquette
-  // ...
-});
-```
-
-Piège voisin : `.data()` convertit les attributs `data-*`, et `data-id="42"` devient le
-**nombre** 42 ; la comparaison `x.id === id` d'`ouvrirModale` échouait alors. Le projet
-lit donc `data-id`, `data-categorie` et `data-competence` avec `.attr()`, qui renvoie
-toujours une chaîne. Un test Playwright sert un projet d'identifiant `"42"` pour le
-vérifier.
-
-> **À retenir :** pour des éléments créés dynamiquement, on attache l'écouteur à un
-> conteneur qui existe déjà, avec `.on("click", "selecteur", ...)`. Un sélecteur qui ne
-> trouve rien ne provoque aucune erreur, il ne fait simplement rien. Un gestionnaire
-> délégué reçoit aussi les événements des descendants : comparer `e.target` et `this`
-> avant d'appeler `preventDefault()`.
-
-## 5.2 Séparer la logique du DOM pour pouvoir la tester
-
-**Contexte.** La règle « quels projets afficher ? » est la partie la plus susceptible de
-contenir des bugs : combinaison de trois critères, accents, plusieurs mots.
-
-**L'approche naïve.** On écrit le filtre dans le gestionnaire jQuery, en parcourant les
-cartes avec `$(".carte").each(...)` et en cachant celles dont `.text()` ne contient pas
-la recherche. Cela fonctionne, mais le seul moyen de le tester est d'ouvrir un
-navigateur : chargé dans Node.js, ce code s'arrête sur `ReferenceError: $ is not
-defined`. De plus, la recherche porterait sur le texte **affiché**, pas sur le champ
-`details`, qui n'apparaît que dans la modale.
-
-**La bonne façon, dans le projet.** Toute la logique est dans `js/filtres.js`, qui
-ne connaît ni jQuery ni `document` : des tableaux en entrée, un tableau en sortie. Le
-motif de 4.2 (`typeof module !== "undefined" ? module.exports : window.Filtres`) permet
-de charger le **même fichier** dans la page et dans les tests :
-
-```js
-const { filtrerProjets } = require("../js/filtres.js");
-const projets = require("../data/projets.json");
-
-test("filtre par compétence", () => {
-  const go = filtrerProjets(projets, { competence: "Go" });
-  assert.deepEqual(go.map((p) => p.id), ["go-uptime"]);
-});
-```
-
-Les 9 tests de `tests/filtres.test.js` s'exécutent en une fraction de seconde avec
-`node --test`, sans dépendance à installer. Ils vérifient aussi les données : chaque
-projet a tous ses champs, un lien vers `github.com/jejcqr/`, et aucun identifiant n'est
-en double. Une faute de frappe dans `data/projets.json` est donc détectée par la CI avant
-la mise en ligne.
-
-> **À retenir :** isoler les règles métier dans des fonctions pures (données en entrée,
-> résultat en sortie, sans DOM) les rend testables en millisecondes. Le code jQuery ne
-> fait plus que relier ces fonctions à la page.
-
-## 5.3 Ne pas tout redessiner à chaque touche : le *debounce*
-
-**Contexte.** La recherche filtre en direct pendant la frappe. Chaque redessin vide la
-grille et relance les fondus des cartes.
-
-**L'approche naïve.**
-
-```js
-$("#recherche").on("input", function () {
-  criteres.recherche = $(this).val();
-  afficherProjets();
-});
-```
-
-Taper « docker » déclenche six redessins en moins d'une seconde. Les animations
-`delay(i * 40).fadeIn(200)` se chevauchent : les cartes clignotent, et sur un téléphone
-peu puissant la saisie devient saccadée.
-
-**La bonne façon, dans le projet.**
+**Objectif.** Chaque action modifie `criteres` puis appelle `afficherProjets()`. Pour la
+recherche, on attend une pause dans la frappe (*debounce*) :
 
 ```js
 var minuterie;
 $("#recherche").on("input", function () {
   var valeur = $(this).val();
   clearTimeout(minuterie);
-  minuterie = setTimeout(function () {   // évite de tout redessiner à chaque touche
+  // Attendre une pause de 150 ms évite de tout redessiner à chaque touche.
+  minuterie = setTimeout(function () {
     criteres.recherche = valeur;
     afficherProjets();
   }, 150);
 });
 ```
 
-Chaque frappe annule le minuteur précédent (`clearTimeout`) et en programme un nouveau.
-Le redessin n'a donc lieu que lorsque l'utilisateur a fait une pause de 150 ms. Ce motif
-s'appelle *debounce* (anti-rebond). La valeur est lue **immédiatement**
-(`var valeur = $(this).val()`), car dans la fonction différée `this` ne désigne plus
-le champ de saisie.
+La valeur est lue tout de suite, car dans la fonction différée `this` ne désigne plus le
+champ. `input` couvre aussi le collage et la croix d'effacement, contrairement à `keyup`.
+Les boutons de catégorie sont gérés par délégation :
+`$(".categories").on("click", ".filtre", ...)`.
 
-L'événement `input` est préférable à `keyup` : il se déclenche aussi pour un collage à
-la souris, une dictée vocale ou un clic sur la croix d'effacement d'un champ
-`type="search"`.
+**Vérifier.** Tests « la recherche filtre les cartes » et « les catégories filtrent les
+cartes ». Mesure réelle dans Chromium, en tapant « docker » à une touche toutes les
+60 ms : 6 événements `input`, un seul appel à `Filtres.filtrerProjets`.
 
-> **À retenir :** pour réagir à une saisie continue, on attend une courte pause avec
-> `clearTimeout` + `setTimeout` plutôt que de travailler à chaque frappe.
+**Le piège à cette étape.** `$(".filtre").on("click", ...)` sur des boutons qui
+n'existent pas encore (5.1) ; `.data("categorie")`, qui convertit les types (5.2).
 
-## 5.4 `$.getJSON` et le protocole `file://`
+## 4.6 Étape 6 : la fiche détaillée (modale)
 
-**Contexte.** Le site charge ses données avec `$.getJSON("data/projets.json")`.
-
-**L'approche naïve.** On double-clique sur `index.html`. Le navigateur l'ouvre avec une
-adresse `file:///.../index.html`, et la page affiche seulement « Impossible de charger les
-projets. ». La console de Chromium explique :
-
-```text
-Access to XMLHttpRequest at 'file:///home/claude/portfolio-web/data/projets.json'
-from origin 'null' has been blocked by CORS policy: Cross origin requests are only
-supported for protocol schemes: chrome, chrome-extension, chrome-untrusted, data,
-http, https, isolated-app.
-```
-
-Pour des raisons de sécurité, une page ouverte depuis le disque n'a pas d'« origine »
-(elle vaut `null`) et n'a pas le droit de lire d'autres fichiers locaux par requête
-AJAX. Sinon, un fichier HTML téléchargé pourrait lire tout le disque de l'utilisateur et
-l'envoyer sur Internet.
-
-**La bonne façon, dans le projet.** On sert le dossier par HTTP, même en local :
-
-```bash
-npm start      # python3 -m http.server 8080 --bind 127.0.0.1
-```
-
-`playwright.config.js` lance la même commande (option `webServer`) avant les tests, et c'est la situation réelle sur GitHub Pages. Le code prévoit en outre le cas
-d'échec avec `.fail(...)` : l'utilisateur voit un message plutôt qu'une page vide.
-
-Deux détails utiles :
-
-- le chemin `data/projets.json` est **relatif** (sans `/` initial). Il fonctionne donc
-  aussi bien à la racine d'un domaine que dans un sous-dossier comme
-  `https://jejcqr.github.io/portfolio-web/` ;
-- `.done` et `.fail` ne sont appelés qu'**après** la réponse. Tout code qui a besoin
-  des projets doit être appelé depuis `.done`, pas écrit juste après `$.getJSON`.
-
-> **À retenir :** une page qui fait des requêtes AJAX doit être servie par HTTP, même
-> pendant le développement. Une requête peut échouer : il faut toujours prévoir le cas
-> d'erreur.
-
-## 5.5 Un thème sombre sans flash
-
-**Contexte.** Le site respecte la préférence du système (mode sombre de Windows, macOS,
-Android…), mais l'utilisateur peut aussi imposer son choix avec le bouton.
-
-**L'approche naïve.** On applique le thème enregistré dans `app.js` :
+**Objectif.** Afficher le détail d'un projet par-dessus la page, utilisable à la souris,
+au clavier et avec un lecteur d'écran.
 
 ```js
-$(function () {
-  $("html").attr("data-theme", localStorage.getItem("theme"));
+function ouvrirModale(id) {
+  var p = projets.find(function (x) {
+    return x.id === id;
+  });
+  if (!p) return;
+  dernierFocus = document.activeElement;
+  $modale.find("#modale-titre").text(p.titre);
+  $modale.find(".modale-details").text(p.details);
+  $modale.find(".modale-competences").empty().append(etiquettes(p.competences));
+  $modale.find(".modale-lien").attr("href", p.depot);
+  // stop(true, true) termine un fondu de fermeture en cours,
+  // dont le rappel remettrait hidden.
+  $modale.stop(true, true).prop("hidden", false).hide().fadeIn(150);
+  // Ni clic, ni focus, ni lecteur d'écran derrière la modale.
+  $arrierePlan.prop("inert", true);
+  $modale.find(".modale-fermer").trigger("focus");
+  $("body").addClass("sans-defilement");
+}
+```
+
+La modale porte `role="dialog"`, `aria-modal="true"` et
+`aria-labelledby="modale-titre"` dans `index.html`. `fermerModale` fait l'inverse, retire
+`inert` **avant** de rendre le focus à `dernierFocus` (un élément inerte le refuse) et
+ne remet `hidden` qu'à la fin du fondu. Les cartes ont `tabindex='0'` et s'ouvrent aussi
+avec Entrée ou Espace.
+
+**Vérifier.** Test « la modale s'ouvre au clic et se ferme avec Échap ».
+
+**Le piège à cette étape.** Le CSS donne `display: grid` à `.modale`, ce qui l'emporte
+sur le style par défaut de `hidden` : sans `.modale[hidden] { display: none; }`, la
+modale est toujours visible. Pièges réels plus subtils : 5.7 et 5.8.
+
+## 4.7 Étape 7 : le thème clair ou sombre
+
+**Objectif.** Suivre la préférence du système, permettre de la remplacer, s'en souvenir.
+Dans le `<head>` de `index.html`, avant tout affichage :
+
+```html
+<script>
+  // Appliqué avant l'affichage pour éviter un flash de thème clair.
+  try {
+    var t = localStorage.getItem("theme");
+    if (t) document.documentElement.dataset.theme = t;
+  } catch {
+    /* stockage indisponible : thème par défaut */
+  }
+</script>
+```
+
+Dans `css/style.css`, les couleurs sont des variables (`--fond`, `--texte`…) redéfinies
+sous `:root[data-theme="sombre"]` et sous `@media (prefers-color-scheme: dark)` avec
+`:root:not([data-theme="clair"])` (« sombre si le système l'est, sauf choix contraire »).
+Le reste du CSS n'utilise que `var(--fond)` : un seul attribut change tout.
+
+**Vérifier.** Test « le thème sombre est mémorisé » : clic, `page.reload()`, puis
+`data-theme` vaut toujours `"sombre"`.
+
+**Le piège à cette étape.** Appliquer le thème dans `app.js`, chargé en fin de page :
+l'affichage passerait du clair au sombre au chargement (illustratif, non mesuré ici). Le
+bouton doit aussi exposer son état (5.10).
+
+## 4.8 Étape 8 : animations et compteurs, sans imposer le mouvement
+
+**Objectif.** Ajouter les fondus en cascade et les compteurs animés, coupés pour les
+personnes qui ont demandé moins d'animations à leur système.
+
+```js
+var moinsDeMouvement = window.matchMedia("(prefers-reduced-motion: reduce)");
+$.fx.off = moinsDeMouvement.matches;
+moinsDeMouvement.addEventListener("change", function (e) {
+  $.fx.off = e.matches;
 });
 ```
 
-Résultat : à chaque chargement, la page s'affiche d'abord en clair pendant une fraction
-de seconde, puis bascule en sombre. Ce clignotement (*flash of unstyled content*) vient
-de ce que `app.js` est chargé en fin de page, après jQuery depuis le CDN, alors que le
-navigateur a déjà commencé à dessiner.
+Pour les compteurs, `animerCompteur` appelle `$({ valeur: 0 }).animate({ valeur: cible },
+{ duration: 900, step: ..., complete: ... })` : `$()` enveloppe un simple objet dont
+`.animate` fait varier la propriété, `step` écrit la valeur arrondie et `complete`
+garantit le nombre final. Avec `$.fx.off` à `true`, jQuery saute directement
+à l'état final. Dans `afficherProjets`, le fondu n'est lancé que si les animations sont
+actives : `if (!$.fx.off) { $carte.hide().delay(i * 40).fadeIn(200); }` (sur
+plusieurs lignes dans le fichier).
 
-**La bonne façon, dans le projet.** Le script inline du `<head>` (4.1) pose
-`data-theme` **avant** le premier affichage ; il est minuscule et n'a besoin d'aucune
-bibliothèque. Ensuite, les couleurs sont des **variables CSS** redéfinies selon le thème
-dans `css/style.css` (extrait simplifié) :
+**Vérifier.** Le test du bloc `avec prefers-reduced-motion` observe chaque valeur écrite
+dans le compteur et n'en attend qu'une, `"12"`.
 
-```css
-:root { --fond: #f7f7f5; --texte: #1c1f26; color-scheme: light; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="clair"]) { --fond: #111318; --texte: #e8eaee; }
-}
-:root[data-theme="sombre"] { --fond: #111318; --texte: #e8eaee; }
+**Le piège à cette étape.** Croire qu'une règle CSS `prefers-reduced-motion` suffit
+(5.9).
+
+## 4.9 Étape 9 : tests fiables, analyse statique et intégration continue
+
+**Objectif.** Rendre les tests reproductibles, contrôler le code automatiquement, puis ne
+publier que si tout passe.
+
+```js
+test.beforeEach(async ({ page }) => {
+  // jQuery est servi depuis node_modules : les tests ne dépendent pas du réseau.
+  await page.route("https://code.jquery.com/**", (route) =>
+    route.fulfill({
+      path: path.join(__dirname, "../node_modules/jquery/dist/jquery.min.js"),
+      contentType: "application/javascript",
+    }),
+  );
+  await page.goto("/");
+});
 ```
 
-Le reste du CSS n'utilise que ces variables (`background: var(--fond)`) : un seul
-attribut sur `<html>` change toutes les couleurs d'un coup.
-La règle `:root:not([data-theme="clair"])` exprime : « si le système est en sombre,
-appliquer le sombre, **sauf** si l'utilisateur a explicitement choisi le clair ». La
-propriété `color-scheme` indique au navigateur d'adapter aussi ses propres éléments
-(barres de défilement, champ de recherche). Enfin, `localStorage` est toujours entouré
-d'un `try/catch`, car son accès peut lever une exception lorsque le stockage est bloqué.
+Cela ne marche que parce que `package.json`
+fixe `"jquery": "3.7.1"`, la version du CDN, sinon l'empreinte `integrity` ne
+correspondrait plus (5.4).
 
-> **À retenir :** tout ce qui change l'apparence dès le premier affichage doit être
-> appliqué dans le `<head>`, avant le chargement des scripts lourds. Des variables CSS
-> permettent de changer de thème en modifiant un seul attribut.
+On ajoute ensuite ESLint et Prettier en dépendances de développement, avec deux scripts
+(`"lint": "eslint ."` et `"format:check": "prettier --check ."`). `eslint.config.js`
+(configuration « plate ») part de `js.configs.recommended` et déclare un environnement
+par type de fichier : navigateur et jQuery global (`globals.browser`, `globals.jquery`,
+`Filtres`) pour `js/`, avec la règle `eqeqeq` ; Node.js pour les tests et la
+configuration ; navigateur en plus pour les specs Playwright, dont les fonctions passées
+à `page.evaluate()` s'exécutent dans la page. `.prettierrc.json` fixe seulement
+`"printWidth": 100`.
 
-## 5.6 Une modale accessible
+Dans `.github/workflows/ci.yml`, le job `tests` lance `npm run lint && npm run
+format:check` avant les tests, et le job `deploiement` déclare `needs: tests`.
 
-**Contexte.** La fiche détaillée s'affiche par-dessus la page. Elle doit être utilisable
-au clavier et compréhensible par un lecteur d'écran.
+**Vérifier.** `npm run lint` et `npm run format:check` ne signalent rien (sortie réelle
+de Prettier : `All matched files use Prettier code style!`).
+`CHROMIUM_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome npx playwright test
+--repeat-each=2` (chemin propre à la machine utilisée) se termine, en sortie réelle, par
+`72 passed (26.1s)` : les 36 tests, joués deux fois pour débusquer un test instable.
 
-**L'approche naïve.** Une `<div>` montrée avec `.show()` et des cartes en `<div>`
-cliquables. Avec Tab, on n'atteint jamais une carte (une `<div>` n'est pas focalisable),
-donc la fiche est inaccessible sans souris ; un lecteur d'écran ne sait pas qu'une
-fenêtre s'est ouverte ; après fermeture, le focus retombe au début de la page.
+**Le piège à cette étape.** Attendre une durée au lieu d'un état, corriger sans test de
+non-régression (5.11) ; publier sans `needs: tests`, réutiliser un serveur déjà lancé ou
+donner trop de permissions à la CI (5.12). À sa première exécution, ESLint a signalé
+`'e' is defined but never used` sur le `catch (e)` du thème (5.6).
 
-Un autre piège, purement CSS : la modale est cachée avec l'attribut HTML `hidden`, mais
-le CSS lui donne `display: grid` pour la centrer. Or une règle CSS d'auteur l'emporte sur
-le style par défaut de `hidden` : la modale resterait visible en permanence. Le projet
-ajoute donc explicitement :
+# 5. Les mauvaises pratiques qu'on apprend à éviter
 
-```css
-.modale { position: fixed; inset: 0; display: grid; place-items: center; }
-.modale[hidden] { display: none; }
-```
+Chaque sous-partie part du code qu'un débutant écrirait spontanément dans ce projet. La
+mention « Piège réel rencontré dans ce projet » signale un défaut d'une version
+précédente du dépôt : soit celle du commit `bdd73d5`, corrigée dans le commit `63c1652`,
+soit celle de `63c1652` lui-même, corrigée ensuite (journalisation des erreurs en 5.6,
+permissions de la CI et serveur de test en 5.12). Chaque correction est accompagnée d'un
+test quand le défaut est testable, et la conséquence décrite a été reproduite en lançant
+l'ancien code. Les autres conséquences ont été reproduites dans la page actuelle, sauf
+mention « illustratif ».
 
-**La bonne façon, dans le projet.**
+## 5.1 Attacher un écouteur à des éléments qui n'existent pas encore
 
-```html
-<div class="modale" id="modale" role="dialog" aria-modal="true"
-     aria-labelledby="modale-titre" hidden>
-```
+Piège réel rencontré dans ce projet (deuxième forme).
 
-- `role="dialog"` et `aria-modal="true"` annoncent une boîte de dialogue ;
-  `aria-labelledby` lui donne pour nom le titre du projet.
-- Les cartes ont `tabindex='0'` et un `aria-label`, et réagissent à Entrée et Espace :
+**Ce qu'on écrit spontanément.** `$(".carte").on("click", ...)` ; ou, une fois la
+délégation découverte, un gestionnaire clavier trop large (version `bdd73d5`) :
 
 ```js
 $grille.on("keydown", ".carte", function (e) {
+  if (e.key === "Enter" || e.key === " ") {
+    e.preventDefault();
+    ouvrirModale($(this).data("id"));
+  }
+});
+```
+
+**Ce qui se passe.** `$(".carte")` s'exécute avant la réponse de `$.getJSON` : il ne
+trouve aucun élément et le gestionnaire n'est attaché à rien, sans erreur. Essai réel
+avec jQuery 3.7.1 : après `$(".x").on("click", () => n++)` et
+`$("#g").on("click", ".x", () => n += 10)`, puis l'ajout d'un `.x` dans `#g` et un clic,
+`n` vaut 10, pas 11. Pour le second extrait, l'appui sur Entrée dans l'étiquette
+« Docker » d'une carte remonte jusqu'à la carte : la fiche s'ouvre et `preventDefault()`
+annule le clic que le navigateur aurait déclenché sur le bouton. Mesure réelle sur
+`bdd73d5` : modale ouverte, aucun filtre, 12 cartes au lieu de 3.
+
+**Pourquoi c'est une mauvaise pratique.** Un sélecteur est évalué une seule fois : il
+ignore les éléments créés ensuite, et ceux qu'il a trouvés disparaissent au premier
+`empty()`. Inversement, un événement se propage vers tous les ancêtres (*bubbling*) : un
+gestionnaire posé sur un conteneur reçoit aussi les événements de ses descendants, et
+son `preventDefault()` peut casser un comportement natif plus bas.
+
+**La bonne pratique.** Déléguer à un parent stable, et vérifier la cible avant d'agir :
+
+```js
+$grille.on("keydown", ".carte", function (e) {
+  // Seulement sur la carte elle-même : Entrée sur une étiquette doit garder son clic.
   if (e.target !== this) return;
   if (e.key === "Enter" || e.key === " ") {
     e.preventDefault();
@@ -666,22 +477,266 @@ $grille.on("keydown", ".carte", function (e) {
 });
 ```
 
-  Le `preventDefault()` empêche Espace de faire défiler la page ; la première ligne est
-  expliquée en 5.1.
-- À l'ouverture, le focus va sur le bouton « Fermer ». La touche Échap, écoutée sur
-  `document`, appelle `fermerModale`, qui rend le focus à `dernierFocus` (la carte
-  d'origine) et ne remet l'attribut `hidden` qu'à la **fin** du fondu, dans la fonction
-  de rappel de `fadeOut(150, ...)`.
-- `aria-modal="true"` promet que rien d'autre n'est utilisable : il faut le tenir. Tant
-  que la modale est ouverte, l'en-tête, `main` et le pied de page reçoivent l'attribut
-  `inert` (4.8), et un gestionnaire fait boucler Tab du dernier élément au premier, et
-  Maj+Tab du premier au dernier :
+Les étiquettes (cartes, modale, nuage) sont déléguées à `document`, et leur gestionnaire
+appelle `e.stopPropagation()` pour qu'un clic sur une étiquette n'ouvre pas la fiche.
+
+**Comment s'en protéger durablement.** Le test « Entrée sur une étiquette d'une carte
+filtre sans ouvrir la fiche ». Réflexes : tester chaque interaction au clavier, pas
+seulement à la souris ; un gestionnaire qui appelle `preventDefault()` vérifie d'abord
+`e.target`.
+
+> **À retenir :** pour des éléments créés dynamiquement, on délègue à un conteneur stable
+> avec `.on("evenement", "selecteur", ...)`, et on compare `e.target` à `this` avant
+> d'annuler quoi que ce soit.
+
+## 5.2 Lire les attributs `data-*` avec `.data()`
+
+Piège réel rencontré dans ce projet.
+
+**Ce qu'on écrit spontanément** (version `bdd73d5`) :
+
+```js
+$grille.on("click", ".carte", function () { ouvrirModale($(this).data("id")); });
+// dans ouvrirModale :
+var p = projets.find(function (x) { return x.id === id; });
+if (!p) return;
+```
+
+**Ce qui se passe.** `.data()` convertit une valeur qui ressemble à un nombre, un booléen
+ou du JSON. Essai réel : `$("<div data-id='42'>").data("id")` renvoie le nombre `42`,
+`.attr("data-id")` la chaîne `"42"`. Avec un projet d'identifiant `"42"`, `"42" === 42`
+est faux, `find` ne trouve rien et `return` fait échouer l'ouverture en silence. Sur
+`bdd73d5`, le test correspondant échoue avec `Expected: "Projet 42"`, `Received: ""`.
+
+**Pourquoi c'est une mauvaise pratique.** Une conversion implicite rend le comportement
+dépendant du **contenu** des données : le code marche avec `"go-uptime"`, casse avec
+`"42"`, et aucun test écrit avec les données actuelles ne le voit.
+
+**La bonne pratique.** `.attr()`, qui renvoie toujours la chaîne, avec un commentaire
+pour le prochain lecteur. Idem pour `data-categorie` et `data-competence`.
+
+```js
+// .attr() et non .data(), qui convertirait data-id="42" en nombre.
+$grille.on("click", ".carte", function () {
+  ouvrirModale($(this).attr("data-id"));
+});
+```
+
+**Comment s'en protéger durablement.** Le test « un identifiant numérique ouvre quand même
+la bonne fiche » sert, avec `page.route`, un projet d'identifiant `"42"` et de compétence
+`"2024"`. Réflexes : tester avec des données limites fabriquées ; `===` partout.
+
+> **À retenir :** `.data()` convertit les types ; pour lire une chaîne, `.attr("data-…")`.
+
+## 5.3 Construire le HTML en concaténant des données
+
+**Ce qu'on écrit spontanément.**
+
+```js
+$grille.append("<article class='carte'><h3>" + p.titre + "</h3>"
+  + "<p>" + p.resume + "</p></article>");
+```
+
+**Ce qui se passe.** Essai réel dans la page, avec le titre
+`<img src=x onerror="window.pirate = 'code exécuté'">` : inséré par concaténation,
+`window.pirate` vaut `'code exécuté'` 300 ms plus tard (l'image échoue à charger et
+`onerror` exécute le code) ; inséré avec `$("<h3>").text(titre)`, aucune image n'est créée
+et le titre s'affiche tel quel. C'est une faille **XSS** : le code injecté pourrait
+modifier les liens vers les dépôts ou agir au nom du visiteur. Même sans malveillance, un
+résumé contenant « la balise `<main>` », inséré comme HTML, perdrait le mot `<main>`.
+
+**Pourquoi c'est une mauvaise pratique.** Mélanger données et code dans une même chaîne
+laisse les données décider de la structure : c'est le même défaut que l'injection SQL.
+Une donnée est non fiable par principe, même si elle vient aujourd'hui d'un fichier écrit
+par l'auteur.
+
+**La bonne pratique.** Balises fixes, données placées par `.text()` ou `.attr()` :
+
+```js
+.append($("<h3>").text(p.titre))
+.append($("<p>").text(p.resume))
+```
+
+Le seul `.html()` de `js/app.js` reçoit une chaîne fixe, dans le `.fail`.
+
+**Comment s'en protéger durablement.** Relire le résultat de
+`grep -nE '\.(html|append)\(' js/app.js` : chaque appel doit recevoir un objet jQuery ou
+une chaîne fixe, jamais une chaîne construite avec des données. Les règles recommandées
+d'ESLint ne détectent pas ce défaut ; l'exercice 7.5 propose une règle qui le ferait.
+
+> **À retenir :** une donnée ne doit jamais être insérée comme du HTML. Structure fixe,
+> puis `.text()` ou `.attr()`.
+
+## 5.4 Charger un script tiers sans vérifier son intégrité
+
+**Ce qu'on écrit spontanément.**
+`<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>`
+
+**Ce qui se passe.** Le navigateur exécuterait tout ce que le CDN renvoie. Avec
+l'attribut `integrity` du projet, un essai réel où l'on sert un jQuery auquel on a
+seulement ajouté un commentaire `/* modifié */` donne dans la console :
+
+```text
+Failed to find a valid digest in the 'integrity' attribute for resource
+'https://code.jquery.com/jquery-3.7.1.min.js' with computed SHA-256 integrity
+'f5kHpRup4dTh/ORBmpobIEW5UT/0dM44oVQIraYbhmU='. The resource has been blocked.
+```
+
+Le script est refusé et `app.js` s'arrête sur `$ is not defined` : aucune carte, mais
+aucun code étranger exécuté. Sans l'attribut, le fichier modifié aurait été exécuté.
+
+**Pourquoi c'est une mauvaise pratique.** Tout code chargé depuis un tiers fait partie de
+l'application ; sans vérification, la sécurité du site dépend de celle du CDN. C'est le
+principe de `npm ci` et de `package-lock.json` : exécuter exactement ce qu'on a vérifié.
+
+**La bonne pratique.**
+
+```html
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+        crossorigin="anonymous"></script>
+```
+
+Dans le même esprit, le lien GitHub de la modale (`target="_blank"`) porte
+`rel="noopener"` : la page ouverte ne peut pas manipuler l'onglet du portfolio.
+
+**Comment s'en protéger durablement.** Les 36 tests Playwright servent le jQuery de
+`node_modules` (version 3.7.1 exacte) à la place du CDN : si l'empreinte ne correspond
+pas, la page ne fonctionne plus et tous les tests échouent. Mettre jQuery à jour oblige à
+changer `package.json` et `integrity` ensemble.
+
+> **À retenir :** un script venu d'un CDN porte toujours `integrity`, et la version est
+> fixe partout (`3.7.1`, pas `^3`).
+
+## 5.5 Supposer qu'une liste n'est jamais vide
+
+Piège réel rencontré dans ce projet.
+
+**Ce qu'on écrit spontanément** (version `bdd73d5`, dans `afficherNuage`) :
+
+```js
+var stats = Filtres.compterCompetences(projets);
+var max = stats[0].nombre;
+```
+
+**Ce qui se passe.** Avec un `data/projets.json` réduit à `[]`, la version `bdd73d5`
+lève, en sortie réelle, `Cannot read properties of undefined (reading 'nombre')`.
+L'exception interrompt `afficherNuage` ; la page affiche « Aucun projet ne correspond à
+cette recherche. » alors qu'aucune recherche n'a été faite, et garde « Cliquez sur une
+compétence… » au-dessus d'un nuage vide.
+
+**Pourquoi c'est une mauvaise pratique.** `tableau[0]` sur un tableau vide renvoie
+`undefined` sans erreur ; l'erreur apparaît plus loin, loin de sa cause. Les cas limites
+(vide, un seul élément) sont ceux que les données réelles ne montrent jamais pendant le
+développement.
+
+**La bonne pratique.**
+
+```js
+// Liste triée : la première compétence est la plus utilisée.
+var max = stats.length ? stats[0].nombre : 0;
+if (!stats.length) $(".aide").text("Aucune compétence à afficher pour le moment.");
+```
+
+`afficherProjets` distingue de même « Aucun projet à
+afficher pour le moment. » (JSON vide) de « Aucun projet ne correspond à cette
+recherche. ».
+
+**Comment s'en protéger durablement.** Le test unitaire « une liste de projets vide donne
+des résultats vides » et le test Playwright « une liste de projets vide affiche un
+message au lieu de planter », qui collecte les `pageerror` et exige qu'il n'y en ait
+aucun. Ce réflexe se généralise : un test de bout en bout devrait échouer sur toute
+exception JavaScript.
+
+> **À retenir :** avant d'écrire `liste[0]`, se demander « et si la liste est vide ? », et
+> le tester avec des données fabriquées.
+
+## 5.6 Avaler une erreur, ou l'afficher brute
+
+Piège réel rencontré dans ce projet (erreur avalée), corrigé avec un test écrit d'abord.
+
+**Ce qu'on écrit spontanément.** Une requête sans `.fail`, ou un `.fail` qui affiche un
+message mais jette la cause, comme la version précédente du projet :
+
+```js
+.fail(function () {
+  $grille.html("<p class='vide'>Impossible de charger les projets.</p>");
+});
+```
+
+Ou, à l'inverse, montrer l'erreur au visiteur (illustratif) :
+`.fail(function (xhr, statut, erreur) { $grille.text(statut + " : " + erreur); })`.
+
+**Ce qui se passe.** Essai réel avec `data/projets.json` remplacé par le texte
+`[ { invalide` : sans `.fail`, la grille reste vide et le compteur affiche « 0 » ; avec
+l'ancien `.fail`, le visiteur lit « Impossible de charger les projets. ». Dans les deux
+cas, **la console ne contient aucun message** : le développeur n'a aucune piste. Le test
+écrit avant la correction l'a confirmé en échouant sur les deux profils
+(`Expected substring: "parsererror"`, `Received string: ""`). Dans la version
+« erreur brute », le visiteur lirait `parsererror : SyntaxError: Expected property name
+or '}' in JSON at position 4 (line 1 column 5)` (arguments réels du `.fail`),
+incompréhensible et révélateur de détails internes.
+
+**Pourquoi c'est une mauvaise pratique.** Une opération réseau peut toujours échouer. Une
+erreur avalée transforme une panne en mystère ; une erreur brute donne à l'utilisateur
+une information inutile et, dans une vraie application, peut révéler chemins, versions
+ou requêtes. La règle : message clair pour l'utilisateur, détail pour le développeur.
+
+**La bonne pratique.** Le `.fail` actuel (extrait en 4.4) sépare les deux publics :
+`console.error("Chargement de data/projets.json impossible :", statut, String(erreur))`
+pour le développeur, un message fixe pour le visiteur. Sortie réelle de la console avec
+le même JSON invalide :
+
+```text
+Chargement de data/projets.json impossible : parsererror SyntaxError: Expected property
+name or '}' in JSON at position 4 (line 1 column 5)
+```
+
+Pour `localStorage`, dont l'accès peut lever une exception quand le stockage est bloqué,
+l'erreur est en revanche ignorée **volontairement** (le thème non mémorisé n'empêche pas
+d'utiliser le site), et le code le dit : `catch { /* stockage indisponible */ }`. ESLint
+signalait l'ancienne forme `catch (e)` (`'e' is defined but never used`) ; la forme sans
+variable, valide depuis ES2019, exprime mieux l'intention.
+
+**Comment s'en protéger durablement.** Le test « un JSON invalide affiche un message
+clair et journalise la cause » sert le JSON invalide avec `page.route`, vérifie le message
+affiché, l'absence de `SyntaxError` dans la page, et la présence de `parsererror` dans
+la console (`page.on("console", ...)`). Réflexes : chaque requête a sa branche d'échec,
+qui journalise ; chaque `catch` vide porte un commentaire qui justifie le silence.
+
+> **À retenir :** jamais d'erreur avalée en silence ni affichée brute : message clair
+> pour l'utilisateur, `console.error` pour le développeur. Un `catch` vide n'est
+> acceptable que justifié par écrit.
+
+## 5.7 Laisser le focus au hasard
+
+Deux pièges réels rencontrés dans ce projet.
+
+**Ce qu'on écrit spontanément** (version `bdd73d5`) : une modale qui met le focus sur
+« Fermer » à l'ouverture, sans plus ; un filtre par compétence qui ferme la modale,
+redessine la grille et fait défiler la page, sans s'occuper du focus.
+
+**Ce qui se passe.** Mesures réelles sur `bdd73d5`, fiche « mysh » ouverte au clavier :
+
+- Tab parcourt « C », « Linux », le lien GitHub, puis sort de la modale vers `<body>`,
+  puis vers le logo de l'en-tête, **derrière** le fond sombre ;
+- clic sur l'étiquette « Linux » de la modale : `fermerModale()` rend le focus à la carte
+  d'origine, qu'`afficherProjets()` détruit aussitôt ; le focus retombe sur `<body>`, au
+  début de la page, et un lecteur d'écran n'annonce rien du filtre.
+
+**Pourquoi c'est une mauvaise pratique.** Pour qui navigue au clavier ou avec un lecteur
+d'écran, le focus **est** la position dans la page. `aria-modal="true"` promet que rien
+d'autre n'est utilisable : le code doit tenir cette promesse.
+
+**La bonne pratique.** L'arrière-plan devient `inert` (4.6), et Tab boucle dans la
+modale :
 
 ```js
 $modale.on("keydown", function (e) {
   if (e.key !== "Tab") return;
   var $elements = $modale.find("a[href], button:not(:disabled)");
-  var premier = $elements.get(0), dernier = $elements.get(-1);
+  var premier = $elements.get(0),
+    dernier = $elements.get(-1);
   if (e.shiftKey && document.activeElement === premier) {
     e.preventDefault();
     dernier.focus();
@@ -692,285 +747,355 @@ $modale.on("keydown", function (e) {
 });
 ```
 
-  `inert` seul ne suffit pas : après le dernier élément, Tab ferait sortir le focus de la
-  page, vers l'interface du navigateur. À la fermeture, `inert` est retiré **avant** de rendre le
-  focus à la carte, sinon `focus()` sur un élément inerte serait sans effet.
+`filtrerParCompetence` place lui-même le focus sur le bandeau « Filtré par … », qui porte
+`tabindex="-1"` (focalisable par le code, pas par Tab) :
+`$(".filtre-actif")[0].focus({ preventScroll: true })`. « tout afficher », qui cache ce
+bandeau, renvoie le focus au champ de recherche. Mesure réelle sur la version actuelle :
+après le lien GitHub, Tab revient sur « Fermer » ; après « Linux », le focus est sur le
+bandeau et le Tab suivant atteint « tout afficher ».
 
-Deux pièges réels sont apparus en testant au clavier. D'abord, un élément focalisé qui
-disparaît du DOM emporte le focus avec lui : après un filtre lancé depuis une étiquette de
-la modale, `fermerModale` rendait le focus à la carte d'origine, aussitôt détruite par
-`afficherProjets()`, et le focus retombait sur `<body>`, au tout début de la page. Le
-filtre place désormais le focus lui-même (4.6). Ensuite, appuyer sur Échap puis tout de
-suite sur Entrée rouvrait la fiche **pendant** le fondu de fermeture : le rappel de
-`fadeOut` remettait ensuite `hidden`, et la fiche restait affichée mais marquée cachée,
-impossible à refermer. `$modale.stop(true, true)` termine le fondu en cours (rappel
-compris) avant de rouvrir.
+**Comment s'en protéger durablement.** Les tests « le focus reste piégé dans la modale et
+l'arrière-plan est inerte » et « après un filtre lancé depuis la modale, le focus va sur
+le bandeau du filtre » (`toBeFocused()`). Réflexe : chaque fois que le code cache ou
+détruit un élément (`empty()`, `hidden`, `fadeOut`), se demander s'il pouvait avoir le
+focus, et où celui-ci doit aller.
 
-> **À retenir :** un élément interactif doit être atteignable au clavier, avoir un nom
-> lisible et rendre le focus là où il l'a pris ; une modale doit garder le focus et
-> rendre l'arrière-plan inerte. Avant de détruire l'élément qui a le focus, décider où
-> le mettre. Un `display` défini en CSS annule l'attribut `hidden` : il faut ajouter
-> `[hidden] { display: none; }`.
+> **À retenir :** le focus est un état que le code gère explicitement. Une modale le garde
+> et rend l'arrière-plan inerte ; avant de détruire l'élément focalisé, on décide où
+> mettre le focus.
 
-## 5.7 `.text()` plutôt que `.html()` : éviter l'injection de code
+## 5.8 Relancer une animation sans arrêter la précédente
 
-**Contexte.** Tous les textes affichés viennent de `data/projets.json`. Aujourd'hui, ce
-fichier est écrit par l'auteur du site ; demain, il pourrait venir d'une API ou d'un
-formulaire.
+Piège réel rencontré dans ce projet.
 
-**L'approche naïve.** Construire les cartes par concaténation de chaînes :
+**Ce qu'on écrit spontanément** (version `bdd73d5`) :
 
 ```js
-$grille.append("<article class='carte'><h3>" + p.titre + "</h3>"
-  + "<p>" + p.resume + "</p></article>");
+$modale.prop("hidden", false).hide().fadeIn(150);                    // ouvrirModale
+$modale.fadeOut(150, function () { $modale.prop("hidden", true); });  // fermerModale
 ```
 
-Si un titre contient `<img src=x onerror=alert(document.cookie)>`, le navigateur crée
-une vraie image dont l'erreur de chargement exécute le code. C'est une faille **XSS**
-(*cross-site scripting*). Moins grave mais plus courant : un résumé comme « Utilise la balise <main> »
-perdrait le mot `<main>`, que le navigateur prendrait pour une vraie balise.
+**Ce qui se passe.** Échap puis, tout de suite, Entrée sur la carte : la fiche se rouvre
+**pendant** le fondu de fermeture, dont le rappel remet ensuite `hidden`. Mesure réelle
+sur `bdd73d5`, 600 ms plus tard : attribut `hidden` présent, mais `display: block` (style
+en ligne posé par jQuery) et opacité 1. La fiche est affichée mais marquée cachée, et
+Échap ne fait plus rien, puisque `fermerModale` commence par
+`if ($modale.prop("hidden")) return;`.
 
-**La bonne façon, dans le projet.** Les éléments sont créés vides, puis remplis avec
-`.text()` ou `.attr()` :
+**Pourquoi c'est une mauvaise pratique.** Une animation est une opération asynchrone à
+rappel différé : c'est une situation de concurrence, comme deux requêtes dont les
+réponses arrivent dans le désordre. Un rappel ne doit pas supposer que l'état n'a pas
+changé depuis son lancement.
+
+**La bonne pratique.** `stop(true, true)` vide la file d'animations et termine celle en
+cours, rappel compris, **avant** la réouverture :
 
 ```js
-.append($("<h3>").text(p.titre))
-.append($("<p>").text(p.resume))
+$modale.stop(true, true).prop("hidden", false).hide().fadeIn(150);
 ```
 
-`.text()` insère la valeur comme du texte brut : les caractères `<` et `>` sont affichés
-tels quels, jamais interprétés. Le seul `.html()` du projet est dans le cas d'erreur de
-`$.getJSON`, avec une chaîne fixe écrite dans le code.
+**Comment s'en protéger durablement.** Le test « fermer puis rouvrir aussitôt la fiche la
+laisse utilisable » enchaîne `Escape` et `Enter` sans attente. Réflexe : pour toute
+action animée, tester l'action inverse déclenchée pendant l'animation.
 
-> **À retenir :** une donnée ne doit jamais être insérée comme du HTML. On crée la
-> structure avec des balises fixes, puis on y place les données avec `.text()` ou
-> `.attr()`.
+> **À retenir :** un rappel différé (animation, minuteur, requête) s'exécute dans un état
+> qui a pu changer ; annuler l'opération précédente (`stop`, `clearTimeout`) d'abord.
 
-## 5.8 Tester comme un utilisateur avec Playwright
+## 5.9 Animer en JavaScript sans respecter `prefers-reduced-motion`
 
-**Contexte.** Les tests unitaires vérifient le filtrage, mais pas que le clic sur
-« Docker » dans le nuage produise bien le bon nombre de cartes, ni que la page ne déborde
-pas sur un téléphone.
+Deux pièges réels rencontrés dans ce projet.
 
-**L'approche naïve.** Tester à la main, ou écrire des tests qui patientent un temps
-fixe (`await page.waitForTimeout(1000)`) avant de compter les cartes avec
-`.count()`. Un tel test est lent et instable : si la machine de CI est chargée, les
-fondus durent plus longtemps et le comptage tombe au mauvais moment.
-
-**La bonne façon, dans le projet.** `tests/portfolio.spec.js` utilise des assertions qui
-**réessaient** automatiquement jusqu'à ce qu'elles soient vraies (ou qu'un délai
-maximal soit atteint) :
+**Ce qu'on écrit spontanément** (version `bdd73d5`) : une règle CSS qui coupe les
+transitions sous `prefers-reduced-motion`, des fondus et compteurs jQuery, et un
+défilement doux programmé pour les liens du menu :
 
 ```js
-test("les catégories filtrent les cartes", async ({ page }) => {
-  await page.click(".filtre[data-categorie='bots']");
-  await expect(page.locator(".carte")).toHaveCount(2);
+$(".nav a[href^='#']").on("click", function (e) {
+  var $cible = $($(this).attr("href"));
+  if ($cible.length) {
+    e.preventDefault();
+    $("html, body").animate({ scrollTop: $cible.offset().top - 70 }, 400);
+  }
 });
 ```
 
-Trois autres choix rendent la suite fiable :
+**Ce qui se passe.** Mesures réelles sur `bdd73d5` avec `reducedMotion: "reduce"` : le
+compteur « projets » reçoit 57 valeurs successives au lieu d'une, car la règle CSS ne
+voit pas les `.animate()` jQuery ; après Entrée sur « Projets », l'adresse reste sans
+`#projets` et le Tab suivant va sur le lien « Compétences » du menu au lieu du champ de
+recherche, car `preventDefault()` a empêché le navigateur de suivre l'ancre.
 
-- **Pas de dépendance au réseau.** Si le CDN de jQuery était lent ou injoignable, tous
-  les tests échoueraient. Le `beforeEach` intercepte donc la requête avec
-  `page.route("https://code.jquery.com/**", ...)` et répond avec `route.fulfill` en
-  servant `node_modules/jquery/dist/jquery.min.js`. Cela ne marche que parce que la
-  version npm est exactement la 3.7.1 : sinon l'empreinte `integrity` (4.1) ne
-  correspondrait plus et le navigateur refuserait le script.
-- **Les attentes viennent des données.** Le test « affiche tous les projets » compare
-  à `projets.length` lu dans le JSON : ajouter un projet ne casse pas le test. À
-  l'inverse, quand un cas limite l'exige, `page.route("**/data/projets.json", ...)` sert
-  des données fabriquées (une liste vide, un identifiant `"42"`).
-- **Les préférences de l'utilisateur sont simulées.** `page.emulateMedia({ colorScheme })`
-  et `test.use({ reducedMotion: "reduce" })` jouent les tests du thème et de
-  `prefers-reduced-motion` (5.11) sans toucher au système.
-- **Deux appareils.** `playwright.config.js` déclare les profils `ordinateur` (Desktop
-  Chrome) et `mobile` (Pixel 7). Le test « pas de défilement horizontal » vérifie que
-  `scrollWidth` ne dépasse pas la largeur de l'écran, un défaut fréquent sur mobile.
+**Pourquoi c'est une mauvaise pratique.** Une préférence de l'utilisateur (troubles
+vestibulaires, migraines) se respecte partout, pas seulement là où c'est facile. Et
+réécrire un comportement natif fait perdre ce que le navigateur faisait gratuitement :
+adresse, historique, point de départ du clavier.
 
-> **À retenir :** un test de bout en bout doit attendre un **état** (« il y a deux
-> cartes »), jamais une **durée**. Il doit aussi isoler la page des services externes
-> pour donner le même résultat à chaque exécution.
-
-## 5.9 Une CI qui teste avant de publier
-
-**Contexte.** Le site est mis en ligne automatiquement à chaque `push` sur `main`.
-
-**L'approche naïve.** Publier tout le dépôt dès qu'on pousse. Une virgule oubliée dans
-`data/projets.json` met alors en ligne un site vide, sans que personne ne soit prévenu,
-et les tests et la configuration sont publiés avec le site.
-
-**La bonne façon, dans le projet.** Dans `.github/workflows/ci.yml` :
-
-- le job `tests` exécute `npm ci` (installation exacte des versions de
-  `package-lock.json`), `npm test`, puis les 34 tests Playwright ;
-- le job `deploiement` déclare `needs: tests` : il ne démarre que si les tests ont
-  réussi, et seulement sur `main` (`if: github.ref == 'refs/heads/main' && ...`) ;
-- seul le dossier `_site`, qui contient `index.html`, `css`, `js` et `data`, est
-  publié.
-
-Les tests unitaires lisent le vrai `data/projets.json` : un JSON mal formé fait échouer
-`require("../data/projets.json")` dès le chargement du fichier de test, et le
-déploiement est bloqué.
-
-> **À retenir :** une mise en ligne automatique doit dépendre du succès des tests et ne
-> publier que les fichiers nécessaires. `npm ci` garantit que la CI utilise exactement
-> les mêmes versions que le développeur.
-
-## 5.10 Comparer des textes en français : accents et Unicode
-
-**Contexte.** Un recruteur qui tape « emissions » ou « interpreteur » sur un clavier
-QWERTY doit trouver « Émissions de CO₂ en R » et le mini-shell (« Interpréteur de
-commandes »).
-
-**L'approche naïve.** Passer les deux textes en minuscules et comparer :
-
-```js
-"Émissions".toLowerCase().includes("emissions")   // false
-```
-
-« é » et « e » restent deux caractères différents, et une table de remplacement
-(`é -> e`, `ç -> c`…) serait forcément incomplète.
-
-**La bonne façon, dans le projet.** Unicode prévoit qu'un caractère accentué peut s'écrire
-de deux façons : en un seul caractère (« é », U+00E9) ou en deux, la lettre de base
-suivie d'un accent dit « combinant » (« e » U+0065 + « ◌́ » U+0301). La méthode
-`normalize("NFD")` force la seconde forme ; il suffit ensuite de supprimer tous les
-accents combinants, qui occupent la plage U+0300 à U+036F :
-
-```js
-function normaliser(texte) {
-  return String(texte)
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .trim();
-}
-```
-
-Dans `js/filtres.js`, la classe de caractères contient directement les deux caractères
-combinants au lieu des séquences `\u0300` et `\u036f` ; l'effet est identique, mais la
-forme échappée est plus lisible et ne risque pas d'être abîmée par un éditeur. Dans Node.js,
-`"é".length` vaut 1 mais `"é".normalize("NFD").length` vaut 2 : « e » puis l'accent.
-
-Trois détails complètent la fonction :
-
-- `String(texte)` évite une erreur si on lui passe un nombre ou `undefined` ;
-- `trim()` retire les espaces au début et à la fin, ce que vérifie le test
-  `normaliser("  Émissions CO₂ ")` qui doit donner `"emissions co₂"` ;
-- la normalisation est appliquée **des deux côtés** : à la saisie et au texte du projet.
-  Le chiffre « ₂ » n'est pas un accent et reste intact.
-
-Pour le tri, en revanche, le projet n'enlève pas les accents : `compterCompetences`
-utilise `a.nom.localeCompare(b.nom, "fr")`, qui classe les mots selon les règles du
-français (« é » rangé avec « e », et non après « z » comme le ferait une comparaison de
-codes de caractères).
-
-> **À retenir :** pour comparer des textes sans tenir compte des accents, on décompose
-> avec `normalize("NFD")` puis on retire la plage U+0300 à U+036F. Pour trier, on utilise
-> `localeCompare` avec la langue voulue.
-
-## 5.11 Moins d'animations quand on le demande
-
-**Contexte.** Certaines personnes (troubles vestibulaires, migraines, simple confort)
-demandent à leur système de réduire les animations. Le navigateur l'expose avec la
-requête média `prefers-reduced-motion: reduce`.
-
-**L'approche naïve.** Une règle CSS qui coupe les transitions :
+**La bonne pratique.** `$.fx.off` réglé d'après la même requête média (4.8) ; `.delay()`,
+simple minuteur qui ignore `$.fx.off`, n'est utilisé que si les animations sont actives.
+Le défilement doux passe au CSS, et les liens du menu n'ont plus de JavaScript :
 
 ```css
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 70px; /* ancres sous l'en-tête collant */
+}
 @media (prefers-reduced-motion: reduce) {
-  * { transition: none !important; scroll-behavior: auto !important; }
+  * {
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
 }
 ```
 
-Elle est utile (survol des cartes), mais les fondus en cascade et les compteurs sont des
-`.animate()` jQuery, qui modifient les styles à chaque image depuis JavaScript. Le CSS
-n'en sait rien et ils continuaient de s'exécuter. Le défilement doux était lui aussi un
-`.animate({ scrollTop })` jQuery, et le gestionnaire des liens du menu appelait
-`e.preventDefault()` pour le lancer. Effet de bord : le navigateur ne traitait plus
-l'ancre, donc ne déplaçait pas le point de départ de la navigation au clavier. Après
-« Projets », la page avait défilé mais le Tab suivant repartait du menu.
+Mesure réelle sur la version actuelle : adresse en `#projets`, Tab sur le champ de
+recherche.
 
-**La bonne façon, dans le projet.** jQuery a un interrupteur global, `$.fx.off` : à
-`true`, chaque animation saute directement à son état final et appelle quand même sa
-fonction `complete`. `js/app.js` le règle d'après la même requête média, et le met à jour
-si la préférence change pendant la visite :
+**Comment s'en protéger durablement.** `test.use({ reducedMotion: "reduce" })` et le test
+« après un lien du menu, Tab continue dans la section visée ». Réflexe : avant un
+`preventDefault()` sur un lien, se demander ce que le navigateur aurait fait.
+
+> **À retenir :** `prefers-reduced-motion` coupe toutes les animations, y compris en
+> JavaScript (`$.fx.off`, mais pas `.delay()`). Préférer le comportement natif à sa
+> réimplémentation.
+
+## 5.10 Un bouton bascule dont l'état n'est pas exposé
+
+Piège réel rencontré dans ce projet.
+
+**Ce qu'on écrit spontanément** (version `bdd73d5`) : un bouton
+`<button class="bouton-theme" type="button" aria-label="Changer de thème">☾</button>`, et
+la logique « le thème est-il sombre ? » écrite directement dans le gestionnaire de clic.
+
+**Ce qui se passe.** Mesure réelle sur `bdd73d5`, système en thème sombre : nom
+« Changer de thème », `aria-pressed` absent, icône « ☾ » alors que la page est déjà
+sombre. Un lecteur d'écran annonce « Changer de thème, bouton » sans dire quel thème est
+actif, et l'icône ne change jamais.
+
+**Pourquoi c'est une mauvaise pratique.** Un état visible doit être lisible par les
+technologies d'assistance, et calculé à **un seul** endroit : enfermé dans le
+gestionnaire de clic, il ne pouvait servir à rien d'autre.
+
+**La bonne pratique.** Nom fixe (`aria-label="Thème sombre"`), état dans `aria-pressed`,
+une fonction d'état appelée au chargement, au clic et au changement de préférence du
+système :
 
 ```js
-var moinsDeMouvement = window.matchMedia("(prefers-reduced-motion: reduce)");
-$.fx.off = moinsDeMouvement.matches;
-moinsDeMouvement.addEventListener("change", function (e) { $.fx.off = e.matches; });
+function themeSombre() {
+  var choix = $("html").attr("data-theme");
+  return choix ? choix === "sombre" : systemeSombre.matches;
+}
+function majBoutonTheme() {
+  $boutonTheme.attr("aria-pressed", themeSombre());
+}
 ```
 
-Le défilement doux est, lui, confié au CSS : `html { scroll-behavior: smooth; }`, que la
-règle ci-dessus ramène à `auto` sous `prefers-reduced-motion`. Les liens du menu n'ont
-plus aucun JavaScript : le navigateur suit l'ancre, met l'adresse à jour (`#projets`),
-s'arrête sous l'en-tête grâce à `scroll-padding-top` et place le point de départ de Tab
-dans la section visée. Un test Playwright le vérifie : après Entrée sur « Projets », Tab
-atteint le champ de recherche. Le filtre par compétence utilise `scrollIntoView()`
-(4.6), qui suit la même règle CSS.
+Le nom ne change pas avec l'état (« Passer au thème clair » annoncé « activé » serait
+contradictoire). L'icône, décorative, vient du CSS :
+`.bouton-theme::before { content: var(--icone-theme); }`. Mesure réelle sur la version
+actuelle, système sombre : « Thème sombre », `aria-pressed="true"`, icône « ☀ ».
 
-Le compteur affiche alors directement « 12 » et le défilement vers les projets est
-immédiat. Seul `.delay()` y échappe : c'est un simple minuteur, qui aurait encore fait
-apparaître les cartes une à une ; `afficherProjets` ne l'utilise donc que si les
-animations sont actives (4.5). Le test Playwright correspondant observe toutes les
-valeurs écrites dans le compteur (une seule attendue) et vérifie, dans le même tour de
-boucle que le clic, que toutes les cartes sont visibles et que la page a défilé.
+**Comment s'en protéger durablement.** `toHaveAccessibleName` et
+`toHaveAttribute("aria-pressed", …)` dans deux tests, dont un qui change la préférence
+avec `page.emulateMedia`. Réflexe : inspecter l'arbre d'accessibilité de chaque contrôle
+personnalisé.
 
-> **À retenir :** `prefers-reduced-motion` doit couper **toutes** les animations, y
-> compris celles pilotées en JavaScript ; avec jQuery, `$.fx.off = true` suffit pour
-> `.animate()` et les fondus, mais pas pour `.delay()`. Un défilement doux en CSS
-> respecte la préférence et laisse le navigateur gérer les ancres et le focus.
+> **À retenir :** un bouton bascule a un nom fixe et un état `aria-pressed`, calculé par
+> une seule fonction appelée partout où il peut changer.
 
-# 6. Pour aller plus loin
+## 5.11 Tester avec des pauses fixes, corriger sans test de non-régression
 
-Du plus simple au plus ambitieux :
+**Ce qu'on écrit spontanément** (illustratif) : `await page.waitForTimeout(1000)` avant
+`expect(await page.locator(".carte").count()).toBe(2)` ; et, pour corriger un bug,
+modifier `app.js`, vérifier à la main, commiter.
 
-1. **Annoncer le nombre de résultats.** Pendant la frappe, un lecteur d'écran ne sait
-   pas combien de cartes restent. Piste : un paragraphe `aria-live="polite"` que
-   `afficherProjets()` remplit avec « 3 projets », et un test Playwright qui lit son
-   texte.
+**Ce qui se passe.** Le test à pause fixe est lent quand tout va bien et faux quand la
+machine de CI est chargée (illustratif). La correction sans test ne protège de rien : le
+bug peut revenir au prochain remaniement sans que personne ne le voie.
+
+Démarche réelle dans ce projet : les 17 scénarios de la suite du commit `63c1652` ont été
+rejoués contre la version précédente, extraite à part avec
+`git archive bdd73d5 | tar -x -C <dossier>` (port du serveur de test changé dans la copie
+pour ne pas réutiliser celui de la version actuelle, voir 5.12). Sortie réelle :
+`20 failed`, `14 passed (1.1m)`. Les dix scénarios ajoutés par ce commit échouent, chacun
+sur le défaut qu'il vise, sur les deux profils ; sur la version corrigée, les 34 tests
+d'alors passent. Même démarche pour la journalisation des erreurs (5.6) : le nouveau test
+a d'abord échoué (2 échecs), puis réussi après la correction. Un test qui n'a jamais
+échoué ne prouve rien.
+
+**Pourquoi c'est une mauvaise pratique.** Un test vérifie un **comportement observable**
+et attend un **état**, jamais une durée. Écrit **avant** la correction, un test de
+non-régression prouve que le bug est reproduit ; le voir passer ensuite prouve que la
+correction le corrige.
+
+**La bonne pratique.** Les assertions Playwright réessaient jusqu'à être vraies, ou
+jusqu'à un délai maximal :
+
+```js
+await page.click(".filtre[data-categorie='bots']");
+await expect(page.locator(".carte")).toHaveCount(2);
+```
+
+**Comment s'en protéger durablement.** Pour chaque bug : le test qui échoue, puis la
+correction, puis les deux dans le même commit. `grep -rn waitForTimeout tests/` doit ne
+rien afficher. La CI rejoue tout à chaque `push`.
+
+> **À retenir :** attendre un état, pas une durée. Pour chaque bug corrigé, un test qui
+> échouait avant et passe après.
+
+## 5.12 Garder des valeurs par défaut dangereuses
+
+Deux pièges réels rencontrés dans ce projet : permissions de la CI, serveur de test
+réutilisé.
+
+**Ce qu'on écrit spontanément.** `python3 -m http.server 8080` ; des `permissions`
+déclarées une fois pour tout le workflow, comme dans la version précédente de `ci.yml` ;
+et, dans `playwright.config.js`, l'option `reuseExistingServer: true` que propose la
+documentation de Playwright. L'ancien `ci.yml` déclarait en tête
+`permissions: { contents: read, pages: write, id-token: write }` (forme abrégée).
+
+**Ce qui se passe.** Sortie réelle du serveur Python lancé sans `--bind` :
+`Serving HTTP on 0.0.0.0 port 8097 (http://0.0.0.0:8097/) ...`. `0.0.0.0` signifie
+« toutes les interfaces » : sur le Wi-Fi d'une école, tout appareil du réseau peut lire
+le dossier servi. Les permissions de niveau workflow sont accordées à **chaque** job :
+le job `tests`, qui exécute `npm ci` et donc le code de dizaines de paquets, recevait
+le droit de publier sur Pages et d'obtenir un jeton OIDC. Enfin, essai réel : un autre
+site (une page « autre ») est lancé sur le port 8080, puis
+`npx playwright test -g "affiche tous les projets"`. Playwright réutilise ce serveur sans
+prévenir et teste le mauvais site (`Received: 0` cartes). Avec une ancienne version du
+portfolio, ils auraient pu **passer** sur un autre code que le code courant.
+
+**Pourquoi c'est une mauvaise pratique.** Une valeur par défaut vise à ce que « ça
+marche », pas à être sûre dans votre cas. **Moindre privilège** : n'écouter, ne publier
+et n'autoriser que le nécessaire ; et tester le code qu'on croit tester.
+
+**La bonne pratique.** `"start": "python3 -m http.server 8080 --bind 127.0.0.1"` dans
+`package.json`. Dans `ci.yml`, un minimum par défaut et des permissions par job ; le
+déploiement attend les tests et ne publie qu'un dossier préparé (`_site`) :
+
+```yaml
+# Minimum par défaut ; chaque job déclare exactement ce dont il a besoin.
+permissions:
+  contents: read
+
+jobs:
+  # tests : permissions: { contents: read }
+  deploiement:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: tests
+    permissions:
+      contents: read
+      pages: write # publier sur GitHub Pages
+      id-token: write # jeton OIDC temporaire exigé par deploy-pages
+```
+
+(Extrait abrégé.) `explications-pdf.yml` suit la même règle (`contents: write` pour le
+seul job qui commite le PDF). Dans
+`playwright.config.js`, `reuseExistingServer: false`. La variante
+`!process.env.CI` (réutiliser en local, jamais en CI) n'a pas été retenue : c'est
+justement en local que traîne un vieux serveur. Avec le même autre site sur le port
+8080, Playwright s'arrête désormais avant tout test, en sortie réelle :
+
+```text
+Error: http://127.0.0.1:8080 is already used, make sure that nothing is running on the
+port/url or set reuseExistingServer:true in config.webServer.
+```
+
+La contrepartie est voulue : il faut arrêter `npm start` avant `npm run test:e2e`. Aucun
+secret n'est stocké ; l'adresse e-mail de `index.html` est publique par choix.
+
+**Comment s'en protéger durablement.** Lire la ligne de démarrage d'un serveur ; pour
+chaque option, se demander « que se passe-t-il sans elle ? » ; relire les `permissions`
+de chaque job (elles ne se testent pas en local) ; protéger la branche `main`.
+
+> **À retenir :** ne jamais se fier aux valeurs par défaut pour l'exposition réseau, les
+> permissions ou la réutilisation d'un serveur. Moindre privilège, job par job, et
+> déploiement conditionné aux tests.
+
+# 6. Check-list avant de rendre son code
+
+| Mauvaise pratique | Risque | Bonne pratique | Où dans le projet |
+|---|---|---|---|
+| Écouteur sur éléments absents ; `preventDefault()` délégué | Action sans effet, clic annulé | Délégation, `e.target !== this` | gestionnaires `.carte` |
+| `.data()` pour lire `data-*` | `"42"` devient `42` | `.attr()`, `===` | `.attr("data-id")` |
+| HTML concaténé avec des données | XSS | Balises fixes + `.text()` | `afficherProjets` |
+| CDN sans `integrity` | Code modifié exécuté | SRI, version fixe | `index.html` |
+| `liste[0]` sans tester le vide | `TypeError` | Tester `length` | `afficherNuage` |
+| Erreur avalée ou affichée brute | Panne sans piste, fuite d'infos | Message fixe + `console.error` | `.fail`, thème |
+| Focus non géré | Focus perdu ou caché | `inert`, boucle Tab, focus placé | `ouvrirModale`, `filtrerParCompetence` |
+| Animation non arrêtée | Modale impossible à fermer | `stop(true, true)` | `ouvrirModale` |
+| Animations JS, ancres en JS | Mouvement imposé, focus perdu | `$.fx.off`, CSS | `js/app.js`, `css/style.css` |
+| Bascule sans état | État invisible | `aria-pressed`, nom fixe | `majBoutonTheme` |
+| `waitForTimeout`, correctif sans test | Tests instables, régressions | Attendre un état ; test d'abord | `tests/portfolio.spec.js` |
+| Défauts dangereux | Dossier exposé, droits en trop, mauvais serveur testé | `--bind`, permissions par job, `reuseExistingServer: false` | `package.json`, `ci.yml`, `playwright.config.js` |
+| Code non vérifié automatiquement | Variables inutilisées, `==`, style incohérent | ESLint + Prettier, en CI | `eslint.config.js`, `package.json` |
+| Variables globales | Collisions entre scripts | Fonction englobante, `"use strict"` | `app.js`, `filtres.js` |
+| `!== undefined` sur une variable absente | `ReferenceError` | `typeof x !== "undefined"` | fin de `filtres.js` |
+| `toLowerCase()` seul | Accents non ignorés | `normalize("NFD")`, `localeCompare` | `normaliser` |
+
+Commandes à lancer avant chaque commit, depuis la racine du dépôt (les quatre premières
+sont aussi celles de la CI) :
+
+```bash
+npm run lint                               # ESLint : aucune sortie = OK
+npm run format:check                       # Prettier ; corriger avec npm run format
+npm test                                   # 9 tests unitaires, dont la validité du JSON
+npm run test:e2e                           # 36 tests Playwright (port 8080 libre)
+grep -nE '\.(html|append)\(' js/app.js     # relire : pas de HTML construit
+git diff --check                           # espaces en fin de ligne
+bash docs/generer-pdf.sh                   # si la documentation a changé
+```
+
+Après une correction délicate, `npx playwright test --repeat-each=2` rejoue chaque test
+deux fois pour détecter un test instable.
+
+# 7. Pour aller plus loin
+
+1. **Annoncer le nombre de résultats.** Pendant la frappe, un lecteur d'écran ne sait pas
+   combien de cartes restent. Piste : un paragraphe `aria-live="polite"` que
+   `afficherProjets()` remplit avec « 3 projets », et un test Playwright qui lit son texte.
 2. **Vérifier l'accessibilité automatiquement.** Les tests actuels couvrent les défauts
-   déjà rencontrés, pas les autres (contraste insuffisant, nom manquant…). Piste :
-   ajouter `@axe-core/playwright` et un test qui analyse la page, en thème clair et en
-   thème sombre, modale ouverte et fermée, et exige zéro violation.
-3. **Mémoriser les filtres dans l'adresse.** Piste : écrire `criteres` dans
-   `location.hash` à chaque changement et le relire avant le premier
-   `afficherProjets()`, pour pouvoir partager un lien déjà filtré.
-4. **Remplacer la modale par l'élément natif `<dialog>`.** Sa méthode `showModal()`
-   rend déjà l'arrière-plan inerte et gère Échap. Piste : supprimer le code
-   correspondant de `js/app.js` et vérifier que les tests de la modale (focus piégé,
-   réouverture rapide) restent verts.
-5. **Compléter `data/projets.json` depuis l'API GitHub.** Piste : un script Node.js lancé
-   en CI interroge `https://api.github.com/users/jejcqr/repos` et ajoute la date de mise
-   à jour et les étoiles, ce qui permet un tri « plus récents d'abord ».
-6. **Réécrire sans jQuery.** Piste : `fetch` au lieu de `$.getJSON`, `addEventListener`
-   et `event.target.closest(...)` pour la délégation, transitions CSS pour les fondus.
-   Les tests Playwright, qui ne regardent que le comportement visible, doivent rester
-   verts sans modification.
+   déjà rencontrés, pas les autres (contraste insuffisant, nom manquant). Piste : ajouter
+   `@axe-core/playwright` et un test qui analyse la page en thème clair et sombre, modale
+   ouverte et fermée, et exige zéro violation.
+3. **Faire échouer tous les tests sur une erreur de console.** Aujourd'hui, seuls
+   quelques tests surveillent `pageerror` ou `console`. Piste : une *fixture* Playwright
+   automatique (`test.extend` avec `{ auto: true }`) qui collecte `pageerror` et les
+   messages `console.error` inattendus, et fait échouer le test s'il y en a ; le test du
+   JSON invalide déclare les siens comme attendus.
+4. **Épingler les actions GitHub par empreinte.** `actions/checkout@v4` suit une
+   étiquette qui peut être déplacée. Piste : remplacer chaque `@v4` par l'empreinte SHA
+   complète du commit correspondant, en gardant la version en commentaire, et laisser
+   Dependabot proposer les mises à jour.
+5. **Interdire l'insertion de HTML construit.** Les règles recommandées d'ESLint ne
+   voient pas `.html("<p>" + donnee + "</p>")`. Piste : une règle `no-restricted-syntax`
+   avec un sélecteur qui vise les appels `.html()` ou `.append()` dont l'argument n'est
+   pas une chaîne littérale, puis vérifier qu'elle signale le code naïf de 5.3 et pas le
+   code actuel.
+6. **Remplacer la modale par l'élément natif `<dialog>`.** Sa méthode `showModal()` rend
+   déjà l'arrière-plan inerte et gère Échap. Piste : supprimer le code correspondant de
+   `js/app.js` et vérifier que les tests de la modale (focus piégé, réouverture rapide)
+   restent verts sans modification.
 
-# 7. Glossaire
+# 8. Glossaire
 
 | Terme | Définition |
 |---|---|
 | AJAX | Requête HTTP faite en arrière-plan par une page, sans la recharger |
+| Analyse statique | Vérification du code sans l'exécuter (ici ESLint) |
 | Asynchrone | Opération dont le résultat arrive plus tard ; le code continue sans l'attendre |
-| `aria-*` | Attributs HTML qui décrivent rôle et état d'un élément aux technologies d'assistance |
-| Bubbling | Propagation d'un événement de l'élément cliqué vers tous ses ancêtres |
+| `aria-*` | Attributs qui décrivent rôle et état d'un élément aux technologies d'assistance |
+| Bubbling | Propagation d'un événement de l'élément visé vers tous ses ancêtres |
 | CDN | Réseau de serveurs qui distribue des fichiers publics, ici jQuery |
-| CI/CD | Tests et mise en ligne automatiques à chaque modification du dépôt |
 | CORS | Règles du navigateur qui limitent les requêtes d'une origine vers une autre |
 | Debounce | Attendre une pause dans une série d'événements avant d'agir |
 | Délégation | Écouteur posé sur un parent stable, valable pour des descendants créés plus tard |
-| DOM | Représentation en mémoire de la page, que JavaScript lit et modifie |
 | Focus | Élément qui reçoit actuellement les frappes du clavier |
+| Formateur | Outil qui réécrit le code dans un style unique (ici Prettier) |
 | Fonction pure | Fonction dont le résultat ne dépend que de ses arguments, sans effet de bord |
-| `localStorage` | Stockage clé/valeur du navigateur, conservé entre les visites |
-| Modale | Fenêtre affichée par-dessus la page, qui bloque l'arrière-plan |
+| `inert` | Attribut qui rend un élément et ses descendants non cliquables et non focalisables |
+| Moindre privilège | Ne donner à un programme que les droits strictement nécessaires |
 | NFD | Normalisation Unicode qui sépare une lettre accentuée en lettre de base plus accent |
-| Origine | Protocole + domaine + port d'une page ; une page `file://` a l'origine `null` |
-| Playwright | Outil qui pilote un vrai navigateur pour des tests de bout en bout |
+| `prefers-reduced-motion` | Requête média : l'utilisateur demande moins d'animations |
 | SRI | Attribut `integrity` : le navigateur vérifie l'empreinte d'un fichier externe |
-| Site statique | Fichiers servis tels quels, sans programme exécuté côté serveur |
-| Variable CSS | Propriété personnalisée (`--fond`) réutilisée avec `var(--fond)` |
+| Test de non-régression | Test qui reproduit un bug corrigé, pour qu'il ne revienne pas |
 | XSS | Faille où un contenu injecté dans une page est exécuté comme du code |

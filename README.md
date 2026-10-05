@@ -17,8 +17,9 @@ déployé automatiquement sur GitHub Pages.
 | CSS moderne | variables, thème clair/sombre (préférence système + choix mémorisé), grille responsive, `color-mix`, défilement doux (`scroll-behavior`), `prefers-reduced-motion` — `css/style.css` |
 | jQuery | chargement AJAX (`$.getJSON`), délégation d'événements, animations et compteurs animés, coupés par `prefers-reduced-motion` — `js/app.js` |
 | JavaScript | logique de filtrage séparée du DOM, recherche insensible aux accents — `js/filtres.js` |
-| Tests | 9 tests unitaires `node --test` + 34 tests Playwright sur ordinateur et mobile |
-| CI/CD | GitHub Actions : tests puis déploiement sur GitHub Pages |
+| Tests | 9 tests unitaires `node --test` + 36 tests Playwright sur ordinateur et mobile |
+| Qualité | ESLint (règles recommandées) et Prettier — `eslint.config.js`, `.prettierrc.json` |
+| CI/CD | GitHub Actions : lint et tests, puis déploiement sur GitHub Pages ; permissions minimales par job |
 
 ## Fonctionnement
 
@@ -50,16 +51,20 @@ que celui que démarrent les tests Playwright.
 
 ## Documentation
 
-[`docs/EXPLICATIONS.md`](docs/EXPLICATIONS.md) ([PDF](docs/EXPLICATIONS.pdf)) explique l'architecture du projet, le code pas à pas et ce qu'on apprend en le réalisant soi-même. Le PDF est régénéré automatiquement par la CI à chaque modification du Markdown.
+[`docs/EXPLICATIONS.md`](docs/EXPLICATIONS.md) ([PDF](docs/EXPLICATIONS.pdf)) explique l'architecture, comment refaire le projet étape par étape et les mauvaises pratiques à éviter. Le PDF est régénéré automatiquement par la CI à chaque modification du Markdown.
 
 ## Tests
 
 ```bash
 npm install
+npm run lint                      # ESLint
+npm run format:check              # Prettier (npm run format pour corriger)
 npm test                          # filtres et validité de projets.json
 npx playwright install chromium
 npm run test:e2e                  # recherche, filtres, modale, clavier, thème, mobile
 ```
+
+`npm run test:e2e` lance son propre serveur sur le port 8080 : arrêter `npm start` avant.
 
 ## Mise en ligne
 

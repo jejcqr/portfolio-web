@@ -3,21 +3,31 @@ $(function () {
   "use strict";
 
   var LIBELLES = {
-    tous: "Tous", "back-end": "Back-end", "système": "Système", data: "Data",
-    infra: "Infra", ia: "IA", web: "Web", mobile: "Mobile", bots: "Bots Discord"
+    tous: "Tous",
+    "back-end": "Back-end",
+    système: "Système",
+    data: "Data",
+    infra: "Infra",
+    ia: "IA",
+    web: "Web",
+    mobile: "Mobile",
+    bots: "Bots Discord",
   };
   var projets = [];
   var criteres = { recherche: "", categorie: "tous", competence: null };
   var $grille = $("#grille");
   var $modale = $("#modale");
-  var $arrierePlan = $(".entete, main, .pied");   // tout ce que la modale recouvre
+  // Tout ce que la modale recouvre.
+  var $arrierePlan = $(".entete, main, .pied");
   var dernierFocus = null;
 
   // ---- Animations : coupées si le système demande moins de mouvement ----
   // La règle CSS prefers-reduced-motion ne touche pas aux animations jQuery.
   var moinsDeMouvement = window.matchMedia("(prefers-reduced-motion: reduce)");
   $.fx.off = moinsDeMouvement.matches;
-  moinsDeMouvement.addEventListener("change", function (e) { $.fx.off = e.matches; });
+  moinsDeMouvement.addEventListener("change", function (e) {
+    $.fx.off = e.matches;
+  });
 
   // ---- Thème clair / sombre ----
   var $boutonTheme = $(".bouton-theme");
@@ -36,16 +46,23 @@ $(function () {
   $boutonTheme.on("click", function () {
     var nouveau = themeSombre() ? "clair" : "sombre";
     $("html").attr("data-theme", nouveau);
-    try { localStorage.setItem("theme", nouveau); } catch (e) { /* stockage indisponible */ }
+    try {
+      localStorage.setItem("theme", nouveau);
+    } catch {
+      /* stockage indisponible */
+    }
     majBoutonTheme();
   });
-  systemeSombre.addEventListener("change", majBoutonTheme);   // sans choix mémorisé, le système décide
+  // Sans choix mémorisé, le système décide.
+  systemeSombre.addEventListener("change", majBoutonTheme);
   majBoutonTheme();
 
   // ---- Rendu ----
   function etiquettes(liste) {
     return liste.map(function (c) {
-      return $("<li>").append($("<button type='button' class='etiquette'>").text(c).attr("data-competence", c));
+      return $("<li>").append(
+        $("<button type='button' class='etiquette'>").text(c).attr("data-competence", c),
+      );
     });
   }
 
@@ -62,13 +79,24 @@ $(function () {
         .append($("<ul class='etiquettes'>").append(etiquettes(p.competences)));
       $carte.appendTo($grille);
       // Fondu en cascade, sauf animations coupées : delay() ne tient pas compte de $.fx.off.
-      if (!$.fx.off) $carte.hide().delay(i * 40).fadeIn(200);
+      if (!$.fx.off) {
+        $carte
+          .hide()
+          .delay(i * 40)
+          .fadeIn(200);
+      }
     });
-    $(".vide").prop("hidden", visibles.length > 0).text(projets.length
-      ? "Aucun projet ne correspond à cette recherche."
-      : "Aucun projet à afficher pour le moment.");
-    $(".filtre-actif").prop("hidden", !criteres.competence)
-      .find("strong").text(criteres.competence || "");
+    $(".vide")
+      .prop("hidden", visibles.length > 0)
+      .text(
+        projets.length
+          ? "Aucun projet ne correspond à cette recherche."
+          : "Aucun projet à afficher pour le moment.",
+      );
+    $(".filtre-actif")
+      .prop("hidden", !criteres.competence)
+      .find("strong")
+      .text(criteres.competence || "");
   }
 
   function afficherCategories() {
@@ -84,14 +112,15 @@ $(function () {
 
   function afficherNuage() {
     var stats = Filtres.compterCompetences(projets);
-    var max = stats.length ? stats[0].nombre : 0;   // liste triée : la première est la plus utilisée
+    // Liste triée : la première compétence est la plus utilisée.
+    var max = stats.length ? stats[0].nombre : 0;
     if (!stats.length) $(".aide").text("Aucune compétence à afficher pour le moment.");
     stats.forEach(function (s) {
       $("<button type='button' class='mot'>")
         .text(s.nom)
         .attr("data-competence", s.nom)
         .attr("title", s.nombre + " projet(s)")
-        .css("font-size", (0.9 + 0.9 * s.nombre / max).toFixed(2) + "rem")
+        .css("font-size", (0.9 + (0.9 * s.nombre) / max).toFixed(2) + "rem")
         .appendTo("#nuage");
     });
     animerCompteur($("#nb-projets"), projets.length);
@@ -99,12 +128,19 @@ $(function () {
   }
 
   function animerCompteur($el, cible) {
-    $({ valeur: 0 }).animate({ valeur: cible }, {
-      duration: 900,
-      easing: "swing",
-      step: function () { $el.text(Math.round(this.valeur)); },
-      complete: function () { $el.text(cible); }
-    });
+    $({ valeur: 0 }).animate(
+      { valeur: cible },
+      {
+        duration: 900,
+        easing: "swing",
+        step: function () {
+          $el.text(Math.round(this.valeur));
+        },
+        complete: function () {
+          $el.text(cible);
+        },
+      },
+    );
   }
 
   // ---- Filtres ----
@@ -112,7 +148,8 @@ $(function () {
   $("#recherche").on("input", function () {
     var valeur = $(this).val();
     clearTimeout(minuterie);
-    minuterie = setTimeout(function () {   // évite de tout redessiner à chaque touche
+    // Attendre une pause de 150 ms évite de tout redessiner à chaque touche.
+    minuterie = setTimeout(function () {
       criteres.recherche = valeur;
       afficherProjets();
     }, 150);
@@ -145,35 +182,45 @@ $(function () {
     e.preventDefault();
     criteres.competence = null;
     afficherProjets();
-    $("#recherche").trigger("focus");   // le lien vient d'être caché avec son bandeau
+    // Le lien vient d'être caché avec son bandeau : le focus va au champ de recherche.
+    $("#recherche").trigger("focus");
   });
 
   // ---- Modale de détail ----
   function ouvrirModale(id) {
-    var p = projets.find(function (x) { return x.id === id; });
+    var p = projets.find(function (x) {
+      return x.id === id;
+    });
     if (!p) return;
     dernierFocus = document.activeElement;
     $modale.find("#modale-titre").text(p.titre);
     $modale.find(".modale-details").text(p.details);
     $modale.find(".modale-competences").empty().append(etiquettes(p.competences));
     $modale.find(".modale-lien").attr("href", p.depot);
-    // stop(true, true) termine un fondu de fermeture en cours, dont le rappel remettrait hidden.
+    // stop(true, true) termine un fondu de fermeture en cours,
+    // dont le rappel remettrait hidden.
     $modale.stop(true, true).prop("hidden", false).hide().fadeIn(150);
-    $arrierePlan.prop("inert", true);   // ni clic, ni focus, ni lecteur d'écran derrière la modale
+    // Ni clic, ni focus, ni lecteur d'écran derrière la modale.
+    $arrierePlan.prop("inert", true);
     $modale.find(".modale-fermer").trigger("focus");
     $("body").addClass("sans-defilement");
   }
 
   function fermerModale() {
     if ($modale.prop("hidden")) return;
-    $modale.fadeOut(150, function () { $modale.prop("hidden", true); });
-    $arrierePlan.prop("inert", false);   // avant de rendre le focus : un élément inerte le refuse
+    $modale.fadeOut(150, function () {
+      $modale.prop("hidden", true);
+    });
+    // Avant de rendre le focus : un élément inerte le refuse.
+    $arrierePlan.prop("inert", false);
     $("body").removeClass("sans-defilement");
     if (dernierFocus) dernierFocus.focus();
   }
 
   // .attr() et non .data(), qui convertirait data-id="42" en nombre.
-  $grille.on("click", ".carte", function () { ouvrirModale($(this).attr("data-id")); });
+  $grille.on("click", ".carte", function () {
+    ouvrirModale($(this).attr("data-id"));
+  });
   $grille.on("keydown", ".carte", function (e) {
     // Seulement sur la carte elle-même : Entrée sur une étiquette doit garder son clic.
     if (e.target !== this) return;
@@ -187,7 +234,8 @@ $(function () {
   $modale.on("keydown", function (e) {
     if (e.key !== "Tab") return;
     var $elements = $modale.find("a[href], button:not(:disabled)");
-    var premier = $elements.get(0), dernier = $elements.get(-1);
+    var premier = $elements.get(0),
+      dernier = $elements.get(-1);
     if (e.shiftKey && document.activeElement === premier) {
       e.preventDefault();
       dernier.focus();
@@ -196,7 +244,9 @@ $(function () {
       premier.focus();
     }
   });
-  $(document).on("keydown", function (e) { if (e.key === "Escape") fermerModale(); });
+  $(document).on("keydown", function (e) {
+    if (e.key === "Escape") fermerModale();
+  });
 
   // ---- Chargement ----
   $.getJSON("data/projets.json")
@@ -206,7 +256,10 @@ $(function () {
       afficherProjets();
       afficherNuage();
     })
-    .fail(function () {
+    .fail(function (xhr, statut, erreur) {
+      // Le détail technique va dans la console, pour le développeur ; le visiteur ne
+      // voit qu'un message fixe, sans information interne.
+      console.error("Chargement de data/projets.json impossible :", statut, String(erreur));
       $grille.html("<p class='vide'>Impossible de charger les projets.</p>");
     });
 });

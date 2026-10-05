@@ -11,12 +11,15 @@ on:
       - docs/generer-pdf.sh
   workflow_dispatch:
 
+# Minimum par défaut ; seul le job pdf, qui commite le PDF, peut écrire.
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   pdf:
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 

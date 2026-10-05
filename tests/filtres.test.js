@@ -32,25 +32,37 @@ test("filtre par catégorie", () => {
 
 test("filtre par compétence", () => {
   const go = filtrerProjets(projets, { competence: "Go" });
-  assert.deepEqual(go.map((p) => p.id), ["go-uptime"]);
+  assert.deepEqual(
+    go.map((p) => p.id),
+    ["go-uptime"],
+  );
 });
 
 test("la recherche ignore les accents et combine les mots", () => {
-  assert.deepEqual(filtrerProjets(projets, { recherche: "emissions" }).map((p) => p.id), ["analyse-donnees-r"]);
-  assert.deepEqual(filtrerProjets(projets, { recherche: "python discord coran" }).map((p) => p.id), ["alhudabot"]);
+  assert.deepEqual(
+    filtrerProjets(projets, { recherche: "emissions" }).map((p) => p.id),
+    ["analyse-donnees-r"],
+  );
+  assert.deepEqual(
+    filtrerProjets(projets, { recherche: "python discord coran" }).map((p) => p.id),
+    ["alhudabot"],
+  );
   assert.equal(filtrerProjets(projets, { recherche: "zzzz" }).length, 0);
 });
 
 test("compterCompetences trie par fréquence", () => {
-  const stats = compterCompetences([
-    { competences: ["A", "B"] },
-    { competences: ["B"] },
+  const stats = compterCompetences([{ competences: ["A", "B"] }, { competences: ["B"] }]);
+  assert.deepEqual(stats, [
+    { nom: "B", nombre: 2 },
+    { nom: "A", nombre: 1 },
   ]);
-  assert.deepEqual(stats, [{ nom: "B", nombre: 2 }, { nom: "A", nombre: 1 }]);
 });
 
 test("categories garde l'ordre d'apparition sans doublon", () => {
-  assert.deepEqual(categories([{ categorie: "x" }, { categorie: "y" }, { categorie: "x" }]), ["x", "y"]);
+  assert.deepEqual(categories([{ categorie: "x" }, { categorie: "y" }, { categorie: "x" }]), [
+    "x",
+    "y",
+  ]);
 });
 
 test("une liste de projets vide donne des résultats vides", () => {

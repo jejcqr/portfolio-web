@@ -3,18 +3,18 @@
   "use strict";
 
   function normaliser(texte) {
-    return String(texte)
-      .normalize("NFD")
-      .replace(/[̀-ͯ]/g, "")
-      .toLowerCase()
-      .trim();
+    return String(texte).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
   }
 
   /** Garde les projets de la catégorie et de la compétence choisies qui contiennent la recherche. */
   function filtrerProjets(projets, criteres) {
     var recherche = normaliser(criteres.recherche || "");
     return projets.filter(function (p) {
-      if (criteres.categorie && criteres.categorie !== "tous" && p.categorie !== criteres.categorie) {
+      if (
+        criteres.categorie &&
+        criteres.categorie !== "tous" &&
+        p.categorie !== criteres.categorie
+      ) {
         return false;
       }
       if (criteres.competence && p.competences.indexOf(criteres.competence) === -1) {
@@ -39,8 +39,12 @@
       });
     });
     return Object.keys(compte)
-      .map(function (nom) { return { nom: nom, nombre: compte[nom] }; })
-      .sort(function (a, b) { return b.nombre - a.nombre || a.nom.localeCompare(b.nom, "fr"); });
+      .map(function (nom) {
+        return { nom: nom, nombre: compte[nom] };
+      })
+      .sort(function (a, b) {
+        return b.nombre - a.nombre || a.nom.localeCompare(b.nom, "fr");
+      });
   }
 
   function categories(projets) {

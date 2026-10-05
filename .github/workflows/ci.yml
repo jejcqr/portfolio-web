@@ -4,20 +4,23 @@ on:
   push:
   pull_request:
 
+# Minimum par défaut ; chaque job déclare exactement ce dont il a besoin.
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 jobs:
   tests:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
       - run: npm ci
+      - name: Analyse statique (ESLint) et mise en forme (Prettier)
+        run: npm run lint && npm run format:check
       - name: Tests unitaires (filtres et données)
         run: npm test
       - run: npx playwright install --with-deps chromium
@@ -28,6 +31,10 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     needs: tests
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write # publier sur GitHub Pages
+      id-token: write # jeton OIDC temporaire exigé par deploy-pages
     environment:
       name: github-pages
       url: ${{ steps.deploiement.outputs.page_url }}

@@ -11,7 +11,9 @@ module.exports = defineConfig({
   webServer: {
     command: "npm start",
     url: "http://127.0.0.1:8080",
-    reuseExistingServer: true,
+    // Jamais un serveur déjà lancé : il pourrait servir une autre version du site.
+    // Si le port 8080 est occupé, Playwright s'arrête avec un message explicite.
+    reuseExistingServer: false,
   },
   projects: [
     { name: "ordinateur", use: devices["Desktop Chrome"] },

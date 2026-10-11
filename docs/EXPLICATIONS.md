@@ -66,7 +66,8 @@ téléphone simulé (Pixel 7). Le port 8080 doit être libre : Playwright
 lance son propre serveur et refuse d'en réutiliser un (5.12). Si un Chromium est déjà installé, la variable
 `CHROMIUM_PATH` permet de l'utiliser à la place de `npx playwright install` (voir
 `playwright.config.js`). À chaque `push`, `.github/workflows/ci.yml` relance ESLint,
-Prettier et tous les tests ; sur `main`, s'ils passent, il publie le site sur GitHub Pages.
+Prettier et tous les tests ; sur `main`, s'ils passent, il publie le site sur GitHub Pages (seulement si le dépôt
+est public : GitHub ne sert pas les dépôts privés d'un compte gratuit).
 
 # 3. Architecture
 

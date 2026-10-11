@@ -76,5 +76,6 @@ npm run test:e2e                  # recherche, filtres, modale, clavier, thème,
 
 ## Mise en ligne
 
-Activer GitHub Pages dans *Settings → Pages → Source : GitHub Actions*.
-Chaque push sur `main` relance les tests puis publie le site.
+Rendre le dépôt public, puis activer GitHub Pages dans *Settings → Pages → Source : GitHub Actions*.
+Chaque push sur `main` relance les tests puis publie le site ; tant que le dépôt est privé,
+le job de déploiement est sauté.

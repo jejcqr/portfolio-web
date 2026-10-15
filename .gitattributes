@@ -1,0 +1,3 @@
+# Fiche explicative et guide généré : documentation, exclue des statistiques de langage.
+docs/** linguist-documentation
+docs/guide/index.html linguist-generated

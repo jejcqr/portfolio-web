@@ -1,0 +1,2054 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="pandoc + docs/guide-src">
+<title>portfolio-web — guide interactif</title>
+<style>
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  background-color: #f8f8f8; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } /* Alert */
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #204a87; } /* Attribute */
+code span.bn { color: #0000cf; } /* BaseN */
+code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4e9a06; } /* Char */
+code span.cn { color: #8f5902; } /* Constant */
+code span.co { color: #8f5902; font-style: italic; } /* Comment */
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code span.dt { color: #204a87; } /* DataType */
+code span.dv { color: #0000cf; } /* DecVal */
+code span.er { color: #a40000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #0000cf; } /* Float */
+code span.fu { color: #204a87; font-weight: bold; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code span.ot { color: #8f5902; } /* Other */
+code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code span.sc { color: #ce5c00; font-weight: bold; } /* SpecialChar */
+code span.ss { color: #4e9a06; } /* SpecialString */
+code span.st { color: #4e9a06; } /* String */
+code span.va { color: #000000; } /* Variable */
+code span.vs { color: #4e9a06; } /* VerbatimString */
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+<style>
+/* Coloration du code : contraste AA sur le fond des blocs, en clair comme en sombre. */
+code span.kw, code span.cf, code span.al, code span.er { color: #a40e26; font-weight: normal; }
+code span.st, code span.ch, code span.vs, code span.ss, code span.sc { color: #0a3069; }
+code span.co, code span.do, code span.an, code span.cv, code span.in { color: #57606a; font-style: italic; }
+code span.dv, code span.bn, code span.fl, code span.cn, code span.dt { color: #0550ae; }
+code span.fu, code span.bu, code span.ex { color: #6639ba; }
+code span.pp, code span.im, code span.at, code span.va, code span.ot, code span.op, code span.wa, code span.sp { color: #953800; }
+
+/* Guide interactif : mise en page, thème clair et sombre, impression. */
+:root {
+  --fond: #ffffff;
+  --texte: #1f2328;
+  --discret: #57606a;
+  --bordure: #d0d7de;
+  --panneau: #f6f8fa;
+  --accent: #0b5cad;
+  --succes: #1a7f37;
+  --erreur: #b42318;
+  --piege: #fff8e6;
+  --piege-bord: #b07d00;
+  --code-fond: #f6f8fa;
+  --code-texte: #1f2328;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fond: #0f1419;
+    --texte: #e6edf3;
+    --discret: #9da7b3;
+    --bordure: #3d444d;
+    --panneau: #161b22;
+    --accent: #6cb6ff;
+    --succes: #57c46b;
+    --erreur: #ff8a80;
+    --piege: #2b2410;
+    --piege-bord: #d4a72c;
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-padding-top: 1rem; }
+body {
+  margin: 0;
+  background: var(--fond);
+  color: var(--texte);
+  font: 1rem/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+a { color: var(--accent); }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.evitement { position: absolute; left: -9999px; }
+.evitement:focus { left: 1rem; top: 1rem; z-index: 10; background: var(--fond); padding: .5rem 1rem; }
+
+.entete { padding: 1.5rem 1rem 1rem; border-bottom: 1px solid var(--bordure); max-width: 76rem; margin: 0 auto; }
+.entete h1 { margin: .2rem 0; font-size: 2rem; line-height: 1.2; }
+.surtitre { margin: 0; color: var(--discret); text-transform: uppercase; letter-spacing: .08em; font-size: .8rem; }
+.soustitre { margin: .3rem 0; font-size: 1.1rem; }
+.auteur, .aide { color: var(--discret); margin: .3rem 0; font-size: .9rem; }
+.progression { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; margin-top: .8rem; }
+.progression p { margin: 0; font-weight: 600; }
+.progression progress { flex: 1 1 12rem; height: .8rem; accent-color: var(--succes); }
+button {
+  font: inherit; cursor: pointer; padding: .35rem .9rem; border-radius: 6px;
+  border: 1px solid var(--bordure); background: var(--panneau); color: var(--texte);
+}
+button:hover { border-color: var(--accent); }
+
+.mise-en-page { display: grid; grid-template-columns: 17rem minmax(0, 1fr); gap: 2rem; max-width: 76rem; margin: 0 auto; padding: 0 1rem 4rem; }
+.sommaire > details { position: sticky; top: 0; max-height: 100vh; overflow-y: auto; padding: 1rem 0; font-size: .9rem; }
+.sommaire summary { font-weight: 600; cursor: pointer; }
+.sommaire ul { list-style: none; padding-left: .8rem; margin: .3rem 0; }
+.sommaire > details > ul, .sommaire nav > ul { padding-left: 0; }
+.sommaire li { margin: .2rem 0; }
+.sommaire a { text-decoration: none; }
+.sommaire a:hover { text-decoration: underline; }
+.sommaire a.fait-ok::after { content: " ✓"; color: var(--succes); }
+
+main { min-width: 0; overflow-wrap: break-word; }
+main h1 { font-size: 1.6rem; margin-top: 2.5rem; padding-bottom: .3rem; border-bottom: 1px solid var(--bordure); }
+main h2 { font-size: 1.25rem; margin-top: 2rem; }
+code { font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; font-size: .9em; }
+:not(pre) > code { background: var(--panneau); padding: .1em .3em; border-radius: 4px; }
+pre {
+  position: relative; overflow-x: auto; padding: 2rem 1rem .8rem; border-radius: 6px;
+  background: var(--code-fond); color: var(--code-texte); border: 1px solid var(--bordure); line-height: 1.45;
+}
+div.sourceCode { margin: 1rem 0; }
+pre code { background: none; padding: 0; }
+.copier { position: absolute; top: .4rem; right: .4rem; font-size: .75rem; padding: .1rem .5rem; opacity: .85; }
+blockquote { margin: 1rem 0; padding: .6rem 1rem; border-left: 4px solid var(--succes); background: var(--panneau); }
+blockquote p { margin: .2rem 0; }
+table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: .92rem; display: block; overflow-x: auto; }
+th, td { border: 1px solid var(--bordure); padding: .4rem .6rem; text-align: left; vertical-align: top; }
+thead th { background: var(--panneau); }
+th p, td p { margin: 0; }
+
+section.etape, section.piege { border: 1px solid var(--bordure); border-radius: 8px; padding: 0 1.2rem 1rem; margin: 1.5rem 0; }
+section.etape > h2, section.piege > h2 { margin-top: 1rem; }
+section.etape.est-faite { border-color: var(--succes); }
+.fait { display: inline-flex; gap: .4rem; align-items: center; font-weight: 600; cursor: pointer; }
+input[type="checkbox"], input[type="radio"] { width: 1.1rem; height: 1.1rem; accent-color: var(--accent); }
+.piege-etape { border-left: 4px solid var(--piege-bord); background: var(--piege); padding: .2rem 1rem; border-radius: 0 6px 6px 0; }
+
+details.code-replie, details.explication { margin: 1rem 0; border: 1px dashed var(--bordure); border-radius: 6px; padding: .3rem .8rem; }
+details > summary { cursor: pointer; font-weight: 600; color: var(--accent); }
+details[open].code-replie, details[open].explication { border-style: solid; }
+
+.quiz { margin: 1rem 0; padding: .8rem 1rem; border-radius: 8px; background: var(--panneau); border: 1px solid var(--bordure); }
+.quiz fieldset { border: 0; padding: 0; margin: 0 0 .6rem; min-width: 0; }
+.quiz label span { min-width: 0; overflow-wrap: anywhere; }
+.quiz legend { font-weight: 700; margin-bottom: .4rem; }
+.quiz label { display: flex; gap: .6rem; align-items: flex-start; padding: .35rem .4rem; border-radius: 6px; cursor: pointer; }
+.quiz label input { margin-top: .3rem; flex: none; }
+.quiz label:hover { background: var(--fond); }
+.quiz label.bonne { outline: 2px solid var(--succes); }
+.quiz label.mauvaise { outline: 2px solid var(--erreur); }
+.quiz-retour { margin: .5rem 0 0; font-weight: 600; }
+.quiz-retour.ok { color: var(--succes); }
+.quiz-retour.ko { color: var(--erreur); }
+
+table.check-list td.case { text-align: center; }
+table.check-list tr.cochee > * { background: color-mix(in srgb, var(--succes) 12%, transparent); }
+.recherche { display: flex; flex-wrap: wrap; gap: .4rem 1rem; align-items: center; }
+.recherche label { font-weight: 600; }
+.recherche input { font: inherit; padding: .35rem .6rem; border: 1px solid var(--bordure); border-radius: 6px; background: var(--fond); color: var(--texte); min-width: 16rem; }
+.recherche p { margin: 0; color: var(--discret); }
+
+@media (max-width: 60rem) {
+  .mise-en-page { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .sommaire > details { position: static; max-height: none; }
+  .entete h1 { font-size: 1.6rem; }
+}
+@media print {
+  .progression, .aide, .sommaire, .copier, .quiz button, .evitement, .recherche { display: none; }
+  .mise-en-page { display: block; }
+  section.etape, section.piege { break-inside: auto; }
+}
+table[hidden] { display: none; }
+</style>
+</head>
+<body data-guide="portfolio-web">
+<a class="evitement" href="#contenu">Aller au contenu</a>
+<header class="entete">
+  <p class="surtitre">Guide interactif</p>
+  <h1>portfolio-web</h1>
+  <p class="soustitre">Un site portfolio statique en HTML, CSS et jQuery
+: comment le refaire soi-même, étape par étape, et les mauvaises
+pratiques qu'on apprend à éviter en le codant.</p>
+  <p class="auteur">Jean-Emmanuel
+Jacquier · <a href="../EXPLICATIONS.pdf">version PDF</a> · <a href="../EXPLICATIONS.md">source Markdown</a></p>
+  <div class="progression">
+    <p id="progression-texte" aria-live="polite">Progression : 0 / 0</p>
+    <progress id="progression-barre" max="1" value="0" aria-labelledby="progression-texte"></progress>
+    <p id="quiz-score" aria-live="polite"></p>
+    <button type="button" id="reinitialiser">Effacer ma progression</button>
+  </div>
+  <p class="aide">Cochez les étapes faites et la check-list : la progression reste enregistrée dans ce navigateur.</p>
+</header>
+<div class="mise-en-page">
+<nav class="sommaire" aria-label="Sommaire">
+<details open id="sommaire-details"><summary>Sommaire</summary>
+<ul>
+<li><a href="#1-le-projet-en-bref" id="toc-1-le-projet-en-bref">1. Le
+projet en bref</a></li>
+<li><a href="#2-lancer-et-tester" id="toc-2-lancer-et-tester">2. Lancer
+et tester</a></li>
+<li><a href="#3-architecture" id="toc-3-architecture">3.
+Architecture</a></li>
+<li><a href="#4-refaire-le-projet-soi-même-étape-par-étape"
+id="toc-4-refaire-le-projet-soi-même-étape-par-étape">4. Refaire le
+projet soi-même, étape par étape</a>
+<ul>
+<li><a href="#41-étape-1--une-page-statique-servie-par-http"
+id="toc-41-étape-1--une-page-statique-servie-par-http">4.1 Étape 1 : une
+page statique servie par HTTP</a></li>
+<li><a
+href="#42-étape-2--décrire-les-projets-dans-un-json-et-le-valider"
+id="toc-42-étape-2--décrire-les-projets-dans-un-json-et-le-valider">4.2
+Étape 2 : décrire les projets dans un JSON, et le valider</a></li>
+<li><a href="#43-étape-3--la-logique-de-filtrage-en-fonctions-pures"
+id="toc-43-étape-3--la-logique-de-filtrage-en-fonctions-pures">4.3 Étape
+3 : la logique de filtrage en fonctions pures</a></li>
+<li><a href="#44-étape-4--charger-les-données-et-afficher-les-cartes"
+id="toc-44-étape-4--charger-les-données-et-afficher-les-cartes">4.4
+Étape 4 : charger les données et afficher les cartes</a></li>
+<li><a href="#45-étape-5--la-recherche-et-les-filtres"
+id="toc-45-étape-5--la-recherche-et-les-filtres">4.5 Étape 5 : la
+recherche et les filtres</a></li>
+<li><a href="#46-étape-6--la-fiche-détaillée-modale"
+id="toc-46-étape-6--la-fiche-détaillée-modale">4.6 Étape 6 : la fiche
+détaillée (modale)</a></li>
+<li><a href="#47-étape-7--le-thème-clair-ou-sombre"
+id="toc-47-étape-7--le-thème-clair-ou-sombre">4.7 Étape 7 : le thème
+clair ou sombre</a></li>
+<li><a
+href="#48-étape-8--animations-et-compteurs-sans-imposer-le-mouvement"
+id="toc-48-étape-8--animations-et-compteurs-sans-imposer-le-mouvement">4.8
+Étape 8 : animations et compteurs, sans imposer le mouvement</a></li>
+<li><a
+href="#49-étape-9--tests-fiables-analyse-statique-et-intégration-continue"
+id="toc-49-étape-9--tests-fiables-analyse-statique-et-intégration-continue">4.9
+Étape 9 : tests fiables, analyse statique et intégration
+continue</a></li>
+</ul></li>
+<li><a href="#5-les-mauvaises-pratiques-quon-apprend-à-éviter"
+id="toc-5-les-mauvaises-pratiques-quon-apprend-à-éviter">5. Les
+mauvaises pratiques qu'on apprend à éviter</a>
+<ul>
+<li><a
+href="#51-attacher-un-écouteur-à-des-éléments-qui-nexistent-pas-encore"
+id="toc-51-attacher-un-écouteur-à-des-éléments-qui-nexistent-pas-encore">5.1
+Attacher un écouteur à des éléments qui n'existent pas encore</a></li>
+<li><a href="#52-lire-les-attributs-data--avec-data"
+id="toc-52-lire-les-attributs-data--avec-data">5.2 Lire les attributs
+<code>data-*</code> avec <code>.data()</code></a></li>
+<li><a href="#53-construire-le-html-en-concaténant-des-données"
+id="toc-53-construire-le-html-en-concaténant-des-données">5.3 Construire
+le HTML en concaténant des données</a></li>
+<li><a href="#54-charger-un-script-tiers-sans-vérifier-son-intégrité"
+id="toc-54-charger-un-script-tiers-sans-vérifier-son-intégrité">5.4
+Charger un script tiers sans vérifier son intégrité</a></li>
+<li><a href="#55-supposer-quune-liste-nest-jamais-vide"
+id="toc-55-supposer-quune-liste-nest-jamais-vide">5.5 Supposer qu'une
+liste n'est jamais vide</a></li>
+<li><a href="#56-avaler-une-erreur-ou-lafficher-brute"
+id="toc-56-avaler-une-erreur-ou-lafficher-brute">5.6 Avaler une erreur,
+ou l'afficher brute</a></li>
+<li><a href="#57-laisser-le-focus-au-hasard"
+id="toc-57-laisser-le-focus-au-hasard">5.7 Laisser le focus au
+hasard</a></li>
+<li><a href="#58-relancer-une-animation-sans-arrêter-la-précédente"
+id="toc-58-relancer-une-animation-sans-arrêter-la-précédente">5.8
+Relancer une animation sans arrêter la précédente</a></li>
+<li><a
+href="#59-animer-en-javascript-sans-respecter-prefers-reduced-motion"
+id="toc-59-animer-en-javascript-sans-respecter-prefers-reduced-motion">5.9
+Animer en JavaScript sans respecter
+<code>prefers-reduced-motion</code></a></li>
+<li><a href="#510-un-bouton-bascule-dont-létat-nest-pas-exposé"
+id="toc-510-un-bouton-bascule-dont-létat-nest-pas-exposé">5.10 Un bouton
+bascule dont l'état n'est pas exposé</a></li>
+<li><a
+href="#511-tester-avec-des-pauses-fixes-corriger-sans-test-de-non-régression"
+id="toc-511-tester-avec-des-pauses-fixes-corriger-sans-test-de-non-régression">5.11
+Tester avec des pauses fixes, corriger sans test de
+non-régression</a></li>
+<li><a href="#512-garder-des-valeurs-par-défaut-dangereuses"
+id="toc-512-garder-des-valeurs-par-défaut-dangereuses">5.12 Garder des
+valeurs par défaut dangereuses</a></li>
+</ul></li>
+<li><a href="#6-check-list-avant-de-rendre-son-code"
+id="toc-6-check-list-avant-de-rendre-son-code">6. Check-list avant de
+rendre son code</a></li>
+<li><a href="#7-pour-aller-plus-loin" id="toc-7-pour-aller-plus-loin">7.
+Pour aller plus loin</a></li>
+<li><a href="#8-glossaire" id="toc-8-glossaire">8. Glossaire</a></li>
+</ul>
+</details>
+</nav>
+<main id="contenu">
+<h1 id="1-le-projet-en-bref">1. Le projet en bref</h1>
+<p><code>portfolio-web</code> est le site personnel de Jean-Emmanuel
+Jacquier, étudiant en informatique à Epitech Lyon. C'est une seule page
+qui présente ses projets GitHub sous forme de cartes. Le visiteur peut
+rechercher un projet par mot-clé (sans se soucier des accents ni des
+majuscules), filtrer par catégorie, cliquer sur une compétence comme «
+Docker » pour ne voir que les projets qui l'utilisent, ouvrir la fiche
+détaillée d'un projet à la souris ou au clavier, et basculer entre thème
+clair et thème sombre.</p>
+<p>Le site est <strong>statique</strong> : ni serveur applicatif ni base
+de données. Le navigateur télécharge <code>index.html</code>, une
+feuille de style, jQuery, deux scripts et le fichier
+<code>data/projets.json</code>, puis construit la page en JavaScript.
+Ajouter un projet consiste à ajouter une entrée au JSON, sans toucher au
+code.</p>
+<p><strong>Ce que le projet apprend à faire :</strong> séparer la
+logique (fonctions pures testables avec Node.js) de l'affichage (jQuery)
+; manipuler le DOM sans ouvrir de faille d'injection ; gérer le clavier,
+le focus et les préférences du système (thème, animations réduites) ;
+écrire des tests de bout en bout fiables avec Playwright ; contrôler le
+code avec ESLint et Prettier ; et publier automatiquement le site
+seulement si tout passe.</p>
+<p><strong>Un exemple réel.</strong> La logique de filtrage ne dépend
+pas du navigateur : on peut l'appeler depuis Node.js pour savoir ce que
+la page affichera.</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">node</span> <span class="at">-e</span> <span class="st">&#39;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="st">const F = require(&quot;./js/filtres.js&quot;);</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="st">const p = require(&quot;./data/projets.json&quot;);</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="st">console.log(F.filtrerProjets(p, { recherche: &quot;emissions&quot; }).map(x =&gt; x.titre));</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="st">console.log(F.compterCompetences(p).slice(0, 2));&#39;</span></span></code></pre></div>
+<pre class="text"><code># sortie réelle
+[ &#39;Émissions de CO₂ en R&#39; ]
+[ { nom: &#39;Python&#39;, nombre: 5 }, { nom: &#39;Docker&#39;, nombre: 3 } ]</code></pre>
+<p>Dans la page, taper « emissions » laisse exactement cette carte
+visible, et « Python » est le mot le plus gros du nuage de
+compétences.</p>
+<h1 id="2-lancer-et-tester">2. Lancer et tester</h1>
+<p>Le site doit être servi par HTTP (un double-clic sur
+<code>index.html</code> ne suffit pas, voir l'étape 4.1) :</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> start                  <span class="co"># python3 -m http.server 8080 --bind 127.0.0.1</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                           <span class="co"># puis ouvrir http://127.0.0.1:8080</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> install</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run lint               <span class="co"># ESLint (règles recommandées)</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run format:check       <span class="co"># Prettier, sans rien modifier</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test                   <span class="co"># 9 tests unitaires (node --test)</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="ex">npx</span> playwright install chromium</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run test:e2e           <span class="co"># tests de bout en bout (Playwright)</span></span></code></pre></div>
+<p><code>npm start</code> ne télécharge rien : il lance le serveur
+intégré à Python 3. Chaque scénario de
+<code>tests/portfolio.spec.js</code> est joué deux fois : sur un écran
+d'ordinateur et sur un téléphone simulé (Pixel 7). Le port 8080 doit
+être libre : Playwright lance son propre serveur et refuse d'en
+réutiliser un (5.12). Si un Chromium est déjà installé, la variable
+<code>CHROMIUM_PATH</code> permet de l'utiliser à la place de
+<code>npx playwright install</code> (voir
+<code>playwright.config.js</code>). À chaque <code>push</code>,
+<code>.github/workflows/ci.yml</code> relance ESLint, Prettier et tous
+les tests ; sur <code>main</code>, s'ils passent, il publie le site sur
+GitHub Pages (seulement si le dépôt est public : GitHub ne sert pas les
+dépôts privés d'un compte gratuit).</p>
+<h1 id="3-architecture">3. Architecture</h1>
+<pre class="text"><code>  push sur main --&gt; GitHub Actions (ci.yml)
+                      job tests : lint, format:check, npm test, npm run test:e2e
+                      job deploiement (needs: tests) : index.html css js data --&gt; Pages
+
+  Navigateur
+    index.html     script inline du &lt;head&gt; : applique le thème mémorisé
+    css/style.css  variables de couleur, thème sombre, prefers-reduced-motion
+    jQuery (CDN)   vérifié par l&#39;attribut integrity
+    js/filtres.js  crée window.Filtres (fonctions pures, sans DOM)
+    js/app.js      $(function () { ... }) quand le DOM est prêt
+        |
+        |  $.getJSON(&quot;data/projets.json&quot;)
+        v
+    projets[] --&gt; afficherCategories()  afficherProjets()  afficherNuage()
+                                             |
+                    Filtres.filtrerProjets(projets, criteres)
+                                             ^
+         criteres = { recherche, categorie, competence }
+                                             ^
+    Événements : saisie #recherche, clic .filtre, clic .etiquette / .mot
+                 clic ou Entrée sur .carte --&gt; ouvrirModale()
+                 Échap, fond, bouton Fermer --&gt; fermerModale()</code></pre>
+<p>Le principe central : <strong>un seul état</strong>
+(<code>criteres</code>) et <strong>une seule fonction de rendu</strong>
+(<code>afficherProjets</code>). Chaque action de l'utilisateur modifie
+<code>criteres</code>, puis la grille est redessinée à partir de
+zéro.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Fichier</th>
+<th>Rôle</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>index.html</code></td>
+<td>Squelette : sections à remplir, modale cachée, script inline du
+thème</td>
+</tr>
+<tr class="even">
+<td><code>css/style.css</code></td>
+<td>Variables de couleur, thème sombre, grille de cartes, modale,
+mobile</td>
+</tr>
+<tr class="odd">
+<td><code>js/filtres.js</code></td>
+<td>Fonctions pures : <code>normaliser</code>,
+<code>filtrerProjets</code>, <code>compterCompetences</code>,
+<code>categories</code></td>
+</tr>
+<tr class="even">
+<td><code>js/app.js</code></td>
+<td>Code jQuery : chargement, rendu, événements, modale, thème,
+compteurs</td>
+</tr>
+<tr class="odd">
+<td><code>data/projets.json</code></td>
+<td>Les 12 projets (titre, résumé, détails, compétences, catégorie,
+dépôt)</td>
+</tr>
+<tr class="even">
+<td><code>tests/filtres.test.js</code></td>
+<td>Tests <code>node --test</code> des filtres et de la validité du
+JSON</td>
+</tr>
+<tr class="odd">
+<td><code>tests/portfolio.spec.js</code></td>
+<td>Tests Playwright : recherche, filtres, modale, clavier, thème,
+mobile</td>
+</tr>
+<tr class="even">
+<td><code>playwright.config.js</code></td>
+<td>Serveur de test (<code>npm start</code>), profils « ordinateur » et
+« mobile »</td>
+</tr>
+<tr class="odd">
+<td><code>eslint.config.js</code>, <code>.prettierrc.json</code></td>
+<td>Analyse statique (ESLint) et mise en forme (Prettier)</td>
+</tr>
+<tr class="even">
+<td><code>.github/workflows/ci.yml</code></td>
+<td>Lint et tests, puis déploiement GitHub Pages</td>
+</tr>
+<tr class="odd">
+<td><code>docs/</code>, <code>explications-pdf.yml</code></td>
+<td>Ce document, son script PDF et le workflow qui le régénère</td>
+</tr>
+</tbody>
+</table>
+<h1 id="4-refaire-le-projet-soi-même-étape-par-étape">4. Refaire le
+projet soi-même, étape par étape</h1>
+<p>Les étapes suivent l'ordre dans lequel on construirait réellement le
+site : d'abord la plus petite version qui fonctionne, puis une
+fonctionnalité à la fois, chacune vérifiée avant de passer à la
+suivante. Les extraits sont ceux du code final.</p>
+<section id="41-étape-1--une-page-statique-servie-par-http"
+class="etape">
+<h2>4.1 Étape 1 : une page statique servie par HTTP</h2>
+<label class="fait"><input type="checkbox" data-suivi="etape:41-étape-1--une-page-statique-servie-par-http"> J'ai fait cette étape</label>
+<p><strong>Objectif.</strong> Écrire le squelette HTML (en-tête,
+sections vides, modale cachée) et l'ouvrir dans un navigateur comme il
+le sera en production. Les zones à remplir par JavaScript sont vides
+:</p>
+<details class="code-replie"><summary>Voir la solution (HTML)</summary>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode html"><code class="sourceCode html"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">div</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;grille&quot;</span> <span class="er">id</span><span class="ot">=</span><span class="st">&quot;grille&quot;</span><span class="dt">&gt;&lt;/</span><span class="kw">div</span><span class="dt">&gt;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">p</span> <span class="er">class</span><span class="ot">=</span><span class="st">&quot;vide&quot;</span> <span class="er">hidden</span><span class="dt">&gt;&lt;/</span><span class="kw">p</span><span class="dt">&gt;</span></span></code></pre></div>
+</details>
+<p><strong>Vérifier.</strong> Lancer <code>npm start</code>, puis dans
+un autre terminal :</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-s</span> <span class="at">-o</span> /dev/null <span class="at">-w</span> <span class="st">&#39;%{http_code} %{content_type}\n&#39;</span> <span class="dt">\</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  http://127.0.0.1:8080/data/projets.json</span></code></pre></div>
+<pre class="text"><code># sortie réelle (une fois data/projets.json créé à l&#39;étape 2)
+200 application/json</code></pre>
+<div class="piege-etape">
+<p><strong>Le piège à cette étape.</strong> Ouvrir
+<code>index.html</code> par un double-clic (adresse
+<code>file://</code>). Dès l'étape 4, la page affiche « Impossible de
+charger les projets. » et la console de Chromium indique, en sortie
+réelle :
+<code>Access to XMLHttpRequest at 'file:///home/claude/portfolio-web/data/projets.json' from origin 'null' has been blocked by CORS policy</code>.
+Une page ouverte depuis le disque n'a pas d'origine et ne peut pas lire
+d'autres fichiers locaux. Autre piège : oublier <code>--bind</code>
+(5.12).</p>
+</div>
+</section>
+<section id="42-étape-2--décrire-les-projets-dans-un-json-et-le-valider"
+class="etape">
+<h2>4.2 Étape 2 : décrire les projets dans un JSON, et le valider</h2>
+<label class="fait"><input type="checkbox" data-suivi="etape:42-étape-2--décrire-les-projets-dans-un-json-et-le-valider"> J'ai fait cette étape</label>
+<p><strong>Objectif.</strong> Séparer les données du code. Chaque projet
+de <code>data/projets.json</code> a un <code>id</code>, un
+<code>titre</code>, un <code>resume</code>, des <code>details</code>,
+une liste de <code>competences</code>, une <code>categorie</code> et un
+lien <code>depot</code> (exemple dans le <code>README.md</code>). Le
+premier test à écrire vérifie les données elles-mêmes
+(<code>tests/filtres.test.js</code>) :</p>
+<details class="code-replie"><summary>Voir la solution (JavaScript)</summary>
+<div class="sourceCode" id="cb8"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">test</span>(<span class="st">&quot;chaque projet a les champs attendus&quot;</span><span class="op">,</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> ids <span class="op">=</span> <span class="kw">new</span> <span class="bu">Set</span>()<span class="op">;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">const</span> p <span class="kw">of</span> projets) {</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (<span class="kw">const</span> champ <span class="kw">of</span> [<span class="st">&quot;id&quot;</span><span class="op">,</span> <span class="st">&quot;titre&quot;</span><span class="op">,</span> <span class="st">&quot;resume&quot;</span><span class="op">,</span> <span class="st">&quot;details&quot;</span><span class="op">,</span> <span class="st">&quot;categorie&quot;</span><span class="op">,</span> <span class="st">&quot;depot&quot;</span>]) {</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>      assert<span class="op">.</span><span class="fu">ok</span>(p[champ]<span class="op">,</span> <span class="vs">`</span><span class="sc">${</span>p<span class="op">.</span><span class="at">id</span><span class="sc">}</span><span class="vs"> : champ </span><span class="sc">${</span>champ<span class="sc">}</span><span class="vs"> manquant`</span>)<span class="op">;</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    assert<span class="op">.</span><span class="fu">ok</span>(p<span class="op">.</span><span class="at">competences</span><span class="op">.</span><span class="at">length</span> <span class="op">&gt;</span> <span class="dv">0</span><span class="op">,</span> <span class="vs">`</span><span class="sc">${</span>p<span class="op">.</span><span class="at">id</span><span class="sc">}</span><span class="vs"> : aucune compétence`</span>)<span class="op">;</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    assert<span class="op">.</span><span class="fu">match</span>(p<span class="op">.</span><span class="at">depot</span><span class="op">,</span> <span class="ss">/</span><span class="sc">^</span><span class="ss">https:</span><span class="sc">\/\/</span><span class="ss">github</span><span class="sc">\.</span><span class="ss">com</span><span class="sc">\/</span><span class="ss">jejcqr</span><span class="sc">\/</span><span class="ss">/</span>)<span class="op">;</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    assert<span class="op">.</span><span class="fu">ok</span>(<span class="op">!</span>ids<span class="op">.</span><span class="fu">has</span>(p<span class="op">.</span><span class="at">id</span>)<span class="op">,</span> <span class="vs">`id en double : </span><span class="sc">${</span>p<span class="op">.</span><span class="at">id</span><span class="sc">}</span><span class="vs">`</span>)<span class="op">;</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    ids<span class="op">.</span><span class="fu">add</span>(p<span class="op">.</span><span class="at">id</span>)<span class="op">;</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+</details>
+<p><strong>Vérifier.</strong> <code>npm test</code> ; avec le projet
+complet, la sortie réelle se termine par <code># tests 9</code>,
+<code># pass 9</code>, <code># fail 0</code>.</p>
+<div class="piege-etape">
+<p><strong>Le piège à cette étape.</strong> Une virgule après le dernier
+élément, tolérée en JavaScript, est interdite en JSON. Essai réel sur
+une copie du projet : <code>npm test</code> échoue dès le chargement,
+avec
+<code>SyntaxError: .../data/projets.json: Unexpected token ']', ... is not valid JSON</code>.
+C'est voulu : l'erreur est arrêtée avant la mise en ligne (5.12).</p>
+</div>
+</section>
+<section id="43-étape-3--la-logique-de-filtrage-en-fonctions-pures"
+class="etape">
+<h2>4.3 Étape 3 : la logique de filtrage en fonctions pures</h2>
+<label class="fait"><input type="checkbox" data-suivi="etape:43-étape-3--la-logique-de-filtrage-en-fonctions-pures"> J'ai fait cette étape</label>
+<p><strong>Objectif.</strong> Écrire « quels projets afficher ? » sans
+jQuery ni <code>document</code>, dans un fichier que le navigateur
+<strong>et</strong> Node.js peuvent charger. Extrait de
+<code>js/filtres.js</code> :</p>
+<details class="code-replie"><summary>Voir la solution (JavaScript)</summary>
+<div class="sourceCode" id="cb9"><pre class="sourceCode js"><code class="sourceCode javascript"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>(<span class="kw">function</span> (exports) {</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;use strict&quot;</span><span class="op">;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">function</span> <span class="fu">normaliser</span>(texte) {</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">String</span>(texte)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span><span class="fu">normalize</span>(<span class="st">&quot;NFD&quot;</span>)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span><span class="fu">replace</span>(<span class="ss">/</span><span class="sc">[\u0300-\u036f]</span><span class="ss">/g</span><span class="op">,</span> <span class="st">&quot;&quot;</span>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span><span class="fu">toLowerCase</span>()</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>      <span class="op">.</span><span class="fu">trim</span>()<span class="op">;</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ... filtrerProjets, compterCompetences, categories ...</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  exports<span class="op">.</span><span class="at">normaliser</span> <span class="op">=</span> normaliser<span class="op">;</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  exports<span class="op">.</span><span class="at">filtrerProjets</span> <span class="op">=</span> filtrerProjets<span class="op">;</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  <span class="co">// ...</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>})(<span class="kw">typeof</span> module <span class="op">!==</span> <span class="st">&quot;undefined&quot;</span> <span class="op">?</span> module<span class="op">.</span><span class="at">exports</span> <span class="op">:</span> (<span class="bu">window</span><span class="op">.</span><span class="at">Filtres</span> <span class="op">=</span> {}))<span class="op">;</span></span></code></pre></div>
+</details>
+<p>Le fichier réel écrit cette chaîne d'appels sur une seule ligne, et
+contient directement les deux accents combinants au lieu de
+<code>\u0300</code> et <code>\u036f</code> ; la forme échappée est plus
+lisible. <code>normalize("NFD")</code> sépare « é » en « e » suivi d'un
+accent combinant, que l'expression régulière supprime.
+<code>filtrerProjets</code> applique la catégorie, puis la compétence,
+puis exige que <strong>chaque</strong> mot de la recherche apparaisse
+dans le titre, le résumé, les détails ou les compétences. La dernière
+ligne range les fonctions dans <code>module.exports</code> sous Node.js,
+dans <code>window.Filtres</code> dans le navigateur ;
+<code>typeof</code> est la seule façon sûre de tester une variable qui
+peut ne pas exister (<code>module !== undefined</code> lèverait une
+<code>ReferenceError</code> dans le navigateur).</p>
+<p><strong>Vérifier.</strong> Écrire les tests en même temps que les
+fonctions, par exemple « la recherche ignore les accents et combine les
+mots », qui attend <code>["alhudabot"]</code> pour
+<code>{ recherche: "python discord coran" }</code>. L'appel
+<code>node -e</code> de la partie 1 donne aussi un retour immédiat.</p>
+<div class="piege-etape">
+<p><strong>Le piège à cette étape.</strong> Se contenter de
+<code>toLowerCase()</code> : en sortie réelle,
+<code>"Émissions".toLowerCase().includes("emissions")</code> vaut
+<code>false</code>. Et écrire le filtre dans un gestionnaire jQuery le
+rendrait intestable sans navigateur.</p>
+</div>
+</section>
+<section id="44-étape-4--charger-les-données-et-afficher-les-cartes"
+class="etape">
+<h2>4.4 Étape 4 : charger les données et afficher les cartes</h2>
+<label class="fait"><input type="checkbox" data-suivi="etape:44-étape-4--charger-les-données-et-afficher-les-cartes"> J'ai fait cette étape</label>
+<p><strong>Objectif.</strong> Relier données et fonctions pures à la
+page. Fin de <code>js/app.js</code> :</p>
+<details class="code-replie"><summary>Voir la solution (JavaScript)</summary>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode js"><code class="sourceCode javascript"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>$<span class="op">.</span><span class="fu">getJSON</span>(<span class="st">&quot;data/projets.json&quot;</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">done</span>(<span class="kw">function</span> (donnees) {</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    projets <span class="op">=</span> donnees<span class="op">;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">afficherCategories</span>()<span class="op">;</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">afficherProjets</span>()<span class="op">;</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">afficherNuage</span>()<span class="op">;</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">fail</span>(<span class="kw">function</span> (xhr<span class="op">,</span> statut<span class="op">,</span> erreur) {</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Le détail technique va dans la console, pour le développeur ; le visiteur ne</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="co">// voit qu&#39;un message fixe, sans information interne.</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(<span class="st">&quot;Chargement de data/projets.json impossible :&quot;</span><span class="op">,</span> statut<span class="op">,</span> <span class="bu">String</span>(erreur))<span class="op">;</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    $grille<span class="op">.</span><span class="fu">html</span>(<span class="st">&quot;&lt;p class=&#39;vide&#39;&gt;Impossible de charger les projets.&lt;/p&gt;&quot;</span>)<span class="op">;</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span></code></pre></div>
+</details>
+<p><code>$.getJSON</code> est <strong>asynchrone</strong> :
+<code>.done</code> est appelé plus tard, à l'arrivée de la réponse ;
+tout code qui a besoin des projets part de là.
+<code>afficherProjets</code> appelle
+<code>Filtres.filtrerProjets(projets, criteres)</code>, vide la grille
+avec <code>$grille.empty()</code>, puis crée chaque carte avec des
+balises fixes remplies par <code>.text()</code> et <code>.attr()</code>
+(5.3).</p>
+<p><strong>Vérifier.</strong> Premier test Playwright, « affiche tous
+les projets et les compteurs » :
+<code>await expect(page.locator(".carte")).toHaveCount(projets.length)</code>.
+L'attente vient des données : ajouter un projet ne casse pas le
+test.</p>
+<div class="piege-etape">
+<p><strong>Le piège à cette étape.</strong> Concaténer du HTML (5.3),
+oublier le <code>.fail</code> (5.6), supposer que le JSON contient au
+moins un projet (5.5).</p>
+</div>
+</section>
+<section id="45-étape-5--la-recherche-et-les-filtres" class="etape">
+<h2>4.5 Étape 5 : la recherche et les filtres</h2>
+<label class="fait"><input type="checkbox" data-suivi="etape:45-étape-5--la-recherche-et-les-filtres"> J'ai fait cette étape</label>
+<p><strong>Objectif.</strong> Chaque action modifie
+<code>criteres</code> puis appelle <code>afficherProjets()</code>. Pour
+la recherche, on attend une pause dans la frappe (<em>debounce</em>)
+:</p>
+<details class="code-replie"><summary>Voir la solution (JavaScript)</summary>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode js"><code class="sourceCode javascript"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> minuterie<span class="op">;</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">$</span>(<span class="st">&quot;#recherche&quot;</span>)<span class="op">.</span><span class="fu">on</span>(<span class="st">&quot;input&quot;</span><span class="op">,</span> <span class="kw">function</span> () {</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> valeur <span class="op">=</span> <span class="fu">$</span>(<span class="kw">this</span>)<span class="op">.</span><span class="fu">val</span>()<span class="op">;</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="pp">clearTimeout</span>(minuterie)<span class="op">;</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Attendre une pause de 150 ms évite de tout redessiner à chaque touche.</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  minuterie <span class="op">=</span> <span class="pp">setTimeout</span>(<span class="kw">function</span> () {</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    criteres<span class="op">.</span><span class="at">recherche</span> <span class="op">=</span> valeur<span class="op">;</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">afficherProjets</span>()<span class="op">;</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  }<span class="op">,</span> <span class="dv">150</span>)<span class="op">;</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+</details>
+<p>La valeur est lue tout de suite, car dans la fonction différée
+<code>this</code> ne désigne plus le champ. <code>input</code> couvre
+aussi le collage et la croix d'effacement, contrairement à
+<code>keyup</code>. Les boutons de catégorie sont gérés par délégation :
+<code>$(".categories").on("click", ".filtre", ...)</code>.</p>
+<p><strong>Vérifier.</strong> Tests « la recherche filtre les cartes »
+et « les catégories filtrent les cartes ». Mesure réelle dans Chromium,
+en tapant « docker » à une touche toutes les 60 ms : 6 événements
+<code>input</code>, un seul appel à
+<code>Filtres.filtrerProjets</code>.</p>
+<div class="piege-etape">
+<p><strong>Le piège à cette étape.</strong>
+<code>$(".filtre").on("click", ...)</code> sur des boutons qui
+n'existent pas encore (5.1) ; <code>.data("categorie")</code>, qui
+convertit les types (5.2).</p>
+</div>
+</section>
+<section id="46-étape-6--la-fiche-détaillée-modale" class="etape">
+<h2>4.6 Étape 6 : la fiche détaillée (modale)</h2>
+<label class="fait"><input type="checkbox" data-suivi="etape:46-étape-6--la-fiche-détaillée-modale"> J'ai fait cette étape</label>
+<p><strong>Objectif.</strong> Afficher le détail d'un projet par-dessus
+la page, utilisable à la souris, au clavier et avec un lecteur
+d'écran.</p>
+<details class="code-replie"><summary>Voir la solution (JavaScript)</summary>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode js"><code class="sourceCode javascript"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">ouvrirModale</span>(id) {</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> p <span class="op">=</span> projets<span class="op">.</span><span class="fu">find</span>(<span class="kw">function</span> (x) {</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> x<span class="op">.</span><span class="at">id</span> <span class="op">===</span> id<span class="op">;</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="op">!</span>p) <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  dernierFocus <span class="op">=</span> <span class="bu">document</span><span class="op">.</span><span class="at">activeElement</span><span class="op">;</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  $modale<span class="op">.</span><span class="fu">find</span>(<span class="st">&quot;#modale-titre&quot;</span>)<span class="op">.</span><span class="fu">text</span>(p<span class="op">.</span><span class="at">titre</span>)<span class="op">;</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  $modale<span class="op">.</span><span class="fu">find</span>(<span class="st">&quot;.modale-details&quot;</span>)<span class="op">.</span><span class="fu">text</span>(p<span class="op">.</span><span class="at">details</span>)<span class="op">;</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  $modale<span class="op">.</span><span class="fu">find</span>(<span class="st">&quot;.modale-competences&quot;</span>)<span class="op">.</span><span class="fu">empty</span>()<span class="op">.</span><span class="fu">append</span>(<span class="fu">etiquettes</span>(p<span class="op">.</span><span class="at">competences</span>))<span class="op">;</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  $modale<span class="op">.</span><span class="fu">find</span>(<span class="st">&quot;.modale-lien&quot;</span>)<span class="op">.</span><span class="fu">attr</span>(<span class="st">&quot;href&quot;</span><span class="op">,</span> p<span class="op">.</span><span class="at">depot</span>)<span class="op">;</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">// stop(true, true) termine un fondu de fermeture en cours,</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="co">// dont le rappel remettrait hidden.</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  $modale<span class="op">.</span><span class="fu">stop</span>(<span class="kw">true</span><span class="op">,</span> <span class="kw">true</span>)<span class="op">.</span><span class="fu">prop</span>(<span class="st">&quot;hidden&quot;</span><span class="op">,</span> <span class="kw">false</span>)<span class="op">.</span><span class="fu">hide</span>()<span class="op">.</span><span class="fu">fadeIn</span>(<span class="dv">150</span>)<span class="op">;</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Ni clic, ni focus, ni lecteur d&#39;écran derrière la modale.</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>  $arrierePlan<span class="op">.</span><span class="fu">prop</span>(<span class="st">&quot;inert&quot;</span><span class="op">,</span> <span class="kw">true</span>)<span class="op">;</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>  $modale<span class="op">.</span><span class="fu">find</span>(<span class="st">&quot;.modale-fermer&quot;</span>)<span class="op">.</span><span class="fu">trigger</span>(<span class="st">&quot;focus&quot;</span>)<span class="op">;</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">$</span>(<span class="st">&quot;body&quot;</span>)<span class="op">.</span><span class="fu">addClass</span>(<span class="st">&quot;sans-defilement&quot;</span>)<span class="op">;</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+</details>
+<p>La modale porte <code>role="dialog"</code>,
+<code>aria-modal="true"</code> et
+<code>aria-labelledby="modale-titre"</code> dans
+<code>index.html</code>. <code>fermerModale</code> fait l'inverse,
+retire <code>inert</code> <strong>avant</strong> de rendre le focus à
+<code>dernierFocus</code> (un élément inerte le refuse) et ne remet
+<code>hidden</code> qu'à la fin du fondu. Les cartes ont
+<code>tabindex='0'</code> et s'ouvrent aussi avec Entrée ou Espace.</p>
+<p><strong>Vérifier.</strong> Test « la modale s'ouvre au clic et se
+ferme avec Échap ».</p>
+<div class="piege-etape">
+<p><strong>Le piège à cette étape.</strong> Le CSS donne
+<code>display: grid</code> à <code>.modale</code>, ce qui l'emporte sur
+le style par défaut de <code>hidden</code> : sans
+<code>.modale[hidden] { display: none; }</code>, la modale est toujours
+visible. Pièges réels plus subtils : 5.7 et 5.8.</p>
+</div>
+</section>
+<section id="47-étape-7--le-thème-clair-ou-sombre" class="etape">
+<h2>4.7 Étape 7 : le thème clair ou sombre</h2>
+<label class="fait"><input type="checkbox" data-suivi="etape:47-étape-7--le-thème-clair-ou-sombre"> J'ai fait cette étape</label>
+<p><strong>Objectif.</strong> Suivre la préférence du système, permettre
+de la remplacer, s'en souvenir. Dans le <code>&lt;head&gt;</code> de
+<code>index.html</code>, avant tout affichage :</p>
+<details class="code-replie"><summary>Voir la solution (HTML)</summary>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode html"><code class="sourceCode html"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">script</span><span class="dt">&gt;</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Appliqué avant l&#39;affichage pour éviter un flash de thème clair.</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">try</span> {</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> t <span class="op">=</span> localStorage<span class="op">.</span><span class="fu">getItem</span>(<span class="st">&quot;theme&quot;</span>)<span class="op">;</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (t) <span class="bu">document</span><span class="op">.</span><span class="at">documentElement</span><span class="op">.</span><span class="at">dataset</span><span class="op">.</span><span class="at">theme</span> <span class="op">=</span> t<span class="op">;</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">catch</span> {</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">/* stockage indisponible : thème par défaut */</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">script</span><span class="dt">&gt;</span></span></code></pre></div>
+</details>
+<p>Dans <code>css/style.css</code>, les couleurs sont des variables
+(<code>--fond</code>, <code>--texte</code>…) redéfinies sous
+<code>:root[data-theme="sombre"]</code> et sous
+<code>@media (prefers-color-scheme: dark)</code> avec
+<code>:root:not([data-theme="clair"])</code> (« sombre si le système
+l'est, sauf choix contraire »). Le reste du CSS n'utilise que
+<code>var(--fond)</code> : un seul attribut change tout.</p>
+<p><strong>Vérifier.</strong> Test « le thème sombre est mémorisé » :
+clic, <code>page.reload()</code>, puis <code>data-theme</code> vaut
+toujours <code>"sombre"</code>.</p>
+<div class="piege-etape">
+<p><strong>Le piège à cette étape.</strong> Appliquer le thème dans
+<code>app.js</code>, chargé en fin de page : l'affichage passerait du
+clair au sombre au chargement (illustratif, non mesuré ici). Le bouton
+doit aussi exposer son état (5.10).</p>
+</div>
+</section>
+<section
+id="48-étape-8--animations-et-compteurs-sans-imposer-le-mouvement"
+class="etape">
+<h2>4.8 Étape 8 : animations et compteurs, sans imposer le
+mouvement</h2>
+<label class="fait"><input type="checkbox" data-suivi="etape:48-étape-8--animations-et-compteurs-sans-imposer-le-mouvement"> J'ai fait cette étape</label>
+<p><strong>Objectif.</strong> Ajouter les fondus en cascade et les
+compteurs animés, coupés pour les personnes qui ont demandé moins
+d'animations à leur système.</p>
+<details class="code-replie"><summary>Voir la solution (JavaScript)</summary>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode js"><code class="sourceCode javascript"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> moinsDeMouvement <span class="op">=</span> <span class="bu">window</span><span class="op">.</span><span class="fu">matchMedia</span>(<span class="st">&quot;(prefers-reduced-motion: reduce)&quot;</span>)<span class="op">;</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>$<span class="op">.</span><span class="at">fx</span><span class="op">.</span><span class="at">off</span> <span class="op">=</span> moinsDeMouvement<span class="op">.</span><span class="at">matches</span><span class="op">;</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>moinsDeMouvement<span class="op">.</span><span class="fu">addEventListener</span>(<span class="st">&quot;change&quot;</span><span class="op">,</span> <span class="kw">function</span> (e) {</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  $<span class="op">.</span><span class="at">fx</span><span class="op">.</span><span class="at">off</span> <span class="op">=</span> e<span class="op">.</span><span class="at">matches</span><span class="op">;</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+</details>
+<p>Pour les compteurs, <code>animerCompteur</code> appelle
+<code>$({ valeur: 0 }).animate({ valeur: cible }, { duration: 900, step: ..., complete: ... })</code>
+: <code>$()</code> enveloppe un simple objet dont <code>.animate</code>
+fait varier la propriété, <code>step</code> écrit la valeur arrondie et
+<code>complete</code> garantit le nombre final. Avec
+<code>$.fx.off</code> à <code>true</code>, jQuery saute directement à
+l'état final. Dans <code>afficherProjets</code>, le fondu n'est lancé
+que si les animations sont actives :
+<code>if (!$.fx.off) { $carte.hide().delay(i * 40).fadeIn(200); }</code>
+(sur plusieurs lignes dans le fichier).</p>
+<p><strong>Vérifier.</strong> Le test du bloc
+<code>avec prefers-reduced-motion</code> observe chaque valeur écrite
+dans le compteur et n'en attend qu'une, <code>"12"</code>.</p>
+<div class="piege-etape">
+<p><strong>Le piège à cette étape.</strong> Croire qu'une règle CSS
+<code>prefers-reduced-motion</code> suffit (5.9).</p>
+</div>
+</section>
+<section
+id="49-étape-9--tests-fiables-analyse-statique-et-intégration-continue"
+class="etape">
+<h2>4.9 Étape 9 : tests fiables, analyse statique et intégration
+continue</h2>
+<label class="fait"><input type="checkbox" data-suivi="etape:49-étape-9--tests-fiables-analyse-statique-et-intégration-continue"> J'ai fait cette étape</label>
+<p><strong>Objectif.</strong> Rendre les tests reproductibles, contrôler
+le code automatiquement, puis ne publier que si tout passe.</p>
+<details class="code-replie"><summary>Voir la solution (JavaScript)</summary>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode js"><code class="sourceCode javascript"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>test<span class="op">.</span><span class="fu">beforeEach</span>(<span class="kw">async</span> ({ page }) <span class="kw">=&gt;</span> {</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// jQuery est servi depuis node_modules : les tests ne dépendent pas du réseau.</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">await</span> page<span class="op">.</span><span class="fu">route</span>(<span class="st">&quot;https://code.jquery.com/**&quot;</span><span class="op">,</span> (route) <span class="kw">=&gt;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    route<span class="op">.</span><span class="fu">fulfill</span>({</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>      <span class="dt">path</span><span class="op">:</span> path<span class="op">.</span><span class="fu">join</span>(<span class="bu">__dirname</span><span class="op">,</span> <span class="st">&quot;../node_modules/jquery/dist/jquery.min.js&quot;</span>)<span class="op">,</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>      <span class="dt">contentType</span><span class="op">:</span> <span class="st">&quot;application/javascript&quot;</span><span class="op">,</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    })<span class="op">,</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  )<span class="op">;</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">await</span> page<span class="op">.</span><span class="fu">goto</span>(<span class="st">&quot;/&quot;</span>)<span class="op">;</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+</details>
+<p>Cela ne marche que parce que <code>package.json</code> fixe
+<code>"jquery": "3.7.1"</code>, la version du CDN, sinon l'empreinte
+<code>integrity</code> ne correspondrait plus (5.4).</p>
+<p>On ajoute ensuite ESLint et Prettier en dépendances de développement,
+avec deux scripts (<code>"lint": "eslint ."</code> et
+<code>"format:check": "prettier --check ."</code>).
+<code>eslint.config.js</code> (configuration « plate ») part de
+<code>js.configs.recommended</code> et déclare un environnement par type
+de fichier : navigateur et jQuery global (<code>globals.browser</code>,
+<code>globals.jquery</code>, <code>Filtres</code>) pour
+<code>js/</code>, avec la règle <code>eqeqeq</code> ; Node.js pour les
+tests et la configuration ; navigateur en plus pour les specs
+Playwright, dont les fonctions passées à <code>page.evaluate()</code>
+s'exécutent dans la page. <code>.prettierrc.json</code> fixe seulement
+<code>"printWidth": 100</code>.</p>
+<p>Dans <code>.github/workflows/ci.yml</code>, le job <code>tests</code>
+lance <code>npm run lint &amp;&amp; npm run format:check</code> avant
+les tests, et le job <code>deploiement</code> déclare
+<code>needs: tests</code>.</p>
+<p><strong>Vérifier.</strong> <code>npm run lint</code> et
+<code>npm run format:check</code> ne signalent rien (sortie réelle de
+Prettier : <code>All matched files use Prettier code style!</code>).
+<code>CHROMIUM_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome npx playwright test --repeat-each=2</code>
+(chemin propre à la machine utilisée) se termine, en sortie réelle, par
+<code>72 passed (26.1s)</code> : les 36 tests, joués deux fois pour
+débusquer un test instable.</p>
+<div class="piege-etape">
+<p><strong>Le piège à cette étape.</strong> Attendre une durée au lieu
+d'un état, corriger sans test de non-régression (5.11) ; publier sans
+<code>needs: tests</code>, réutiliser un serveur déjà lancé ou donner
+trop de permissions à la CI (5.12). À sa première exécution, ESLint a
+signalé <code>'e' is defined but never used</code> sur le
+<code>catch (e)</code> du thème (5.6).</p>
+</div>
+</section>
+<h1 id="5-les-mauvaises-pratiques-quon-apprend-à-éviter">5. Les
+mauvaises pratiques qu'on apprend à éviter</h1>
+<p>Chaque sous-partie part du code qu'un débutant écrirait spontanément
+dans ce projet. La mention « Piège réel rencontré dans ce projet »
+signale un défaut d'une version précédente du dépôt : soit la première
+version, corrigée lors de la relecture, soit la version de relecture
+elle-même, corrigée ensuite (journalisation des erreurs en 5.6,
+permissions de la CI et serveur de test en 5.12). Chaque correction est
+accompagnée d'un test quand le défaut est testable, et la conséquence
+décrite a été reproduite en lançant l'ancien code. Les autres
+conséquences ont été reproduites dans la page actuelle, sauf mention «
+illustratif ».</p>
+<section
+id="51-attacher-un-écouteur-à-des-éléments-qui-nexistent-pas-encore"
+class="piege">
+<h2>5.1 Attacher un écouteur à des éléments qui n'existent pas
+encore</h2>
+<p>Piège réel rencontré dans ce projet (deuxième forme).</p>
+<p><strong>Ce qu'on écrit spontanément.</strong>
+<code>$(".carte").on("click", ...)</code> ; ou, une fois la délégation
+découverte, un gestionnaire clavier trop large (première version) :</p>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode js"><code class="sourceCode javascript"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>$grille<span class="op">.</span><span class="fu">on</span>(<span class="st">&quot;keydown&quot;</span><span class="op">,</span> <span class="st">&quot;.carte&quot;</span><span class="op">,</span> <span class="kw">function</span> (e) {</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (e<span class="op">.</span><span class="at">key</span> <span class="op">===</span> <span class="st">&quot;Enter&quot;</span> <span class="op">||</span> e<span class="op">.</span><span class="at">key</span> <span class="op">===</span> <span class="st">&quot; &quot;</span>) {</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    e<span class="op">.</span><span class="fu">preventDefault</span>()<span class="op">;</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ouvrirModale</span>(<span class="fu">$</span>(<span class="kw">this</span>)<span class="op">.</span><span class="fu">data</span>(<span class="st">&quot;id&quot;</span>))<span class="op">;</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+<form class="quiz" data-quiz="quiz-51-attacher-un-écouteur-à-des-éléments-qui-nexistent-pas-encore">
+<fieldset><legend>Quelle règle aurait évité ce code ?</legend>
+<label><input type="radio" name="quiz-51-attacher-un-écouteur-à-des-éléments-qui-nexistent-pas-encore" value="1"> <span>le focus est un état que le code gère explicitement. Une modale le garde
+et rend l'arrière-plan inerte ; avant de détruire l'élément focalisé, on
+décide où mettre le focus.</span></label>
+<label><input type="radio" name="quiz-51-attacher-un-écouteur-à-des-éléments-qui-nexistent-pas-encore" value="2"> <span>ne jamais se fier aux valeurs par défaut pour l'exposition réseau, les
+permissions ou la réutilisation d'un serveur. Moindre privilège, job par
+job, et déploiement conditionné aux tests.</span></label>
+<label><input type="radio" name="quiz-51-attacher-un-écouteur-à-des-éléments-qui-nexistent-pas-encore" value="3" data-correct> <span>pour des éléments créés dynamiquement, on délègue à un conteneur stable
+avec <code>.on("evenement", "selecteur", ...)</code>, et on compare
+<code>e.target</code> à <code>this</code> avant d'annuler quoi que ce
+soit.</span></label>
+<label><input type="radio" name="quiz-51-attacher-un-écouteur-à-des-éléments-qui-nexistent-pas-encore" value="4"> <span>un rappel différé (animation, minuteur, requête) s'exécute dans un état
+qui a pu changer ; annuler l'opération précédente (<code>stop</code>,
+<code>clearTimeout</code>) d'abord.</span></label>
+</fieldset><button type="submit">Valider</button><p class="quiz-retour" role="status" aria-live="polite"></p></form>
+<details class="explication"><summary>Voir l'explication et la bonne pratique</summary>
+<p><strong>Ce qui se passe.</strong> <code>$(".carte")</code> s'exécute
+avant la réponse de <code>$.getJSON</code> : il ne trouve aucun élément
+et le gestionnaire n'est attaché à rien, sans erreur. Essai réel avec
+jQuery 3.7.1 : après <code>$(".x").on("click", () =&gt; n++)</code> et
+<code>$("#g").on("click", ".x", () =&gt; n += 10)</code>, puis l'ajout
+d'un <code>.x</code> dans <code>#g</code> et un clic, <code>n</code>
+vaut 10, pas 11. Pour le second extrait, l'appui sur Entrée dans
+l'étiquette « Docker » d'une carte remonte jusqu'à la carte : la fiche
+s'ouvre et <code>preventDefault()</code> annule le clic que le
+navigateur aurait déclenché sur le bouton. Mesure réelle sur la première
+version : modale ouverte, aucun filtre, 12 cartes au lieu de 3.</p>
+<p><strong>Pourquoi c'est une mauvaise pratique.</strong> Un sélecteur
+est évalué une seule fois : il ignore les éléments créés ensuite, et
+ceux qu'il a trouvés disparaissent au premier <code>empty()</code>.
+Inversement, un événement se propage vers tous les ancêtres
+(<em>bubbling</em>) : un gestionnaire posé sur un conteneur reçoit aussi
+les événements de ses descendants, et son <code>preventDefault()</code>
+peut casser un comportement natif plus bas.</p>
+<p><strong>La bonne pratique.</strong> Déléguer à un parent stable, et
+vérifier la cible avant d'agir :</p>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode js"><code class="sourceCode javascript"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>$grille<span class="op">.</span><span class="fu">on</span>(<span class="st">&quot;keydown&quot;</span><span class="op">,</span> <span class="st">&quot;.carte&quot;</span><span class="op">,</span> <span class="kw">function</span> (e) {</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Seulement sur la carte elle-même : Entrée sur une étiquette doit garder son clic.</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (e<span class="op">.</span><span class="at">target</span> <span class="op">!==</span> <span class="kw">this</span>) <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (e<span class="op">.</span><span class="at">key</span> <span class="op">===</span> <span class="st">&quot;Enter&quot;</span> <span class="op">||</span> e<span class="op">.</span><span class="at">key</span> <span class="op">===</span> <span class="st">&quot; &quot;</span>) {</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    e<span class="op">.</span><span class="fu">preventDefault</span>()<span class="op">;</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ouvrirModale</span>(<span class="fu">$</span>(<span class="kw">this</span>)<span class="op">.</span><span class="fu">attr</span>(<span class="st">&quot;data-id&quot;</span>))<span class="op">;</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+<p>Les étiquettes (cartes, modale, nuage) sont déléguées à
+<code>document</code>, et leur gestionnaire appelle
+<code>e.stopPropagation()</code> pour qu'un clic sur une étiquette
+n'ouvre pas la fiche.</p>
+<p><strong>Comment s'en protéger durablement.</strong> Le test « Entrée
+sur une étiquette d'une carte filtre sans ouvrir la fiche ». Réflexes :
+tester chaque interaction au clavier, pas seulement à la souris ; un
+gestionnaire qui appelle <code>preventDefault()</code> vérifie d'abord
+<code>e.target</code>.</p>
+<blockquote>
+<p>pour des éléments créés dynamiquement, on délègue à un conteneur
+stable avec <code>.on("evenement", "selecteur", ...)</code>, et on
+compare <code>e.target</code> à <code>this</code> avant d'annuler quoi
+que ce soit.</p>
+</blockquote>
+</details>
+</section>
+<section id="52-lire-les-attributs-data--avec-data" class="piege">
+<h2>5.2 Lire les attributs <code>data-*</code> avec
+<code>.data()</code></h2>
+<p>Piège réel rencontré dans ce projet.</p>
+<p><strong>Ce qu'on écrit spontanément</strong> (première version) :</p>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode js"><code class="sourceCode javascript"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>$grille<span class="op">.</span><span class="fu">on</span>(<span class="st">&quot;click&quot;</span><span class="op">,</span> <span class="st">&quot;.carte&quot;</span><span class="op">,</span> <span class="kw">function</span> () { <span class="fu">ouvrirModale</span>(<span class="fu">$</span>(<span class="kw">this</span>)<span class="op">.</span><span class="fu">data</span>(<span class="st">&quot;id&quot;</span>))<span class="op">;</span> })<span class="op">;</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co">// dans ouvrirModale :</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> p <span class="op">=</span> projets<span class="op">.</span><span class="fu">find</span>(<span class="kw">function</span> (x) { <span class="cf">return</span> x<span class="op">.</span><span class="at">id</span> <span class="op">===</span> id<span class="op">;</span> })<span class="op">;</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="op">!</span>p) <span class="cf">return</span><span class="op">;</span></span></code></pre></div>
+<form class="quiz" data-quiz="quiz-52-lire-les-attributs-data--avec-data">
+<fieldset><legend>Quelle règle aurait évité ce code ?</legend>
+<label><input type="radio" name="quiz-52-lire-les-attributs-data--avec-data" value="1" data-correct> <span><code>.data()</code> convertit les types ; pour lire une chaîne,
+<code>.attr("data-…")</code>.</span></label>
+<label><input type="radio" name="quiz-52-lire-les-attributs-data--avec-data" value="2"> <span>un script venu d'un CDN porte toujours <code>integrity</code>, et la
+version est fixe partout (<code>3.7.1</code>, pas <code>^3</code>).</span></label>
+<label><input type="radio" name="quiz-52-lire-les-attributs-data--avec-data" value="3"> <span>un rappel différé (animation, minuteur, requête) s'exécute dans un état
+qui a pu changer ; annuler l'opération précédente (<code>stop</code>,
+<code>clearTimeout</code>) d'abord.</span></label>
+<label><input type="radio" name="quiz-52-lire-les-attributs-data--avec-data" value="4"> <span>attendre un état, pas une durée. Pour chaque bug corrigé, un test qui
+échouait avant et passe après.</span></label>
+</fieldset><button type="submit">Valider</button><p class="quiz-retour" role="status" aria-live="polite"></p></form>
+<details class="explication"><summary>Voir l'explication et la bonne pratique</summary>
+<p><strong>Ce qui se passe.</strong> <code>.data()</code> convertit une
+valeur qui ressemble à un nombre, un booléen ou du JSON. Essai réel :
+<code>$("&lt;div data-id='42'&gt;").data("id")</code> renvoie le nombre
+<code>42</code>, <code>.attr("data-id")</code> la chaîne
+<code>"42"</code>. Avec un projet d'identifiant <code>"42"</code>,
+<code>"42" === 42</code> est faux, <code>find</code> ne trouve rien et
+<code>return</code> fait échouer l'ouverture en silence. Sur la première
+version, le test correspondant échoue avec
+<code>Expected: "Projet 42"</code>, <code>Received: ""</code>.</p>
+<p><strong>Pourquoi c'est une mauvaise pratique.</strong> Une conversion
+implicite rend le comportement dépendant du <strong>contenu</strong> des
+données : le code marche avec <code>"go-uptime"</code>, casse avec
+<code>"42"</code>, et aucun test écrit avec les données actuelles ne le
+voit.</p>
+<p><strong>La bonne pratique.</strong> <code>.attr()</code>, qui renvoie
+toujours la chaîne, avec un commentaire pour le prochain lecteur. Idem
+pour <code>data-categorie</code> et <code>data-competence</code>.</p>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode js"><code class="sourceCode javascript"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">// .attr() et non .data(), qui convertirait data-id=&quot;42&quot; en nombre.</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>$grille<span class="op">.</span><span class="fu">on</span>(<span class="st">&quot;click&quot;</span><span class="op">,</span> <span class="st">&quot;.carte&quot;</span><span class="op">,</span> <span class="kw">function</span> () {</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ouvrirModale</span>(<span class="fu">$</span>(<span class="kw">this</span>)<span class="op">.</span><span class="fu">attr</span>(<span class="st">&quot;data-id&quot;</span>))<span class="op">;</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+<p><strong>Comment s'en protéger durablement.</strong> Le test « un
+identifiant numérique ouvre quand même la bonne fiche » sert, avec
+<code>page.route</code>, un projet d'identifiant <code>"42"</code> et de
+compétence <code>"2024"</code>. Réflexes : tester avec des données
+limites fabriquées ; <code>===</code> partout.</p>
+<blockquote>
+<p><code>.data()</code> convertit les types ; pour lire une chaîne,
+<code>.attr("data-…")</code>.</p>
+</blockquote>
+</details>
+</section>
+<section id="53-construire-le-html-en-concaténant-des-données"
+class="piege">
+<h2>5.3 Construire le HTML en concaténant des données</h2>
+<p><strong>Ce qu'on écrit spontanément.</strong></p>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode js"><code class="sourceCode javascript"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>$grille<span class="op">.</span><span class="fu">append</span>(<span class="st">&quot;&lt;article class=&#39;carte&#39;&gt;&lt;h3&gt;&quot;</span> <span class="op">+</span> p<span class="op">.</span><span class="at">titre</span> <span class="op">+</span> <span class="st">&quot;&lt;/h3&gt;&quot;</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="op">+</span> <span class="st">&quot;&lt;p&gt;&quot;</span> <span class="op">+</span> p<span class="op">.</span><span class="at">resume</span> <span class="op">+</span> <span class="st">&quot;&lt;/p&gt;&lt;/article&gt;&quot;</span>)<span class="op">;</span></span></code></pre></div>
+<form class="quiz" data-quiz="quiz-53-construire-le-html-en-concaténant-des-données">
+<fieldset><legend>Quelle règle aurait évité ce code ?</legend>
+<label><input type="radio" name="quiz-53-construire-le-html-en-concaténant-des-données" value="1"> <span>un bouton bascule a un nom fixe et un état <code>aria-pressed</code>,
+calculé par une seule fonction appelée partout où il peut changer.</span></label>
+<label><input type="radio" name="quiz-53-construire-le-html-en-concaténant-des-données" value="2"> <span><code>.data()</code> convertit les types ; pour lire une chaîne,
+<code>.attr("data-…")</code>.</span></label>
+<label><input type="radio" name="quiz-53-construire-le-html-en-concaténant-des-données" value="3" data-correct> <span>une donnée ne doit jamais être insérée comme du HTML. Structure fixe,
+puis <code>.text()</code> ou <code>.attr()</code>.</span></label>
+<label><input type="radio" name="quiz-53-construire-le-html-en-concaténant-des-données" value="4"> <span>pour des éléments créés dynamiquement, on délègue à un conteneur stable
+avec <code>.on("evenement", "selecteur", ...)</code>, et on compare
+<code>e.target</code> à <code>this</code> avant d'annuler quoi que ce
+soit.</span></label>
+</fieldset><button type="submit">Valider</button><p class="quiz-retour" role="status" aria-live="polite"></p></form>
+<details class="explication"><summary>Voir l'explication et la bonne pratique</summary>
+<p><strong>Ce qui se passe.</strong> Essai réel dans la page, avec le
+titre
+<code>&lt;img src=x onerror="window.pirate = 'code exécuté'"&gt;</code>
+: inséré par concaténation, <code>window.pirate</code> vaut
+<code>'code exécuté'</code> 300 ms plus tard (l'image échoue à charger
+et <code>onerror</code> exécute le code) ; inséré avec
+<code>$("&lt;h3&gt;").text(titre)</code>, aucune image n'est créée et le
+titre s'affiche tel quel. C'est une faille <strong>XSS</strong> : le
+code injecté pourrait modifier les liens vers les dépôts ou agir au nom
+du visiteur. Même sans malveillance, un résumé contenant « la balise
+<code>&lt;main&gt;</code> », inséré comme HTML, perdrait le mot
+<code>&lt;main&gt;</code>.</p>
+<p><strong>Pourquoi c'est une mauvaise pratique.</strong> Mélanger
+données et code dans une même chaîne laisse les données décider de la
+structure : c'est le même défaut que l'injection SQL. Une donnée est non
+fiable par principe, même si elle vient aujourd'hui d'un fichier écrit
+par l'auteur.</p>
+<p><strong>La bonne pratique.</strong> Balises fixes, données placées
+par <code>.text()</code> ou <code>.attr()</code> :</p>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode js"><code class="sourceCode javascript"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="op">.</span><span class="fu">append</span>(<span class="fu">$</span>(<span class="st">&quot;&lt;h3&gt;&quot;</span>)<span class="op">.</span><span class="fu">text</span>(p<span class="op">.</span><span class="at">titre</span>))</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="op">.</span><span class="fu">append</span>(<span class="fu">$</span>(<span class="st">&quot;&lt;p&gt;&quot;</span>)<span class="op">.</span><span class="fu">text</span>(p<span class="op">.</span><span class="at">resume</span>))</span></code></pre></div>
+<p>Le seul <code>.html()</code> de <code>js/app.js</code> reçoit une
+chaîne fixe, dans le <code>.fail</code>.</p>
+<p><strong>Comment s'en protéger durablement.</strong> Relire le
+résultat de <code>grep -nE '\.(html|append)\(' js/app.js</code> : chaque
+appel doit recevoir un objet jQuery ou une chaîne fixe, jamais une
+chaîne construite avec des données. Les règles recommandées d'ESLint ne
+détectent pas ce défaut ; l'exercice 7.5 propose une règle qui le
+ferait.</p>
+<blockquote>
+<p>une donnée ne doit jamais être insérée comme du HTML. Structure fixe,
+puis <code>.text()</code> ou <code>.attr()</code>.</p>
+</blockquote>
+</details>
+</section>
+<section id="54-charger-un-script-tiers-sans-vérifier-son-intégrité"
+class="piege">
+<h2>5.4 Charger un script tiers sans vérifier son intégrité</h2>
+<p><strong>Ce qu'on écrit spontanément.</strong>
+<code>&lt;script src="https://code.jquery.com/jquery-3.7.1.min.js"&gt;&lt;/script&gt;</code></p>
+<form class="quiz" data-quiz="quiz-54-charger-un-script-tiers-sans-vérifier-son-intégrité">
+<fieldset><legend>Quelle règle aurait évité ce code ?</legend>
+<label><input type="radio" name="quiz-54-charger-un-script-tiers-sans-vérifier-son-intégrité" value="1" data-correct> <span>un script venu d'un CDN porte toujours <code>integrity</code>, et la
+version est fixe partout (<code>3.7.1</code>, pas <code>^3</code>).</span></label>
+<label><input type="radio" name="quiz-54-charger-un-script-tiers-sans-vérifier-son-intégrité" value="2"> <span>ne jamais se fier aux valeurs par défaut pour l'exposition réseau, les
+permissions ou la réutilisation d'un serveur. Moindre privilège, job par
+job, et déploiement conditionné aux tests.</span></label>
+<label><input type="radio" name="quiz-54-charger-un-script-tiers-sans-vérifier-son-intégrité" value="3"> <span><code>.data()</code> convertit les types ; pour lire une chaîne,
+<code>.attr("data-…")</code>.</span></label>
+<label><input type="radio" name="quiz-54-charger-un-script-tiers-sans-vérifier-son-intégrité" value="4"> <span>un rappel différé (animation, minuteur, requête) s'exécute dans un état
+qui a pu changer ; annuler l'opération précédente (<code>stop</code>,
+<code>clearTimeout</code>) d'abord.</span></label>
+</fieldset><button type="submit">Valider</button><p class="quiz-retour" role="status" aria-live="polite"></p></form>
+<details class="explication"><summary>Voir l'explication et la bonne pratique</summary>
+<p><strong>Ce qui se passe.</strong> Le navigateur exécuterait tout ce
+que le CDN renvoie. Avec l'attribut <code>integrity</code> du projet, un
+essai réel où l'on sert un jQuery auquel on a seulement ajouté un
+commentaire <code>/* modifié */</code> donne dans la console :</p>
+<pre class="text"><code>Failed to find a valid digest in the &#39;integrity&#39; attribute for resource
+&#39;https://code.jquery.com/jquery-3.7.1.min.js&#39; with computed SHA-256 integrity
+&#39;f5kHpRup4dTh/ORBmpobIEW5UT/0dM44oVQIraYbhmU=&#39;. The resource has been blocked.</code></pre>
+<p>Le script est refusé et <code>app.js</code> s'arrête sur
+<code>$ is not defined</code> : aucune carte, mais aucun code étranger
+exécuté. Sans l'attribut, le fichier modifié aurait été exécuté.</p>
+<p><strong>Pourquoi c'est une mauvaise pratique.</strong> Tout code
+chargé depuis un tiers fait partie de l'application ; sans vérification,
+la sécurité du site dépend de celle du CDN. C'est le principe de
+<code>npm ci</code> et de <code>package-lock.json</code> : exécuter
+exactement ce qu'on a vérifié.</p>
+<p><strong>La bonne pratique.</strong></p>
+<div class="sourceCode" id="cb23"><pre
+class="sourceCode html"><code class="sourceCode html"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">script</span> <span class="er">src</span><span class="ot">=</span><span class="st">&quot;https://code.jquery.com/jquery-3.7.1.min.js&quot;</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="ot">        integrity=</span><span class="st">&quot;sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=&quot;</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="ot">        crossorigin=</span><span class="st">&quot;anonymous&quot;</span><span class="dt">&gt;&lt;/</span><span class="kw">script</span><span class="dt">&gt;</span></span></code></pre></div>
+<p>Dans le même esprit, le lien GitHub de la modale
+(<code>target="_blank"</code>) porte <code>rel="noopener"</code> : la
+page ouverte ne peut pas manipuler l'onglet du portfolio.</p>
+<p><strong>Comment s'en protéger durablement.</strong> Les tests
+Playwright servent le jQuery de <code>node_modules</code> (version 3.7.1
+exacte) à la place du CDN : si l'empreinte ne correspond pas, la page ne
+fonctionne plus et tous les tests échouent. Mettre jQuery à jour oblige
+à changer <code>package.json</code> et <code>integrity</code>
+ensemble.</p>
+<blockquote>
+<p>un script venu d'un CDN porte toujours <code>integrity</code>, et la
+version est fixe partout (<code>3.7.1</code>, pas <code>^3</code>).</p>
+</blockquote>
+</details>
+</section>
+<section id="55-supposer-quune-liste-nest-jamais-vide" class="piege">
+<h2>5.5 Supposer qu'une liste n'est jamais vide</h2>
+<p>Piège réel rencontré dans ce projet.</p>
+<p><strong>Ce qu'on écrit spontanément</strong> (première version, dans
+<code>afficherNuage</code>) :</p>
+<div class="sourceCode" id="cb24"><pre
+class="sourceCode js"><code class="sourceCode javascript"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> stats <span class="op">=</span> Filtres<span class="op">.</span><span class="fu">compterCompetences</span>(projets)<span class="op">;</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> max <span class="op">=</span> stats[<span class="dv">0</span>]<span class="op">.</span><span class="at">nombre</span><span class="op">;</span></span></code></pre></div>
+<form class="quiz" data-quiz="quiz-55-supposer-quune-liste-nest-jamais-vide">
+<fieldset><legend>Quelle règle aurait évité ce code ?</legend>
+<label><input type="radio" name="quiz-55-supposer-quune-liste-nest-jamais-vide" value="1"> <span><code>.data()</code> convertit les types ; pour lire une chaîne,
+<code>.attr("data-…")</code>.</span></label>
+<label><input type="radio" name="quiz-55-supposer-quune-liste-nest-jamais-vide" value="2"> <span>le focus est un état que le code gère explicitement. Une modale le garde
+et rend l'arrière-plan inerte ; avant de détruire l'élément focalisé, on
+décide où mettre le focus.</span></label>
+<label><input type="radio" name="quiz-55-supposer-quune-liste-nest-jamais-vide" value="3" data-correct> <span>avant d'écrire <code>liste[0]</code>, se demander « et si la liste est
+vide ? », et le tester avec des données fabriquées.</span></label>
+<label><input type="radio" name="quiz-55-supposer-quune-liste-nest-jamais-vide" value="4"> <span>un bouton bascule a un nom fixe et un état <code>aria-pressed</code>,
+calculé par une seule fonction appelée partout où il peut changer.</span></label>
+</fieldset><button type="submit">Valider</button><p class="quiz-retour" role="status" aria-live="polite"></p></form>
+<details class="explication"><summary>Voir l'explication et la bonne pratique</summary>
+<p><strong>Ce qui se passe.</strong> Avec un
+<code>data/projets.json</code> réduit à <code>[]</code>, la première
+version lève, en sortie réelle,
+<code>Cannot read properties of undefined (reading 'nombre')</code>.
+L'exception interrompt <code>afficherNuage</code> ; la page affiche «
+Aucun projet ne correspond à cette recherche. » alors qu'aucune
+recherche n'a été faite, et garde « Cliquez sur une compétence… »
+au-dessus d'un nuage vide.</p>
+<p><strong>Pourquoi c'est une mauvaise pratique.</strong>
+<code>tableau[0]</code> sur un tableau vide renvoie
+<code>undefined</code> sans erreur ; l'erreur apparaît plus loin, loin
+de sa cause. Les cas limites (vide, un seul élément) sont ceux que les
+données réelles ne montrent jamais pendant le développement.</p>
+<p><strong>La bonne pratique.</strong></p>
+<div class="sourceCode" id="cb25"><pre
+class="sourceCode js"><code class="sourceCode javascript"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Liste triée : la première compétence est la plus utilisée.</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> max <span class="op">=</span> stats<span class="op">.</span><span class="at">length</span> <span class="op">?</span> stats[<span class="dv">0</span>]<span class="op">.</span><span class="at">nombre</span> <span class="op">:</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="op">!</span>stats<span class="op">.</span><span class="at">length</span>) <span class="fu">$</span>(<span class="st">&quot;.aide&quot;</span>)<span class="op">.</span><span class="fu">text</span>(<span class="st">&quot;Aucune compétence à afficher pour le moment.&quot;</span>)<span class="op">;</span></span></code></pre></div>
+<p><code>afficherProjets</code> distingue de même « Aucun projet à
+afficher pour le moment. » (JSON vide) de « Aucun projet ne correspond à
+cette recherche. ».</p>
+<p><strong>Comment s'en protéger durablement.</strong> Le test unitaire
+« une liste de projets vide donne des résultats vides » et le test
+Playwright « une liste de projets vide affiche un message au lieu de
+planter », qui collecte les <code>pageerror</code> et exige qu'il n'y en
+ait aucun. Ce réflexe se généralise : un test de bout en bout devrait
+échouer sur toute exception JavaScript.</p>
+<blockquote>
+<p>avant d'écrire <code>liste[0]</code>, se demander « et si la liste
+est vide ? », et le tester avec des données fabriquées.</p>
+</blockquote>
+</details>
+</section>
+<section id="56-avaler-une-erreur-ou-lafficher-brute" class="piege">
+<h2>5.6 Avaler une erreur, ou l'afficher brute</h2>
+<p>Piège réel rencontré dans ce projet (erreur avalée), corrigé avec un
+test écrit d'abord.</p>
+<p><strong>Ce qu'on écrit spontanément.</strong> Une requête sans
+<code>.fail</code>, ou un <code>.fail</code> qui affiche un message mais
+jette la cause, comme la version précédente du projet :</p>
+<div class="sourceCode" id="cb26"><pre
+class="sourceCode js"><code class="sourceCode javascript"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="op">.</span><span class="fu">fail</span>(<span class="kw">function</span> () {</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  $grille<span class="op">.</span><span class="fu">html</span>(<span class="st">&quot;&lt;p class=&#39;vide&#39;&gt;Impossible de charger les projets.&lt;/p&gt;&quot;</span>)<span class="op">;</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+<p>Ou, à l'inverse, montrer l'erreur au visiteur (illustratif) :
+<code>.fail(function (xhr, statut, erreur) { $grille.text(statut + " : " + erreur); })</code>.</p>
+<form class="quiz" data-quiz="quiz-56-avaler-une-erreur-ou-lafficher-brute">
+<fieldset><legend>Quelle règle aurait évité ce code ?</legend>
+<label><input type="radio" name="quiz-56-avaler-une-erreur-ou-lafficher-brute" value="1" data-correct> <span>jamais d'erreur avalée en silence ni affichée brute : message clair pour
+l'utilisateur, <code>console.error</code> pour le développeur. Un
+<code>catch</code> vide n'est acceptable que justifié par écrit.</span></label>
+<label><input type="radio" name="quiz-56-avaler-une-erreur-ou-lafficher-brute" value="2"> <span>un bouton bascule a un nom fixe et un état <code>aria-pressed</code>,
+calculé par une seule fonction appelée partout où il peut changer.</span></label>
+<label><input type="radio" name="quiz-56-avaler-une-erreur-ou-lafficher-brute" value="3"> <span>un rappel différé (animation, minuteur, requête) s'exécute dans un état
+qui a pu changer ; annuler l'opération précédente (<code>stop</code>,
+<code>clearTimeout</code>) d'abord.</span></label>
+<label><input type="radio" name="quiz-56-avaler-une-erreur-ou-lafficher-brute" value="4"> <span>ne jamais se fier aux valeurs par défaut pour l'exposition réseau, les
+permissions ou la réutilisation d'un serveur. Moindre privilège, job par
+job, et déploiement conditionné aux tests.</span></label>
+</fieldset><button type="submit">Valider</button><p class="quiz-retour" role="status" aria-live="polite"></p></form>
+<details class="explication"><summary>Voir l'explication et la bonne pratique</summary>
+<p><strong>Ce qui se passe.</strong> Essai réel avec
+<code>data/projets.json</code> remplacé par le texte
+<code>[ { invalide</code> : sans <code>.fail</code>, la grille reste
+vide et le compteur affiche « 0 » ; avec l'ancien <code>.fail</code>, le
+visiteur lit « Impossible de charger les projets. ». Dans les deux cas,
+<strong>la console ne contient aucun message</strong> : le développeur
+n'a aucune piste. Le test écrit avant la correction l'a confirmé en
+échouant sur les deux profils
+(<code>Expected substring: "parsererror"</code>,
+<code>Received string: ""</code>). Dans la version « erreur brute », le
+visiteur lirait
+<code>parsererror : SyntaxError: Expected property name or '}' in JSON at position 4 (line 1 column 5)</code>
+(arguments réels du <code>.fail</code>), incompréhensible et révélateur
+de détails internes.</p>
+<p><strong>Pourquoi c'est une mauvaise pratique.</strong> Une opération
+réseau peut toujours échouer. Une erreur avalée transforme une panne en
+mystère ; une erreur brute donne à l'utilisateur une information inutile
+et, dans une vraie application, peut révéler chemins, versions ou
+requêtes. La règle : message clair pour l'utilisateur, détail pour le
+développeur.</p>
+<p><strong>La bonne pratique.</strong> Le <code>.fail</code> actuel
+(extrait en 4.4) sépare les deux publics :
+<code>console.error("Chargement de data/projets.json impossible :", statut, String(erreur))</code>
+pour le développeur, un message fixe pour le visiteur. Sortie réelle de
+la console avec le même JSON invalide :</p>
+<pre class="text"><code>Chargement de data/projets.json impossible : parsererror SyntaxError: Expected property
+name or &#39;}&#39; in JSON at position 4 (line 1 column 5)</code></pre>
+<p>Pour <code>localStorage</code>, dont l'accès peut lever une exception
+quand le stockage est bloqué, l'erreur est en revanche ignorée
+<strong>volontairement</strong> (le thème non mémorisé n'empêche pas
+d'utiliser le site), et le code le dit :
+<code>catch { /* stockage indisponible */ }</code>. ESLint signalait
+l'ancienne forme <code>catch (e)</code>
+(<code>'e' is defined but never used</code>) ; la forme sans variable,
+valide depuis ES2019, exprime mieux l'intention.</p>
+<p><strong>Comment s'en protéger durablement.</strong> Le test « un JSON
+invalide affiche un message clair et journalise la cause » sert le JSON
+invalide avec <code>page.route</code>, vérifie le message affiché,
+l'absence de <code>SyntaxError</code> dans la page, et la présence de
+<code>parsererror</code> dans la console
+(<code>page.on("console", ...)</code>). Réflexes : chaque requête a sa
+branche d'échec, qui journalise ; chaque <code>catch</code> vide porte
+un commentaire qui justifie le silence.</p>
+<blockquote>
+<p>jamais d'erreur avalée en silence ni affichée brute : message clair
+pour l'utilisateur, <code>console.error</code> pour le développeur. Un
+<code>catch</code> vide n'est acceptable que justifié par écrit.</p>
+</blockquote>
+</details>
+</section>
+<section id="57-laisser-le-focus-au-hasard" class="piege">
+<h2>5.7 Laisser le focus au hasard</h2>
+<p>Deux pièges réels rencontrés dans ce projet.</p>
+<p><strong>Ce qu'on écrit spontanément</strong> (première version) : une
+modale qui met le focus sur « Fermer » à l'ouverture, sans plus ; un
+filtre par compétence qui ferme la modale, redessine la grille et fait
+défiler la page, sans s'occuper du focus.</p>
+<form class="quiz" data-quiz="quiz-57-laisser-le-focus-au-hasard">
+<fieldset><legend>Quelle règle aurait évité ce code ?</legend>
+<label><input type="radio" name="quiz-57-laisser-le-focus-au-hasard" value="1"> <span>un rappel différé (animation, minuteur, requête) s'exécute dans un état
+qui a pu changer ; annuler l'opération précédente (<code>stop</code>,
+<code>clearTimeout</code>) d'abord.</span></label>
+<label><input type="radio" name="quiz-57-laisser-le-focus-au-hasard" value="2"> <span>pour des éléments créés dynamiquement, on délègue à un conteneur stable
+avec <code>.on("evenement", "selecteur", ...)</code>, et on compare
+<code>e.target</code> à <code>this</code> avant d'annuler quoi que ce
+soit.</span></label>
+<label><input type="radio" name="quiz-57-laisser-le-focus-au-hasard" value="3"> <span>avant d'écrire <code>liste[0]</code>, se demander « et si la liste est
+vide ? », et le tester avec des données fabriquées.</span></label>
+<label><input type="radio" name="quiz-57-laisser-le-focus-au-hasard" value="4" data-correct> <span>le focus est un état que le code gère explicitement. Une modale le garde
+et rend l'arrière-plan inerte ; avant de détruire l'élément focalisé, on
+décide où mettre le focus.</span></label>
+</fieldset><button type="submit">Valider</button><p class="quiz-retour" role="status" aria-live="polite"></p></form>
+<details class="explication"><summary>Voir l'explication et la bonne pratique</summary>
+<p><strong>Ce qui se passe.</strong> Mesures réelles sur la première
+version, fiche « mysh » ouverte au clavier :</p>
+<ul>
+<li>Tab parcourt « C », « Linux », le lien GitHub, puis sort de la
+modale vers <code>&lt;body&gt;</code>, puis vers le logo de l'en-tête,
+<strong>derrière</strong> le fond sombre ;</li>
+<li>clic sur l'étiquette « Linux » de la modale :
+<code>fermerModale()</code> rend le focus à la carte d'origine,
+qu'<code>afficherProjets()</code> détruit aussitôt ; le focus retombe
+sur <code>&lt;body&gt;</code>, au début de la page, et un lecteur
+d'écran n'annonce rien du filtre.</li>
+</ul>
+<p><strong>Pourquoi c'est une mauvaise pratique.</strong> Pour qui
+navigue au clavier ou avec un lecteur d'écran, le focus
+<strong>est</strong> la position dans la page.
+<code>aria-modal="true"</code> promet que rien d'autre n'est utilisable
+: le code doit tenir cette promesse.</p>
+<p><strong>La bonne pratique.</strong> L'arrière-plan devient
+<code>inert</code> (4.6), et Tab boucle dans la modale :</p>
+<div class="sourceCode" id="cb28"><pre
+class="sourceCode js"><code class="sourceCode javascript"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>$modale<span class="op">.</span><span class="fu">on</span>(<span class="st">&quot;keydown&quot;</span><span class="op">,</span> <span class="kw">function</span> (e) {</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (e<span class="op">.</span><span class="at">key</span> <span class="op">!==</span> <span class="st">&quot;Tab&quot;</span>) <span class="cf">return</span><span class="op">;</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> $elements <span class="op">=</span> $modale<span class="op">.</span><span class="fu">find</span>(<span class="st">&quot;a[href], button:not(:disabled)&quot;</span>)<span class="op">;</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> premier <span class="op">=</span> $elements<span class="op">.</span><span class="fu">get</span>(<span class="dv">0</span>)<span class="op">,</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    dernier <span class="op">=</span> $elements<span class="op">.</span><span class="fu">get</span>(<span class="op">-</span><span class="dv">1</span>)<span class="op">;</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (e<span class="op">.</span><span class="at">shiftKey</span> <span class="op">&amp;&amp;</span> <span class="bu">document</span><span class="op">.</span><span class="at">activeElement</span> <span class="op">===</span> premier) {</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    e<span class="op">.</span><span class="fu">preventDefault</span>()<span class="op">;</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>    dernier<span class="op">.</span><span class="fu">focus</span>()<span class="op">;</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> <span class="cf">if</span> (<span class="op">!</span>e<span class="op">.</span><span class="at">shiftKey</span> <span class="op">&amp;&amp;</span> <span class="bu">document</span><span class="op">.</span><span class="at">activeElement</span> <span class="op">===</span> dernier) {</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>    e<span class="op">.</span><span class="fu">preventDefault</span>()<span class="op">;</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>    premier<span class="op">.</span><span class="fu">focus</span>()<span class="op">;</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+<p><code>filtrerParCompetence</code> place lui-même le focus sur le
+bandeau « Filtré par … », qui porte <code>tabindex="-1"</code>
+(focalisable par le code, pas par Tab) :
+<code>$(".filtre-actif")[0].focus({ preventScroll: true })</code>. «
+tout afficher », qui cache ce bandeau, renvoie le focus au champ de
+recherche. Mesure réelle sur la version actuelle : après le lien GitHub,
+Tab revient sur « Fermer » ; après « Linux », le focus est sur le
+bandeau et le Tab suivant atteint « tout afficher ».</p>
+<p><strong>Comment s'en protéger durablement.</strong> Les tests « le
+focus reste piégé dans la modale et l'arrière-plan est inerte » et «
+après un filtre lancé depuis la modale, le focus va sur le bandeau du
+filtre » (<code>toBeFocused()</code>). Réflexe : chaque fois que le code
+cache ou détruit un élément (<code>empty()</code>, <code>hidden</code>,
+<code>fadeOut</code>), se demander s'il pouvait avoir le focus, et où
+celui-ci doit aller.</p>
+<blockquote>
+<p>le focus est un état que le code gère explicitement. Une modale le
+garde et rend l'arrière-plan inerte ; avant de détruire l'élément
+focalisé, on décide où mettre le focus.</p>
+</blockquote>
+</details>
+</section>
+<section id="58-relancer-une-animation-sans-arrêter-la-précédente"
+class="piege">
+<h2>5.8 Relancer une animation sans arrêter la précédente</h2>
+<p>Piège réel rencontré dans ce projet.</p>
+<p><strong>Ce qu'on écrit spontanément</strong> (première version) :</p>
+<div class="sourceCode" id="cb29"><pre
+class="sourceCode js"><code class="sourceCode javascript"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>$modale<span class="op">.</span><span class="fu">prop</span>(<span class="st">&quot;hidden&quot;</span><span class="op">,</span> <span class="kw">false</span>)<span class="op">.</span><span class="fu">hide</span>()<span class="op">.</span><span class="fu">fadeIn</span>(<span class="dv">150</span>)<span class="op">;</span>                    <span class="co">// ouvrirModale</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>$modale<span class="op">.</span><span class="fu">fadeOut</span>(<span class="dv">150</span><span class="op">,</span> <span class="kw">function</span> () { $modale<span class="op">.</span><span class="fu">prop</span>(<span class="st">&quot;hidden&quot;</span><span class="op">,</span> <span class="kw">true</span>)<span class="op">;</span> })<span class="op">;</span>  <span class="co">// fermerModale</span></span></code></pre></div>
+<form class="quiz" data-quiz="quiz-58-relancer-une-animation-sans-arrêter-la-précédente">
+<fieldset><legend>Quelle règle aurait évité ce code ?</legend>
+<label><input type="radio" name="quiz-58-relancer-une-animation-sans-arrêter-la-précédente" value="1"> <span>avant d'écrire <code>liste[0]</code>, se demander « et si la liste est
+vide ? », et le tester avec des données fabriquées.</span></label>
+<label><input type="radio" name="quiz-58-relancer-une-animation-sans-arrêter-la-précédente" value="2"> <span><code>.data()</code> convertit les types ; pour lire une chaîne,
+<code>.attr("data-…")</code>.</span></label>
+<label><input type="radio" name="quiz-58-relancer-une-animation-sans-arrêter-la-précédente" value="3"> <span>une donnée ne doit jamais être insérée comme du HTML. Structure fixe,
+puis <code>.text()</code> ou <code>.attr()</code>.</span></label>
+<label><input type="radio" name="quiz-58-relancer-une-animation-sans-arrêter-la-précédente" value="4" data-correct> <span>un rappel différé (animation, minuteur, requête) s'exécute dans un état
+qui a pu changer ; annuler l'opération précédente (<code>stop</code>,
+<code>clearTimeout</code>) d'abord.</span></label>
+</fieldset><button type="submit">Valider</button><p class="quiz-retour" role="status" aria-live="polite"></p></form>
+<details class="explication"><summary>Voir l'explication et la bonne pratique</summary>
+<p><strong>Ce qui se passe.</strong> Échap puis, tout de suite, Entrée
+sur la carte : la fiche se rouvre <strong>pendant</strong> le fondu de
+fermeture, dont le rappel remet ensuite <code>hidden</code>. Mesure
+réelle sur la première version, 600 ms plus tard : attribut
+<code>hidden</code> présent, mais <code>display: block</code> (style en
+ligne posé par jQuery) et opacité 1. La fiche est affichée mais marquée
+cachée, et Échap ne fait plus rien, puisque <code>fermerModale</code>
+commence par <code>if ($modale.prop("hidden")) return;</code>.</p>
+<p><strong>Pourquoi c'est une mauvaise pratique.</strong> Une animation
+est une opération asynchrone à rappel différé : c'est une situation de
+concurrence, comme deux requêtes dont les réponses arrivent dans le
+désordre. Un rappel ne doit pas supposer que l'état n'a pas changé
+depuis son lancement.</p>
+<p><strong>La bonne pratique.</strong> <code>stop(true, true)</code>
+vide la file d'animations et termine celle en cours, rappel compris,
+<strong>avant</strong> la réouverture :</p>
+<div class="sourceCode" id="cb30"><pre
+class="sourceCode js"><code class="sourceCode javascript"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>$modale<span class="op">.</span><span class="fu">stop</span>(<span class="kw">true</span><span class="op">,</span> <span class="kw">true</span>)<span class="op">.</span><span class="fu">prop</span>(<span class="st">&quot;hidden&quot;</span><span class="op">,</span> <span class="kw">false</span>)<span class="op">.</span><span class="fu">hide</span>()<span class="op">.</span><span class="fu">fadeIn</span>(<span class="dv">150</span>)<span class="op">;</span></span></code></pre></div>
+<p><strong>Comment s'en protéger durablement.</strong> Le test « fermer
+puis rouvrir aussitôt la fiche la laisse utilisable » enchaîne
+<code>Escape</code> et <code>Enter</code> sans attente. Réflexe : pour
+toute action animée, tester l'action inverse déclenchée pendant
+l'animation.</p>
+<blockquote>
+<p>un rappel différé (animation, minuteur, requête) s'exécute dans un
+état qui a pu changer ; annuler l'opération précédente
+(<code>stop</code>, <code>clearTimeout</code>) d'abord.</p>
+</blockquote>
+</details>
+</section>
+<section
+id="59-animer-en-javascript-sans-respecter-prefers-reduced-motion"
+class="piege">
+<h2>5.9 Animer en JavaScript sans respecter
+<code>prefers-reduced-motion</code></h2>
+<p>Deux pièges réels rencontrés dans ce projet.</p>
+<p><strong>Ce qu'on écrit spontanément</strong> (première version) : une
+règle CSS qui coupe les transitions sous
+<code>prefers-reduced-motion</code>, des fondus et compteurs jQuery, et
+un défilement doux programmé pour les liens du menu :</p>
+<div class="sourceCode" id="cb31"><pre
+class="sourceCode js"><code class="sourceCode javascript"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">$</span>(<span class="st">&quot;.nav a[href^=&#39;#&#39;]&quot;</span>)<span class="op">.</span><span class="fu">on</span>(<span class="st">&quot;click&quot;</span><span class="op">,</span> <span class="kw">function</span> (e) {</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">var</span> $cible <span class="op">=</span> <span class="fu">$</span>(<span class="fu">$</span>(<span class="kw">this</span>)<span class="op">.</span><span class="fu">attr</span>(<span class="st">&quot;href&quot;</span>))<span class="op">;</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> ($cible<span class="op">.</span><span class="at">length</span>) {</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>    e<span class="op">.</span><span class="fu">preventDefault</span>()<span class="op">;</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">$</span>(<span class="st">&quot;html, body&quot;</span>)<span class="op">.</span><span class="fu">animate</span>({ <span class="dt">scrollTop</span><span class="op">:</span> $cible<span class="op">.</span><span class="fu">offset</span>()<span class="op">.</span><span class="at">top</span> <span class="op">-</span> <span class="dv">70</span> }<span class="op">,</span> <span class="dv">400</span>)<span class="op">;</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+<form class="quiz" data-quiz="quiz-59-animer-en-javascript-sans-respecter-prefers-reduced-motion">
+<fieldset><legend>Quelle règle aurait évité ce code ?</legend>
+<label><input type="radio" name="quiz-59-animer-en-javascript-sans-respecter-prefers-reduced-motion" value="1" data-correct> <span><code>prefers-reduced-motion</code> coupe toutes les animations, y
+compris en JavaScript (<code>$.fx.off</code>, mais pas
+<code>.delay()</code>). Préférer le comportement natif à sa
+réimplémentation.</span></label>
+<label><input type="radio" name="quiz-59-animer-en-javascript-sans-respecter-prefers-reduced-motion" value="2"> <span>le focus est un état que le code gère explicitement. Une modale le garde
+et rend l'arrière-plan inerte ; avant de détruire l'élément focalisé, on
+décide où mettre le focus.</span></label>
+<label><input type="radio" name="quiz-59-animer-en-javascript-sans-respecter-prefers-reduced-motion" value="3"> <span>ne jamais se fier aux valeurs par défaut pour l'exposition réseau, les
+permissions ou la réutilisation d'un serveur. Moindre privilège, job par
+job, et déploiement conditionné aux tests.</span></label>
+<label><input type="radio" name="quiz-59-animer-en-javascript-sans-respecter-prefers-reduced-motion" value="4"> <span>avant d'écrire <code>liste[0]</code>, se demander « et si la liste est
+vide ? », et le tester avec des données fabriquées.</span></label>
+</fieldset><button type="submit">Valider</button><p class="quiz-retour" role="status" aria-live="polite"></p></form>
+<details class="explication"><summary>Voir l'explication et la bonne pratique</summary>
+<p><strong>Ce qui se passe.</strong> Mesures réelles sur la première
+version avec <code>reducedMotion: "reduce"</code> : le compteur «
+projets » reçoit 57 valeurs successives au lieu d'une, car la règle CSS
+ne voit pas les <code>.animate()</code> jQuery ; après Entrée sur «
+Projets », l'adresse reste sans <code>#projets</code> et le Tab suivant
+va sur le lien « Compétences » du menu au lieu du champ de recherche,
+car <code>preventDefault()</code> a empêché le navigateur de suivre
+l'ancre.</p>
+<p><strong>Pourquoi c'est une mauvaise pratique.</strong> Une préférence
+de l'utilisateur (troubles vestibulaires, migraines) se respecte
+partout, pas seulement là où c'est facile. Et réécrire un comportement
+natif fait perdre ce que le navigateur faisait gratuitement : adresse,
+historique, point de départ du clavier.</p>
+<p><strong>La bonne pratique.</strong> <code>$.fx.off</code> réglé
+d'après la même requête média (4.8) ; <code>.delay()</code>, simple
+minuteur qui ignore <code>$.fx.off</code>, n'est utilisé que si les
+animations sont actives. Le défilement doux passe au CSS, et les liens
+du menu n'ont plus de JavaScript :</p>
+<div class="sourceCode" id="cb32"><pre
+class="sourceCode css"><code class="sourceCode css"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>html {</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">scroll-behavior</span>: smooth<span class="op">;</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">scroll-padding-top</span>: <span class="dv">70</span><span class="dt">px</span><span class="op">;</span> <span class="co">/* ancres sous l&#39;en-tête collant */</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="im">@media</span> (<span class="kw">prefers-reduced-motion</span>: reduce) {</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">*</span> {</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">transition</span>: <span class="dv">none</span> <span class="at">!important</span><span class="op">;</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">scroll-behavior</span>: <span class="bu">auto</span> <span class="at">!important</span><span class="op">;</span></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>Mesure réelle sur la version actuelle : adresse en
+<code>#projets</code>, Tab sur le champ de recherche.</p>
+<p><strong>Comment s'en protéger durablement.</strong>
+<code>test.use({ reducedMotion: "reduce" })</code> et le test « après un
+lien du menu, Tab continue dans la section visée ». Réflexe : avant un
+<code>preventDefault()</code> sur un lien, se demander ce que le
+navigateur aurait fait.</p>
+<blockquote>
+<p><code>prefers-reduced-motion</code> coupe toutes les animations, y
+compris en JavaScript (<code>$.fx.off</code>, mais pas
+<code>.delay()</code>). Préférer le comportement natif à sa
+réimplémentation.</p>
+</blockquote>
+</details>
+</section>
+<section id="510-un-bouton-bascule-dont-létat-nest-pas-exposé"
+class="piege">
+<h2>5.10 Un bouton bascule dont l'état n'est pas exposé</h2>
+<p>Piège réel rencontré dans ce projet.</p>
+<p><strong>Ce qu'on écrit spontanément</strong> (première version) : un
+bouton
+<code>&lt;button class="bouton-theme" type="button" aria-label="Changer de thème"&gt;☾&lt;/button&gt;</code>,
+et la logique « le thème est-il sombre ? » écrite directement dans le
+gestionnaire de clic.</p>
+<form class="quiz" data-quiz="quiz-510-un-bouton-bascule-dont-létat-nest-pas-exposé">
+<fieldset><legend>Quelle règle aurait évité ce code ?</legend>
+<label><input type="radio" name="quiz-510-un-bouton-bascule-dont-létat-nest-pas-exposé" value="1"> <span>un script venu d'un CDN porte toujours <code>integrity</code>, et la
+version est fixe partout (<code>3.7.1</code>, pas <code>^3</code>).</span></label>
+<label><input type="radio" name="quiz-510-un-bouton-bascule-dont-létat-nest-pas-exposé" value="2"> <span>attendre un état, pas une durée. Pour chaque bug corrigé, un test qui
+échouait avant et passe après.</span></label>
+<label><input type="radio" name="quiz-510-un-bouton-bascule-dont-létat-nest-pas-exposé" value="3"> <span>une donnée ne doit jamais être insérée comme du HTML. Structure fixe,
+puis <code>.text()</code> ou <code>.attr()</code>.</span></label>
+<label><input type="radio" name="quiz-510-un-bouton-bascule-dont-létat-nest-pas-exposé" value="4" data-correct> <span>un bouton bascule a un nom fixe et un état <code>aria-pressed</code>,
+calculé par une seule fonction appelée partout où il peut changer.</span></label>
+</fieldset><button type="submit">Valider</button><p class="quiz-retour" role="status" aria-live="polite"></p></form>
+<details class="explication"><summary>Voir l'explication et la bonne pratique</summary>
+<p><strong>Ce qui se passe.</strong> Mesure réelle sur la première
+version, système en thème sombre : nom « Changer de thème »,
+<code>aria-pressed</code> absent, icône « ☾ » alors que la page est déjà
+sombre. Un lecteur d'écran annonce « Changer de thème, bouton » sans
+dire quel thème est actif, et l'icône ne change jamais.</p>
+<p><strong>Pourquoi c'est une mauvaise pratique.</strong> Un état
+visible doit être lisible par les technologies d'assistance, et calculé
+à <strong>un seul</strong> endroit : enfermé dans le gestionnaire de
+clic, il ne pouvait servir à rien d'autre.</p>
+<p><strong>La bonne pratique.</strong> Nom fixe
+(<code>aria-label="Thème sombre"</code>), état dans
+<code>aria-pressed</code>, une fonction d'état appelée au chargement, au
+clic et au changement de préférence du système :</p>
+<div class="sourceCode" id="cb33"><pre
+class="sourceCode js"><code class="sourceCode javascript"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">themeSombre</span>() {</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> choix <span class="op">=</span> <span class="fu">$</span>(<span class="st">&quot;html&quot;</span>)<span class="op">.</span><span class="fu">attr</span>(<span class="st">&quot;data-theme&quot;</span>)<span class="op">;</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> choix <span class="op">?</span> choix <span class="op">===</span> <span class="st">&quot;sombre&quot;</span> <span class="op">:</span> systemeSombre<span class="op">.</span><span class="at">matches</span><span class="op">;</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">majBoutonTheme</span>() {</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>  $boutonTheme<span class="op">.</span><span class="fu">attr</span>(<span class="st">&quot;aria-pressed&quot;</span><span class="op">,</span> <span class="fu">themeSombre</span>())<span class="op">;</span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>Le nom ne change pas avec l'état (« Passer au thème clair » annoncé «
+activé » serait contradictoire). L'icône, décorative, vient du CSS :
+<code>.bouton-theme::before { content: var(--icone-theme); }</code>.
+Mesure réelle sur la version actuelle, système sombre : « Thème sombre
+», <code>aria-pressed="true"</code>, icône « ☀ ».</p>
+<p><strong>Comment s'en protéger durablement.</strong>
+<code>toHaveAccessibleName</code> et
+<code>toHaveAttribute("aria-pressed", …)</code> dans deux tests, dont un
+qui change la préférence avec <code>page.emulateMedia</code>. Réflexe :
+inspecter l'arbre d'accessibilité de chaque contrôle personnalisé.</p>
+<blockquote>
+<p>un bouton bascule a un nom fixe et un état <code>aria-pressed</code>,
+calculé par une seule fonction appelée partout où il peut changer.</p>
+</blockquote>
+</details>
+</section>
+<section
+id="511-tester-avec-des-pauses-fixes-corriger-sans-test-de-non-régression"
+class="piege">
+<h2>5.11 Tester avec des pauses fixes, corriger sans test de
+non-régression</h2>
+<p><strong>Ce qu'on écrit spontanément</strong> (illustratif) :
+<code>await page.waitForTimeout(1000)</code> avant
+<code>expect(await page.locator(".carte").count()).toBe(2)</code> ; et,
+pour corriger un bug, modifier <code>app.js</code>, vérifier à la main,
+commiter.</p>
+<form class="quiz" data-quiz="quiz-511-tester-avec-des-pauses-fixes-corriger-sans-test-de-non-régression">
+<fieldset><legend>Quelle règle aurait évité ce code ?</legend>
+<label><input type="radio" name="quiz-511-tester-avec-des-pauses-fixes-corriger-sans-test-de-non-régression" value="1"> <span>jamais d'erreur avalée en silence ni affichée brute : message clair pour
+l'utilisateur, <code>console.error</code> pour le développeur. Un
+<code>catch</code> vide n'est acceptable que justifié par écrit.</span></label>
+<label><input type="radio" name="quiz-511-tester-avec-des-pauses-fixes-corriger-sans-test-de-non-régression" value="2"> <span>un script venu d'un CDN porte toujours <code>integrity</code>, et la
+version est fixe partout (<code>3.7.1</code>, pas <code>^3</code>).</span></label>
+<label><input type="radio" name="quiz-511-tester-avec-des-pauses-fixes-corriger-sans-test-de-non-régression" value="3" data-correct> <span>attendre un état, pas une durée. Pour chaque bug corrigé, un test qui
+échouait avant et passe après.</span></label>
+<label><input type="radio" name="quiz-511-tester-avec-des-pauses-fixes-corriger-sans-test-de-non-régression" value="4"> <span>un rappel différé (animation, minuteur, requête) s'exécute dans un état
+qui a pu changer ; annuler l'opération précédente (<code>stop</code>,
+<code>clearTimeout</code>) d'abord.</span></label>
+</fieldset><button type="submit">Valider</button><p class="quiz-retour" role="status" aria-live="polite"></p></form>
+<details class="explication"><summary>Voir l'explication et la bonne pratique</summary>
+<p><strong>Ce qui se passe.</strong> Le test à pause fixe est lent quand
+tout va bien et faux quand la machine de CI est chargée (illustratif).
+La correction sans test ne protège de rien : le bug peut revenir au
+prochain remaniement sans que personne ne le voie.</p>
+<p>Démarche réelle dans ce projet : les 17 scénarios de la suite écrite
+à la relecture ont été rejoués contre la première version, extraite à
+part avec
+<code>git archive &lt;commit&gt; | tar -x -C &lt;dossier&gt;</code>
+(port du serveur de test changé dans la copie pour ne pas réutiliser
+celui de la version actuelle, voir 5.12). Sortie réelle :
+<code>20 failed</code>, <code>14 passed (1.1m)</code>. Les dix scénarios
+ajoutés par ce commit échouent, chacun sur le défaut qu'il vise, sur les
+deux profils ; sur la version corrigée, les 34 tests d'alors passent.
+Même démarche pour la journalisation des erreurs (5.6) : le nouveau test
+a d'abord échoué (2 échecs), puis réussi après la correction. Un test
+qui n'a jamais échoué ne prouve rien.</p>
+<p><strong>Pourquoi c'est une mauvaise pratique.</strong> Un test
+vérifie un <strong>comportement observable</strong> et attend un
+<strong>état</strong>, jamais une durée. Écrit <strong>avant</strong> la
+correction, un test de non-régression prouve que le bug est reproduit ;
+le voir passer ensuite prouve que la correction le corrige.</p>
+<p><strong>La bonne pratique.</strong> Les assertions Playwright
+réessaient jusqu'à être vraies, ou jusqu'à un délai maximal :</p>
+<div class="sourceCode" id="cb34"><pre
+class="sourceCode js"><code class="sourceCode javascript"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> page<span class="op">.</span><span class="fu">click</span>(<span class="st">&quot;.filtre[data-categorie=&#39;bots&#39;]&quot;</span>)<span class="op">;</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="cf">await</span> <span class="fu">expect</span>(page<span class="op">.</span><span class="fu">locator</span>(<span class="st">&quot;.carte&quot;</span>))<span class="op">.</span><span class="fu">toHaveCount</span>(<span class="dv">2</span>)<span class="op">;</span></span></code></pre></div>
+<p><strong>Comment s'en protéger durablement.</strong> Pour chaque bug :
+le test qui échoue, puis la correction, puis les deux dans le même
+commit. <code>grep -rn waitForTimeout tests/</code> doit ne rien
+afficher. La CI rejoue tout à chaque <code>push</code>.</p>
+<blockquote>
+<p>attendre un état, pas une durée. Pour chaque bug corrigé, un test qui
+échouait avant et passe après.</p>
+</blockquote>
+</details>
+</section>
+<section id="512-garder-des-valeurs-par-défaut-dangereuses"
+class="piege">
+<h2>5.12 Garder des valeurs par défaut dangereuses</h2>
+<p>Deux pièges réels rencontrés dans ce projet : permissions de la CI,
+serveur de test réutilisé.</p>
+<p><strong>Ce qu'on écrit spontanément.</strong>
+<code>python3 -m http.server 8080</code> ; des <code>permissions</code>
+déclarées une fois pour tout le workflow, comme dans la version
+précédente de <code>ci.yml</code> ; et, dans
+<code>playwright.config.js</code>, l'option
+<code>reuseExistingServer: true</code> que propose la documentation de
+Playwright. L'ancien <code>ci.yml</code> déclarait en tête
+<code>permissions: { contents: read, pages: write, id-token: write }</code>
+(forme abrégée).</p>
+<form class="quiz" data-quiz="quiz-512-garder-des-valeurs-par-défaut-dangereuses">
+<fieldset><legend>Quelle règle aurait évité ce code ?</legend>
+<label><input type="radio" name="quiz-512-garder-des-valeurs-par-défaut-dangereuses" value="1"> <span>une donnée ne doit jamais être insérée comme du HTML. Structure fixe,
+puis <code>.text()</code> ou <code>.attr()</code>.</span></label>
+<label><input type="radio" name="quiz-512-garder-des-valeurs-par-défaut-dangereuses" value="2"> <span>un rappel différé (animation, minuteur, requête) s'exécute dans un état
+qui a pu changer ; annuler l'opération précédente (<code>stop</code>,
+<code>clearTimeout</code>) d'abord.</span></label>
+<label><input type="radio" name="quiz-512-garder-des-valeurs-par-défaut-dangereuses" value="3" data-correct> <span>ne jamais se fier aux valeurs par défaut pour l'exposition réseau, les
+permissions ou la réutilisation d'un serveur. Moindre privilège, job par
+job, et déploiement conditionné aux tests.</span></label>
+<label><input type="radio" name="quiz-512-garder-des-valeurs-par-défaut-dangereuses" value="4"> <span>un bouton bascule a un nom fixe et un état <code>aria-pressed</code>,
+calculé par une seule fonction appelée partout où il peut changer.</span></label>
+</fieldset><button type="submit">Valider</button><p class="quiz-retour" role="status" aria-live="polite"></p></form>
+<details class="explication"><summary>Voir l'explication et la bonne pratique</summary>
+<p><strong>Ce qui se passe.</strong> Sortie réelle du serveur Python
+lancé sans <code>--bind</code> :
+<code>Serving HTTP on 0.0.0.0 port 8097 (http://0.0.0.0:8097/) ...</code>.
+<code>0.0.0.0</code> signifie « toutes les interfaces » : sur le Wi-Fi
+d'une école, tout appareil du réseau peut lire le dossier servi. Les
+permissions de niveau workflow sont accordées à <strong>chaque</strong>
+job : le job <code>tests</code>, qui exécute <code>npm ci</code> et donc
+le code de dizaines de paquets, recevait le droit de publier sur Pages
+et d'obtenir un jeton OIDC. Enfin, essai réel : un autre site (une page
+« autre ») est lancé sur le port 8080, puis
+<code>npx playwright test -g "affiche tous les projets"</code>.
+Playwright réutilise ce serveur sans prévenir et teste le mauvais site
+(<code>Received: 0</code> cartes). Avec une ancienne version du
+portfolio, ils auraient pu <strong>passer</strong> sur un autre code que
+le code courant.</p>
+<p><strong>Pourquoi c'est une mauvaise pratique.</strong> Une valeur par
+défaut vise à ce que « ça marche », pas à être sûre dans votre cas.
+<strong>Moindre privilège</strong> : n'écouter, ne publier et
+n'autoriser que le nécessaire ; et tester le code qu'on croit
+tester.</p>
+<p><strong>La bonne pratique.</strong>
+<code>"start": "python3 -m http.server 8080 --bind 127.0.0.1"</code>
+dans <code>package.json</code>. Dans <code>ci.yml</code>, un minimum par
+défaut et des permissions par job ; le déploiement attend les tests et
+ne publie qu'un dossier préparé (<code>_site</code>) :</p>
+<div class="sourceCode" id="cb35"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Minimum par défaut ; chaque job déclare exactement ce dont il a besoin.</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">permissions</span><span class="kw">:</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">contents</span><span class="kw">:</span><span class="at"> read</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="fu">jobs</span><span class="kw">:</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="co">  # tests : permissions: { contents: read }</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">deploiement</span><span class="kw">:</span></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">if</span><span class="kw">:</span><span class="at"> github.ref == &#39;refs/heads/main&#39; &amp;&amp; github.event_name == &#39;push&#39;</span></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">needs</span><span class="kw">:</span><span class="at"> tests</span></span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">permissions</span><span class="kw">:</span></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">contents</span><span class="kw">:</span><span class="at"> read</span></span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">pages</span><span class="kw">:</span><span class="at"> write</span><span class="co"> # publier sur GitHub Pages</span></span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">id-token</span><span class="kw">:</span><span class="at"> write</span><span class="co"> # jeton OIDC temporaire exigé par deploy-pages</span></span></code></pre></div>
+<p>(Extrait abrégé.) <code>explications-pdf.yml</code> suit la même
+règle (<code>contents: write</code> pour le seul job qui commite le
+PDF). Dans <code>playwright.config.js</code>,
+<code>reuseExistingServer: false</code>. La variante
+<code>!process.env.CI</code> (réutiliser en local, jamais en CI) n'a pas
+été retenue : c'est justement en local que traîne un vieux serveur. Avec
+le même autre site sur le port 8080, Playwright s'arrête désormais avant
+tout test, en sortie réelle :</p>
+<pre class="text"><code>Error: http://127.0.0.1:8080 is already used, make sure that nothing is running on the
+port/url or set reuseExistingServer:true in config.webServer.</code></pre>
+<p>La contrepartie est voulue : il faut arrêter <code>npm start</code>
+avant <code>npm run test:e2e</code>. Aucun secret n'est stocké ;
+l'adresse e-mail de <code>index.html</code> est publique par choix.</p>
+<p><strong>Comment s'en protéger durablement.</strong> Lire la ligne de
+démarrage d'un serveur ; pour chaque option, se demander « que se
+passe-t-il sans elle ? » ; relire les <code>permissions</code> de chaque
+job (elles ne se testent pas en local) ; protéger la branche
+<code>main</code>.</p>
+<blockquote>
+<p>ne jamais se fier aux valeurs par défaut pour l'exposition réseau,
+les permissions ou la réutilisation d'un serveur. Moindre privilège, job
+par job, et déploiement conditionné aux tests.</p>
+</blockquote>
+</details>
+</section>
+<h1 id="6-check-list-avant-de-rendre-son-code">6. Check-list avant de
+rendre son code</h1>
+<table class="check-list"><thead><tr><th scope="col">Vérifié</th><th scope="col">Mauvaise pratique</th><th scope="col">Risque</th><th scope="col">Bonne pratique</th><th scope="col">Où dans le projet</th></tr></thead><tbody>
+<tr><td class="case"><input type="checkbox" data-suivi="check-list:1:1" aria-label="Vérifié : Écouteur sur éléments absents ; preventDefault() délégué"></td><th scope="row">Écouteur sur éléments absents ; <code>preventDefault()</code> délégué</th><td>Action sans effet, clic annulé</td><td>Délégation, <code>e.target !== this</code></td><td>gestionnaires <code>.carte</code></td></tr>
+<tr><td class="case"><input type="checkbox" data-suivi="check-list:1:2" aria-label="Vérifié : .data() pour lire data-*"></td><th scope="row"><code>.data()</code> pour lire <code>data-*</code></th><td><code>"42"</code> devient <code>42</code></td><td><code>.attr()</code>, <code>===</code></td><td><code>.attr("data-id")</code></td></tr>
+<tr><td class="case"><input type="checkbox" data-suivi="check-list:1:3" aria-label="Vérifié : HTML concaténé avec des données"></td><th scope="row">HTML concaténé avec des données</th><td>XSS</td><td>Balises fixes + <code>.text()</code></td><td><code>afficherProjets</code></td></tr>
+<tr><td class="case"><input type="checkbox" data-suivi="check-list:1:4" aria-label="Vérifié : CDN sans integrity"></td><th scope="row">CDN sans <code>integrity</code></th><td>Code modifié exécuté</td><td>SRI, version fixe</td><td><code>index.html</code></td></tr>
+<tr><td class="case"><input type="checkbox" data-suivi="check-list:1:5" aria-label="Vérifié : liste[0] sans tester le vide"></td><th scope="row"><code>liste[0]</code> sans tester le vide</th><td><code>TypeError</code></td><td>Tester <code>length</code></td><td><code>afficherNuage</code></td></tr>
+<tr><td class="case"><input type="checkbox" data-suivi="check-list:1:6" aria-label="Vérifié : Erreur avalée ou affichée brute"></td><th scope="row">Erreur avalée ou affichée brute</th><td>Panne sans piste, fuite d'infos</td><td>Message fixe + <code>console.error</code></td><td><code>.fail</code>, thème</td></tr>
+<tr><td class="case"><input type="checkbox" data-suivi="check-list:1:7" aria-label="Vérifié : Focus non géré"></td><th scope="row">Focus non géré</th><td>Focus perdu ou caché</td><td><code>inert</code>, boucle Tab, focus placé</td><td><code>ouvrirModale</code>, <code>filtrerParCompetence</code></td></tr>
+<tr><td class="case"><input type="checkbox" data-suivi="check-list:1:8" aria-label="Vérifié : Animation non arrêtée"></td><th scope="row">Animation non arrêtée</th><td>Modale impossible à fermer</td><td><code>stop(true, true)</code></td><td><code>ouvrirModale</code></td></tr>
+<tr><td class="case"><input type="checkbox" data-suivi="check-list:1:9" aria-label="Vérifié : Animations JS, ancres en JS"></td><th scope="row">Animations JS, ancres en JS</th><td>Mouvement imposé, focus perdu</td><td><code>$.fx.off</code>, CSS</td><td><code>js/app.js</code>, <code>css/style.css</code></td></tr>
+<tr><td class="case"><input type="checkbox" data-suivi="check-list:1:10" aria-label="Vérifié : Bascule sans état"></td><th scope="row">Bascule sans état</th><td>État invisible</td><td><code>aria-pressed</code>, nom fixe</td><td><code>majBoutonTheme</code></td></tr>
+<tr><td class="case"><input type="checkbox" data-suivi="check-list:1:11" aria-label="Vérifié : waitForTimeout, correctif sans test"></td><th scope="row"><code>waitForTimeout</code>, correctif sans test</th><td>Tests instables, régressions</td><td>Attendre un état ; test d'abord</td><td><code>tests/portfolio.spec.js</code></td></tr>
+<tr><td class="case"><input type="checkbox" data-suivi="check-list:1:12" aria-label="Vérifié : Défauts dangereux"></td><th scope="row">Défauts dangereux</th><td>Dossier exposé, droits en trop, mauvais serveur testé</td><td><code>--bind</code>, permissions par job,
+<code>reuseExistingServer: false</code></td><td><code>package.json</code>, <code>ci.yml</code>,
+<code>playwright.config.js</code></td></tr>
+<tr><td class="case"><input type="checkbox" data-suivi="check-list:1:13" aria-label="Vérifié : Code non vérifié automatiquement"></td><th scope="row">Code non vérifié automatiquement</th><td>Variables inutilisées, <code>==</code>, style incohérent</td><td>ESLint + Prettier, en CI</td><td><code>eslint.config.js</code>, <code>package.json</code></td></tr>
+<tr><td class="case"><input type="checkbox" data-suivi="check-list:1:14" aria-label="Vérifié : Variables globales"></td><th scope="row">Variables globales</th><td>Collisions entre scripts</td><td>Fonction englobante, <code>"use strict"</code></td><td><code>app.js</code>, <code>filtres.js</code></td></tr>
+<tr><td class="case"><input type="checkbox" data-suivi="check-list:1:15" aria-label="Vérifié : !== undefined sur une variable absente"></td><th scope="row"><code>!== undefined</code> sur une variable absente</th><td><code>ReferenceError</code></td><td><code>typeof x !== "undefined"</code></td><td>fin de <code>filtres.js</code></td></tr>
+<tr><td class="case"><input type="checkbox" data-suivi="check-list:1:16" aria-label="Vérifié : toLowerCase() seul"></td><th scope="row"><code>toLowerCase()</code> seul</th><td>Accents non ignorés</td><td><code>normalize("NFD")</code>, <code>localeCompare</code></td><td><code>normaliser</code></td></tr>
+</tbody></table>
+<p>Commandes à lancer avant chaque commit, depuis la racine du dépôt
+(les quatre premières sont aussi celles de la CI) :</p>
+<div class="sourceCode" id="cb37"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run lint                               <span class="co"># ESLint : aucune sortie = OK</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run format:check                       <span class="co"># Prettier ; corriger avec npm run format</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> test                                   <span class="co"># 9 tests unitaires, dont la validité du JSON</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run test:e2e                           <span class="co"># tests Playwright (port 8080 libre)</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span> <span class="at">-nE</span> <span class="st">&#39;\.(html|append)\(&#39;</span> js/app.js     <span class="co"># relire : pas de HTML construit</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> diff <span class="at">--check</span>                           <span class="co"># espaces en fin de ligne</span></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> docs/generer-pdf.sh                   <span class="co"># si la documentation a changé</span></span></code></pre></div>
+<p>Après une correction délicate,
+<code>npx playwright test --repeat-each=2</code> rejoue chaque test deux
+fois pour détecter un test instable.</p>
+<h1 id="7-pour-aller-plus-loin">7. Pour aller plus loin</h1>
+<ol type="1">
+<li><strong>Annoncer le nombre de résultats.</strong> Pendant la frappe,
+un lecteur d'écran ne sait pas combien de cartes restent. Piste : un
+paragraphe <code>aria-live="polite"</code> que
+<code>afficherProjets()</code> remplit avec « 3 projets », et un test
+Playwright qui lit son texte.</li>
+<li><strong>Vérifier l'accessibilité automatiquement.</strong> Les tests
+actuels couvrent les défauts déjà rencontrés, pas les autres (contraste
+insuffisant, nom manquant). Piste : ajouter
+<code>@axe-core/playwright</code> et un test qui analyse la page en
+thème clair et sombre, modale ouverte et fermée, et exige zéro
+violation.</li>
+<li><strong>Faire échouer tous les tests sur une erreur de
+console.</strong> Aujourd'hui, seuls quelques tests surveillent
+<code>pageerror</code> ou <code>console</code>. Piste : une
+<em>fixture</em> Playwright automatique (<code>test.extend</code> avec
+<code>{ auto: true }</code>) qui collecte <code>pageerror</code> et les
+messages <code>console.error</code> inattendus, et fait échouer le test
+s'il y en a ; le test du JSON invalide déclare les siens comme
+attendus.</li>
+<li><strong>Épingler les actions GitHub par empreinte.</strong>
+<code>actions/checkout@v4</code> suit une étiquette qui peut être
+déplacée. Piste : remplacer chaque <code>@v4</code> par l'empreinte SHA
+complète du commit correspondant, en gardant la version en commentaire,
+et laisser Dependabot proposer les mises à jour.</li>
+<li><strong>Interdire l'insertion de HTML construit.</strong> Les règles
+recommandées d'ESLint ne voient pas
+<code>.html("&lt;p&gt;" + donnee + "&lt;/p&gt;")</code>. Piste : une
+règle <code>no-restricted-syntax</code> avec un sélecteur qui vise les
+appels <code>.html()</code> ou <code>.append()</code> dont l'argument
+n'est pas une chaîne littérale, puis vérifier qu'elle signale le code
+naïf de 5.3 et pas le code actuel.</li>
+<li><strong>Remplacer la modale par l'élément natif
+<code>&lt;dialog&gt;</code>.</strong> Sa méthode
+<code>showModal()</code> rend déjà l'arrière-plan inerte et gère Échap.
+Piste : supprimer le code correspondant de <code>js/app.js</code> et
+vérifier que les tests de la modale (focus piégé, réouverture rapide)
+restent verts sans modification.</li>
+</ol>
+<h1 id="8-glossaire">8. Glossaire</h1>
+<div class="recherche"><label for="recherche-glossaire">Rechercher un terme</label><input type="search" id="recherche-glossaire" autocomplete="off"><p class="recherche-resultat" role="status" aria-live="polite"></p></div>
+<table class="glossaire">
+<thead>
+<tr class="header">
+<th>Terme</th>
+<th>Définition</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>AJAX</td>
+<td>Requête HTTP faite en arrière-plan par une page, sans la
+recharger</td>
+</tr>
+<tr class="even">
+<td>Analyse statique</td>
+<td>Vérification du code sans l'exécuter (ici ESLint)</td>
+</tr>
+<tr class="odd">
+<td>Asynchrone</td>
+<td>Opération dont le résultat arrive plus tard ; le code continue sans
+l'attendre</td>
+</tr>
+<tr class="even">
+<td><code>aria-*</code></td>
+<td>Attributs qui décrivent rôle et état d'un élément aux technologies
+d'assistance</td>
+</tr>
+<tr class="odd">
+<td>Bubbling</td>
+<td>Propagation d'un événement de l'élément visé vers tous ses
+ancêtres</td>
+</tr>
+<tr class="even">
+<td>CDN</td>
+<td>Réseau de serveurs qui distribue des fichiers publics, ici
+jQuery</td>
+</tr>
+<tr class="odd">
+<td>CORS</td>
+<td>Règles du navigateur qui limitent les requêtes d'une origine vers
+une autre</td>
+</tr>
+<tr class="even">
+<td>Debounce</td>
+<td>Attendre une pause dans une série d'événements avant d'agir</td>
+</tr>
+<tr class="odd">
+<td>Délégation</td>
+<td>Écouteur posé sur un parent stable, valable pour des descendants
+créés plus tard</td>
+</tr>
+<tr class="even">
+<td>Focus</td>
+<td>Élément qui reçoit actuellement les frappes du clavier</td>
+</tr>
+<tr class="odd">
+<td>Formateur</td>
+<td>Outil qui réécrit le code dans un style unique (ici Prettier)</td>
+</tr>
+<tr class="even">
+<td>Fonction pure</td>
+<td>Fonction dont le résultat ne dépend que de ses arguments, sans effet
+de bord</td>
+</tr>
+<tr class="odd">
+<td><code>inert</code></td>
+<td>Attribut qui rend un élément et ses descendants non cliquables et
+non focalisables</td>
+</tr>
+<tr class="even">
+<td>Moindre privilège</td>
+<td>Ne donner à un programme que les droits strictement nécessaires</td>
+</tr>
+<tr class="odd">
+<td>NFD</td>
+<td>Normalisation Unicode qui sépare une lettre accentuée en lettre de
+base plus accent</td>
+</tr>
+<tr class="even">
+<td><code>prefers-reduced-motion</code></td>
+<td>Requête média : l'utilisateur demande moins d'animations</td>
+</tr>
+<tr class="odd">
+<td>SRI</td>
+<td>Attribut <code>integrity</code> : le navigateur vérifie l'empreinte
+d'un fichier externe</td>
+</tr>
+<tr class="even">
+<td>Test de non-régression</td>
+<td>Test qui reproduit un bug corrigé, pour qu'il ne revienne pas</td>
+</tr>
+<tr class="odd">
+<td>XSS</td>
+<td>Faille où un contenu injecté dans une page est exécuté comme du
+code</td>
+</tr>
+</tbody>
+</table>
+</main>
+</div>
+<script>
+// Guide interactif : progression mémorisée, quiz, copie du code, recherche du glossaire.
+// Aucune dépendance ; sans JavaScript, le guide reste lisible (le code se déplie quand même).
+(() => {
+  "use strict";
+
+  const cle = "guide:" + (document.body.getAttribute("data-guide") || location.pathname);
+  let etat = { suivi: {}, quiz: {} };
+
+  // Le stockage peut être indisponible (navigation privée, fichier local bloqué) :
+  // le guide fonctionne alors sans mémoriser.
+  function charger() {
+    try {
+      const brut = localStorage.getItem(cle);
+      if (brut) {
+        const lu = JSON.parse(brut);
+        if (lu && typeof lu === "object") {
+          etat.suivi = lu.suivi && typeof lu.suivi === "object" ? lu.suivi : {};
+          etat.quiz = lu.quiz && typeof lu.quiz === "object" ? lu.quiz : {};
+        }
+      }
+    } catch { /* stockage illisible : on repart de zéro */ }
+  }
+  function enregistrer() {
+    try { localStorage.setItem(cle, JSON.stringify(etat)); } catch { /* non mémorisé */ }
+  }
+
+  const cases = Array.from(document.querySelectorAll("input[data-suivi]"));
+  const quizs = Array.from(document.querySelectorAll("form.quiz"));
+
+  function majCase(c) {
+    const section = c.closest("section.etape");
+    if (section) {
+      section.classList.toggle("est-faite", c.checked);
+      const lien = document.querySelector('.sommaire a[href="#' + section.id + '"]');
+      if (lien) lien.classList.toggle("fait-ok", c.checked);
+    }
+    const ligne = c.closest("tr");
+    if (ligne) ligne.classList.toggle("cochee", c.checked);
+  }
+
+  function majProgression() {
+    const faites = cases.filter(function (c) { return c.checked; }).length;
+    const etapes = cases.filter(function (c) { return c.closest("section.etape"); });
+    const etapesFaites = etapes.filter(function (c) { return c.checked; }).length;
+    const texte = document.getElementById("progression-texte");
+    const barre = document.getElementById("progression-barre");
+    texte.textContent = "Progression : " + etapesFaites + " / " + etapes.length + " étapes, " +
+      (faites - etapesFaites) + " / " + (cases.length - etapes.length) + " points de check-list";
+    barre.max = Math.max(cases.length, 1);
+    barre.value = faites;
+
+    let repondus = 0, justes = 0;
+    quizs.forEach(function (q) {
+      const r = etat.quiz[q.getAttribute("data-quiz")];
+      if (r) { repondus++; if (r.premier) justes++; }
+    });
+    document.getElementById("quiz-score").textContent = quizs.length
+      ? "Quiz : " + justes + " juste(s) du premier coup, " + repondus + " / " + quizs.length + " répondu(s)"
+      : "";
+  }
+
+  cases.forEach(function (c) {
+    c.addEventListener("change", function () {
+      if (c.checked) etat.suivi[c.getAttribute("data-suivi")] = true;
+      else delete etat.suivi[c.getAttribute("data-suivi")];
+      enregistrer();
+      majCase(c);
+      majProgression();
+    });
+  });
+
+  function afficherReponse(q, choix, premier) {
+    const retour = q.querySelector(".quiz-retour");
+    const labels = Array.from(q.querySelectorAll("label"));
+    let bon = false, trouve = false;
+    labels.forEach(function (l) {
+      const radio = l.querySelector("input");
+      l.classList.remove("bonne", "mauvaise");
+      if (radio.value === choix) {
+        radio.checked = true;
+        trouve = true;
+        bon = radio.hasAttribute("data-correct");
+        l.classList.add(bon ? "bonne" : "mauvaise");
+      }
+    });
+    if (!trouve) return;
+    retour.className = "quiz-retour " + (bon ? "ok" : "ko");
+    retour.textContent = bon
+      ? (premier ? "Bonne réponse." : "Bonne réponse (pas du premier coup).") + " L'explication est dépliée ci-dessous."
+      : "Ce n'est pas la règle qui s'applique ici : relisez le code et réessayez.";
+    if (bon) {
+      const explication = q.parentNode.querySelector("details.explication");
+      if (explication) explication.open = true;
+    }
+  }
+
+  quizs.forEach(function (q) {
+    const id = q.getAttribute("data-quiz");
+    q.addEventListener("submit", function (ev) {
+      ev.preventDefault();
+      const coche = q.querySelector("input:checked");
+      const retour = q.querySelector(".quiz-retour");
+      if (!coche) {
+        retour.className = "quiz-retour ko";
+        retour.textContent = "Choisissez d'abord une réponse.";
+        return;
+      }
+      const precedent = etat.quiz[id];
+      // « premier » ne change plus une fois la première tentative enregistrée.
+      const premier = precedent ? precedent.premier : coche.hasAttribute("data-correct");
+      etat.quiz[id] = { choix: coche.value, premier: premier };
+      enregistrer();
+      afficherReponse(q, coche.value, premier);
+      majProgression();
+    });
+  });
+
+  document.getElementById("reinitialiser").addEventListener("click", function () {
+    if (!window.confirm("Effacer les cases cochées et les réponses aux quiz de ce guide ?")) return;
+    etat = { suivi: {}, quiz: {} };
+    try { localStorage.removeItem(cle); } catch { /* rien à effacer */ }
+    cases.forEach(function (c) { c.checked = false; majCase(c); });
+    quizs.forEach(function (q) {
+      q.reset();
+      q.querySelectorAll("label").forEach(function (l) { l.classList.remove("bonne", "mauvaise"); });
+      const retour = q.querySelector(".quiz-retour");
+      retour.className = "quiz-retour";
+      retour.textContent = "";
+    });
+    majProgression();
+  });
+
+  // Bouton « Copier » sur chaque bloc de code.
+  document.querySelectorAll("pre").forEach(function (pre) {
+    const bouton = document.createElement("button");
+    bouton.type = "button";
+    bouton.className = "copier";
+    bouton.textContent = "Copier";
+    bouton.setAttribute("aria-label", "Copier ce bloc de code");
+    bouton.addEventListener("click", function () {
+      const texte = pre.querySelector("code") ? pre.querySelector("code").textContent : pre.textContent;
+      function fini(message) {
+        bouton.textContent = message;
+        setTimeout(function () { bouton.textContent = "Copier"; }, 1500);
+      }
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(texte).then(function () { fini("Copié"); }, function () { fini("Échec"); });
+      } else {
+        const zone = document.createElement("textarea");
+        zone.value = texte;
+        zone.setAttribute("readonly", "");
+        zone.style.position = "fixed";
+        zone.style.opacity = "0";
+        document.body.appendChild(zone);
+        zone.select();
+        let ok;
+        try { ok = document.execCommand("copy"); } catch { ok = false; }
+        document.body.removeChild(zone);
+        fini(ok ? "Copié" : "Échec");
+      }
+    });
+    pre.appendChild(bouton);
+  });
+
+  // Recherche dans le glossaire, insensible à la casse et aux accents.
+  function normaliser(s) {
+    return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  }
+  const recherche = document.getElementById("recherche-glossaire");
+  const tables = Array.from(document.querySelectorAll("table.glossaire"));
+  if (recherche && tables.length) {
+    const lignes = tables.flatMap((t) => Array.from(t.querySelectorAll("tbody tr")));
+    const resultat = document.querySelector(".recherche-resultat");
+    recherche.addEventListener("input", function () {
+      const terme = normaliser(recherche.value.trim());
+      let visibles = 0;
+      lignes.forEach(function (l) {
+        const garde = !terme || normaliser(l.textContent).indexOf(terme) !== -1;
+        l.hidden = !garde;
+        if (garde) visibles++;
+      });
+      // Une table sans ligne retenue disparaît, en-tête compris.
+      tables.forEach(function (t) {
+        t.hidden = !Array.from(t.querySelectorAll("tbody tr")).some((l) => !l.hidden);
+      });
+      resultat.textContent = terme ? visibles + " terme(s) sur " + lignes.length : "";
+    });
+  }
+
+  // Sommaire replié par défaut sur petit écran.
+  const sommaire = document.getElementById("sommaire-details");
+  if (sommaire && window.matchMedia("(max-width: 60rem)").matches) sommaire.open = false;
+
+  // À l'impression, tout est déplié.
+  window.addEventListener("beforeprint", function () {
+    document.querySelectorAll("main details").forEach(function (d) { d.open = true; });
+  });
+
+  charger();
+  cases.forEach(function (c) {
+    c.checked = etat.suivi[c.getAttribute("data-suivi")] === true;
+    majCase(c);
+  });
+  quizs.forEach(function (q) {
+    const memo = etat.quiz[q.getAttribute("data-quiz")];
+    if (memo && typeof memo.choix === "string") afficherReponse(q, memo.choix, memo.premier);
+  });
+  majProgression();
+})();
+</script>
+</body>
+</html>

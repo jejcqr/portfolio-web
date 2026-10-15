@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="$lang$">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="pandoc + docs/guide-src">
+<title>$guide-titre$ — guide interactif</title>
+$if(highlighting-css)$
+<style>
+$highlighting-css$
+</style>
+$endif$
+$for(header-includes)$
+$header-includes$
+$endfor$
+</head>
+<body data-guide="$guide-titre$">
+<a class="evitement" href="#contenu">Aller au contenu</a>
+<header class="entete">
+  <p class="surtitre">Guide interactif</p>
+  <h1>$guide-titre$</h1>
+$if(subtitle)$
+  <p class="soustitre">$subtitle$</p>
+$endif$
+  <p class="auteur">$for(author)$$author$$sep$, $endfor$ · <a href="../EXPLICATIONS.pdf">version PDF</a> · <a href="../EXPLICATIONS.md">source Markdown</a></p>
+  <div class="progression">
+    <p id="progression-texte" aria-live="polite">Progression : 0 / 0</p>
+    <progress id="progression-barre" max="1" value="0" aria-labelledby="progression-texte"></progress>
+    <p id="quiz-score" aria-live="polite"></p>
+    <button type="button" id="reinitialiser">Effacer ma progression</button>
+  </div>
+  <p class="aide">Cochez les étapes faites et la check-list : la progression reste enregistrée dans ce navigateur.</p>
+</header>
+<div class="mise-en-page">
+<nav class="sommaire" aria-label="Sommaire">
+<details open id="sommaire-details"><summary>Sommaire</summary>
+$table-of-contents$
+</details>
+</nav>
+<main id="contenu">
+$body$
+</main>
+</div>
+$for(include-after)$
+$include-after$
+$endfor$
+</body>
+</html>

@@ -59,7 +59,11 @@ que celui que démarrent les tests Playwright.
 
 ## Documentation
 
-[`docs/EXPLICATIONS.md`](docs/EXPLICATIONS.md) ([PDF](docs/EXPLICATIONS.pdf)) explique l'architecture, comment refaire le projet étape par étape et les mauvaises pratiques à éviter. Le PDF est régénéré automatiquement par la CI à chaque modification du Markdown.
+[`docs/EXPLICATIONS.md`](docs/EXPLICATIONS.md) ([PDF](docs/EXPLICATIONS.pdf)) explique l'architecture, comment refaire le projet étape par étape et les mauvaises pratiques à éviter.
+
+La même fiche existe en **guide interactif** : [`docs/guide/index.html`](docs/guide/index.html), un fichier autonome à ouvrir dans un navigateur, même hors ligne (GitHub n'en affiche que le code source : cloner ou télécharger le dépôt). On y coche les étapes faites et la check-list, la progression restant enregistrée dans le navigateur ; le code des solutions est replié pour essayer d'abord soi-même ; chaque mauvaise pratique commence par un quiz ; le glossaire a une recherche.
+
+Le Markdown est la seule source : la CI régénère le PDF (`docs/generer-pdf.sh`) et le guide (`docs/generer-guide.sh`, pandoc seul) à chaque modification.
 
 ## Tests
 

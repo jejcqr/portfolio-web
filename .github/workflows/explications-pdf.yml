@@ -1,7 +1,7 @@
-name: PDF des explications
+name: PDF et guide des explications
 
-# Régénère docs/EXPLICATIONS.pdf dès que le Markdown (ou sa mise en page) change,
-# puis le commite sur la branche.
+# Régénère docs/EXPLICATIONS.pdf et le guide interactif docs/guide/index.html dès que
+# le Markdown (ou leur mise en page) change, puis les commite sur la branche.
 on:
   push:
     branches: [main]
@@ -9,9 +9,11 @@ on:
       - docs/EXPLICATIONS.md
       - docs/pdf.css
       - docs/generer-pdf.sh
+      - docs/generer-guide.sh
+      - docs/guide-src/**
   workflow_dispatch:
 
-# Minimum par défaut ; seul le job pdf, qui commite le PDF, peut écrire.
+# Minimum par défaut ; seul le job pdf, qui commite les fichiers générés, peut écrire.
 permissions:
   contents: read
 
@@ -32,14 +34,17 @@ jobs:
       - name: Générer le PDF
         run: bash docs/generer-pdf.sh
 
-      - name: Commiter le PDF s'il a changé
+      - name: Générer le guide interactif
+        run: bash docs/generer-guide.sh
+
+      - name: Commiter les fichiers générés s'ils ont changé
         run: |
-          if git diff --quiet -- docs/EXPLICATIONS.pdf && git ls-files --error-unmatch docs/EXPLICATIONS.pdf >/dev/null 2>&1; then
-            echo "PDF inchangé"
+          git add docs/EXPLICATIONS.pdf docs/guide/index.html
+          if git diff --cached --quiet; then
+            echo "PDF et guide inchangés"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
-          git add docs/EXPLICATIONS.pdf
-          git commit -m "Régénère le PDF des explications"
+          git commit -m "Régénère le PDF et le guide de la fiche explicative"
           git push

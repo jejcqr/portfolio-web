@@ -22,6 +22,12 @@ module.exports = [
     languageOptions: { globals: { module: "readonly" } },
   },
   {
+    // Script du guide interactif (docs/guide-src), intégré à docs/guide/index.html.
+    files: ["docs/guide-src/**/*.js"],
+    languageOptions: { sourceType: "script", globals: { ...globals.browser } },
+    rules: { eqeqeq: "error", "no-var": "error", "prefer-const": "error" },
+  },
+  {
     // Tests et configuration : Node.js, CommonJS.
     files: ["tests/**/*.js", "*.config.js"],
     languageOptions: { sourceType: "commonjs", globals: { ...globals.node } },
